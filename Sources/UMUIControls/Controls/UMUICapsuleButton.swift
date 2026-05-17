@@ -37,10 +37,14 @@ public enum UMUICapsuleButtonSize: Sendable, Equatable {
 /// Features dynamic contrast calculation to ensure text is always readable (white or black)
 /// depending on the background style.
 ///
+/// > [!IMPORTANT]
+/// > **Memory Safety:** If the `action` closure captures reference types (like view controllers
+/// > or view models), ensure you capture them weakly (e.g. `[weak self]`) to prevent strong reference cycles and memory leaks.
+///
 /// Usage:
 /// ```swift
-/// UMUICapsuleButton("Save Changes", style: .accent) {
-///     // action
+/// UMUICapsuleButton("Save Changes", style: .accent) { [weak self] in
+///     self?.saveChanges()
 /// }
 /// ```
 public struct UMUICapsuleButton<Label: View>: View {

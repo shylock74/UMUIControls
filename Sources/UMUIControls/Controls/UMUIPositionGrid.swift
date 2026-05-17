@@ -89,11 +89,14 @@ public struct UMUIPositionButton: View {
 
 /// A 3×3 grid of position buttons for anchor selection.
 ///
+/// > [!IMPORTANT]
+/// > **Memory Safety:** If the `action` closure captures reference types (like view controllers
+/// > or view models), ensure you capture them weakly (e.g. `[weak self]`) to prevent strong reference cycles and memory leaks.
+///
 /// Usage:
 /// ```swift
-/// UMUIPositionGrid(selection: $position) {
-///     // optional action when position changes
-///     offset = .zero
+/// UMUIPositionGrid(selection: $position) { [weak self] in
+///     self?.offset = .zero
 /// }
 /// ```
 public struct UMUIPositionGrid: View {

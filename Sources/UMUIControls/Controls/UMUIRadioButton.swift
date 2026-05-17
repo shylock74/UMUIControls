@@ -12,10 +12,14 @@ import SwiftUI
 ///
 /// Uses `Color.accentColor` for the selected state.
 ///
+/// > [!IMPORTANT]
+/// > **Memory Safety:** If the `action` closure captures reference types (like view controllers
+/// > or view models), ensure you capture them weakly (e.g. `[weak self]`) to prevent strong reference cycles and memory leaks.
+///
 /// Usage:
 /// ```swift
-/// UMUIRadioButton(selected: currentSelection == .option1) {
-///     currentSelection = .option1
+/// UMUIRadioButton(selected: currentSelection == .option1) { [weak self] in
+///     self?.currentSelection = .option1
 /// }
 /// ```
 public struct UMUIRadioButton: View {
@@ -28,7 +32,7 @@ public struct UMUIRadioButton: View {
     /// Creates a new radio button.
     /// - Parameters:
     ///   - selected: Whether this button appears selected.
-    ///   - action: Closure invoked on tap.
+    ///   - action: Closure invoked on tap. Capture reference types weakly to prevent leaks.
     public init(selected: Bool, action: @escaping () -> Void) {
         self.selected = selected
         self.action = action

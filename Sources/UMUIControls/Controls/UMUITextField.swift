@@ -52,8 +52,8 @@ public struct UMUITextField: View {
     /// The visibility state for secure fields.
     @State private var isPasswordVisible: Bool = false
     
-    /// Debouncing background task.
-    @State private var debounceTask: Task<Void, Never>? = nil
+    /// Thread-safe Dispatch debouncer to prevent @MainActor clogging.
+    @State private var debouncer = TextFieldDebouncer()
     
     /// SwiftUI focus tracker.
     @FocusState private var isFocused: Bool
@@ -188,25 +188,50 @@ public struct UMUITextField: View {
         }
     }
     
-    // MARK: - Sychronization & Debounce Logic
+    // MARK: - Synchronization & Debounce Logic
     
     private func startDebounce() {
-        debounceTask?.cancel()
-        debounceTask = Task {
-            try? await Task.sleep(for: .milliseconds(300))
-            guard !Task.isCancelled else { return }
-            if value != localText {
-                value = localText
+        let currentText = localText
+        debouncer.debounce(delay: 0.3) {
+            // Verify changes in the background thread!
+            if self.value != currentText {
+                // Return to the Main Queue ONLY for the binding state write
+                DispatchQueue.main.async {
+                    self.value = currentText
+                }
             }
         }
     }
     
     private func commitChanges() {
-        debounceTask?.cancel()
-        debounceTask = nil
+        debouncer.cancel()
         if value != localText {
             value = localText
         }
+    }
+}
+
+// MARK: - Debouncer Engine
+
+/// A thread-safe, background-managed debouncer that isolates delay-timers and state checks from the Main Actor.
+private final class TextFieldDebouncer {
+    private var workItem: DispatchWorkItem?
+    
+    func debounce(delay: Double, action: @escaping () -> Void) {
+        workItem?.cancel()
+        let newWorkItem = DispatchWorkItem(block: action)
+        workItem = newWorkItem
+        
+        // Execute the delay timer and logic verification in a background interactive queue
+        DispatchQueue.global(qos: .userInteractive).asyncAfter(
+            deadline: .now() + delay,
+            execute: newWorkItem
+        )
+    }
+    
+    func cancel() {
+        workItem?.cancel()
+        workItem = nil
     }
 }
 
