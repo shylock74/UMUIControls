@@ -8,6 +8,12 @@
 
 import SwiftUI
 
+/// Sizing modes for UMUIPositionGrid.
+public enum UMUIPositionGridSize: Sendable, Equatable {
+    case normal
+    case small
+}
+
 /// Represents one of nine anchor positions in a 3×3 grid.
 public enum UMUIPosition: String, CaseIterable, Identifiable, Codable, Sendable {
     case topLeft, top, topRight
@@ -57,6 +63,9 @@ public struct UMUIPositionButton: View {
     /// Binding to the currently selected position.
     @Binding public var current: UMUIPosition
     
+    /// Sizing mode of the button.
+    public let size: UMUIPositionGridSize
+    
     /// Optional callback invoked after the position changes.
     public var action: (() -> Void)?
     
@@ -64,11 +73,26 @@ public struct UMUIPositionButton: View {
     /// - Parameters:
     ///   - position: The position this button represents.
     ///   - current: Binding to the current selection.
+    ///   - size: Sizing mode of the button (default is `.normal`).
     ///   - action: Optional closure called after selection.
-    public init(position: UMUIPosition, current: Binding<UMUIPosition>, action: (() -> Void)? = nil) {
+    public init(
+        position: UMUIPosition,
+        current: Binding<UMUIPosition>,
+        size: UMUIPositionGridSize = .small,
+        action: (() -> Void)? = nil
+    ) {
         self.position = position
         self._current = current
+        self.size = size
         self.action = action
+    }
+    
+    private var buttonDimension: CGFloat {
+        return size == .normal ? 26 : 20
+    }
+    
+    private var fontSize: CGFloat {
+        return size == .normal ? 12 : 10
     }
     
     public var body: some View {
@@ -77,13 +101,13 @@ public struct UMUIPositionButton: View {
             action?()
         } label: {
             Label(position.label, systemImage: position.iconName)
-                .font(.system(size: 10, weight: .bold))
-                .frame(width: 20, height: 20)
+                .font(.system(size: fontSize, weight: .bold))
+                .frame(width: buttonDimension, height: buttonDimension)
         }
         .buttonStyle(.bordered)
         .labelStyle(.iconOnly)
         .tint(current == position ? .accentColor : .secondary)
-        .controlSize(.mini)
+        .controlSize(size == .normal ? .small : .mini)
     }
 }
 
@@ -95,7 +119,7 @@ public struct UMUIPositionButton: View {
 ///
 /// Usage:
 /// ```swift
-/// UMUIPositionGrid(selection: $position) { [weak self] in
+/// UMUIPositionGrid(selection: $position, size: .normal) { [weak self] in
 ///     self?.offset = .zero
 /// }
 /// ```
@@ -103,34 +127,43 @@ public struct UMUIPositionGrid: View {
     /// Binding to the currently selected position.
     @Binding public var selection: UMUIPosition
     
+    /// The sizing mode of the grid.
+    public let size: UMUIPositionGridSize
+    
     /// Optional callback invoked after any position button is tapped.
     public var action: (() -> Void)?
     
     /// Creates a position grid.
     /// - Parameters:
     ///   - selection: Binding to the selected position.
+    ///   - size: Sizing mode (default is `.normal`).
     ///   - action: Optional closure called on selection change.
-    public init(selection: Binding<UMUIPosition>, action: (() -> Void)? = nil) {
+    public init(
+        selection: Binding<UMUIPosition>,
+        size: UMUIPositionGridSize = .small,
+        action: (() -> Void)? = nil
+    ) {
         self._selection = selection
+        self.size = size
         self.action = action
     }
     
     public var body: some View {
         Grid(horizontalSpacing: 2, verticalSpacing: 2) {
             GridRow {
-                UMUIPositionButton(position: .topLeft, current: $selection, action: action)
-                UMUIPositionButton(position: .top, current: $selection, action: action)
-                UMUIPositionButton(position: .topRight, current: $selection, action: action)
+                UMUIPositionButton(position: .topLeft, current: $selection, size: size, action: action)
+                UMUIPositionButton(position: .top, current: $selection, size: size, action: action)
+                UMUIPositionButton(position: .topRight, current: $selection, size: size, action: action)
             }
             GridRow {
-                UMUIPositionButton(position: .left, current: $selection, action: action)
-                UMUIPositionButton(position: .center, current: $selection, action: action)
-                UMUIPositionButton(position: .right, current: $selection, action: action)
+                UMUIPositionButton(position: .left, current: $selection, size: size, action: action)
+                UMUIPositionButton(position: .center, current: $selection, size: size, action: action)
+                UMUIPositionButton(position: .right, current: $selection, size: size, action: action)
             }
             GridRow {
-                UMUIPositionButton(position: .bottomLeft, current: $selection, action: action)
-                UMUIPositionButton(position: .bottom, current: $selection, action: action)
-                UMUIPositionButton(position: .bottomRight, current: $selection, action: action)
+                UMUIPositionButton(position: .bottomLeft, current: $selection, size: size, action: action)
+                UMUIPositionButton(position: .bottom, current: $selection, size: size, action: action)
+                UMUIPositionButton(position: .bottomRight, current: $selection, size: size, action: action)
             }
         }
     }

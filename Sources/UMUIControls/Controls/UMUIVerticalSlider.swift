@@ -9,6 +9,12 @@
 
 import SwiftUI
 
+/// Sizing modes for UMUIVerticalSlider.
+public enum UMUIVerticalSliderSize: Sendable, Equatable {
+    case normal
+    case small
+}
+
 /// A professional-grade vertical slider/fader control suitable for mixers, parametric panels, and equalizers.
 ///
 /// Features professional horizontal pill-fader styling, a graduation grid of tick-marks,
@@ -16,7 +22,7 @@ import SwiftUI
 ///
 /// Usage:
 /// ```swift
-/// UMUIVerticalSlider(label: "Fader 1", value: $volume, range: -60...12, height: 150)
+/// UMUIVerticalSlider(label: "Fader 1", value: $volume, range: -60...12, size: .normal)
 /// ```
 public struct UMUIVerticalSlider: View {
     /// The optional label displayed alongside or above the fader.
@@ -28,8 +34,11 @@ public struct UMUIVerticalSlider: View {
     /// The active range bounds for the value.
     public let range: ClosedRange<Double>
     
-    /// The vertical height of the fader (default is 120).
-    public let height: CGFloat
+    /// The vertical height of the fader (optional override).
+    public let height: CGFloat?
+    
+    /// The sizing mode of the fader control.
+    public let size: UMUIVerticalSliderSize
     
     /// Whether to invert the scale (default is `false`, meaning minimum is at the bottom).
     public let inverted: Bool
@@ -47,14 +56,16 @@ public struct UMUIVerticalSlider: View {
     ///   - label: Optional leading label text.
     ///   - value: Binding to the double value.
     ///   - range: Active bounds (default is `0...1`).
-    ///   - height: The vertical height of the slider (default is `120`).
+    ///   - height: The vertical height override of the fader (default is `nil` to automatically match size).
+    ///   - size: Sizing mode (default is `.normal`).
     ///   - inverted: If `true`, the value increases downwards (default is `false`).
     ///   - labelWidth: Horizontal width reserved for label (default is `80`).
     public init(
         label: String? = nil,
         value: Binding<Double>,
         range: ClosedRange<Double> = 0...1,
-        height: CGFloat = 120,
+        height: CGFloat? = nil,
+        size: UMUIVerticalSliderSize = .small,
         inverted: Bool = false,
         labelWidth: CGFloat = 80
     ) {
@@ -62,8 +73,26 @@ public struct UMUIVerticalSlider: View {
         self._value = value
         self.range = range
         self.height = height
+        self.size = size
         self.inverted = inverted
         self.labelWidth = labelWidth
+    }
+    
+    private var resolvedHeight: CGFloat {
+        if let height = height { return height }
+        return size == .normal ? 150 : 110
+    }
+    
+    private var trackWidth: CGFloat {
+        return size == .normal ? 12 : 8
+    }
+    
+    private var thumbWidth: CGFloat {
+        return size == .normal ? 24 : 18
+    }
+    
+    private var thumbHeight: CGFloat {
+        return size == .normal ? 10 : 6
     }
     
     private var fraction: Double {
@@ -71,7 +100,6 @@ public struct UMUIVerticalSlider: View {
         guard span > 0 else { return 0.0 }
         let rawFraction = (value - range.lowerBound) / span
         let clamped = min(max(rawFraction, 0.0), 1.0)
-        // If inverted, 1.0 fraction is at the bottom, otherwise 1.0 is at the top
         return clamped
     }
     
@@ -81,7 +109,7 @@ public struct UMUIVerticalSlider: View {
             if let label = label {
                 HStack(spacing: 0) {
                     Text(label)
-                        .font(.caption)
+                        .font(size == .normal ? .body : .caption)
                         .lineLimit(1)
                         .foregroundStyle(.primary)
                     Spacer(minLength: 0)
@@ -91,12 +119,14 @@ public struct UMUIVerticalSlider: View {
             
             // Fader Deck Assembly
             HStack(spacing: 6) {
+                let currentHeight = resolvedHeight
+                let currentTrackWidth = trackWidth
+                let currentThumbWidth = thumbWidth
+                let currentThumbHeight = thumbHeight
+                
                 // Vertical Fader Path Track
                 GeometryReader { geometry in
                     let h = geometry.size.height
-                    // The fader thumb offset relative to the top edge (y = 0 is top)
-                    // If NOT inverted, fraction = 1.0 (max) is at the top (offset = 0)
-                    // If inverted, fraction = 1.0 (max) is at the bottom (offset = h)
                     let thumbY: CGFloat = {
                         if inverted {
                             return CGFloat(fraction) * h
@@ -107,11 +137,11 @@ public struct UMUIVerticalSlider: View {
                     
                     ZStack(alignment: .top) {
                         // Glassy track groove
-                        RoundedRectangle(cornerRadius: 4)
+                        RoundedRectangle(cornerRadius: currentTrackWidth / 2)
                             .fill(Color.secondary.opacity(0.12))
-                            .frame(width: 8, height: h)
+                            .frame(width: currentTrackWidth, height: h)
                             .overlay(
-                                RoundedRectangle(cornerRadius: 4)
+                                RoundedRectangle(cornerRadius: currentTrackWidth / 2)
                                     .stroke(Color.secondary.opacity(0.15), lineWidth: 0.5)
                             )
                         
@@ -119,14 +149,14 @@ public struct UMUIVerticalSlider: View {
                         Group {
                             if inverted {
                                 // Sweeps from top (y=0) to thumb
-                                RoundedRectangle(cornerRadius: 4)
+                                RoundedRectangle(cornerRadius: currentTrackWidth / 2)
                                     .fill(Color.accentColor)
-                                    .frame(width: 8, height: max(0, thumbY))
+                                    .frame(width: currentTrackWidth, height: max(0, thumbY))
                             } else {
                                 // Sweeps from bottom (y=h) to thumb
-                                RoundedRectangle(cornerRadius: 4)
+                                RoundedRectangle(cornerRadius: currentTrackWidth / 2)
                                     .fill(Color.accentColor)
-                                    .frame(width: 8, height: max(0, h - thumbY))
+                                    .frame(width: currentTrackWidth, height: max(0, h - thumbY))
                                     .offset(y: thumbY)
                             }
                         }
@@ -134,20 +164,19 @@ public struct UMUIVerticalSlider: View {
                         // Mixing Desk Horizontal Thumb Fader Handle
                         RoundedRectangle(cornerRadius: 2)
                             .fill(Color.white)
-                            .frame(width: 20, height: 8)
+                            .frame(width: currentThumbWidth, height: currentThumbHeight)
                             .shadow(color: .black.opacity(isDragging ? 0.3 : 0.2), radius: isDragging ? 2.5 : 1.5, y: 1)
                             .overlay(
-                                // Inner grab detail line
-                                RoundedRectangle(cornerRadius: 1)
+                                RoundedRectangle(cornerRadius: 2)
                                     .stroke(isHovered || isDragging ? Color.accentColor : Color.secondary.opacity(0.4), lineWidth: 0.5)
                             )
                             // A middle black mark on the fader
                             .overlay(
                                 Rectangle()
                                     .fill(isDragging ? Color.accentColor : Color.secondary.opacity(0.8))
-                                    .frame(width: 8, height: 1.5)
+                                    .frame(width: currentThumbWidth - 12, height: 1.5)
                             )
-                            .offset(x: -6, y: max(0, min(thumbY - 4, h - 8)))
+                            .offset(x: -(currentThumbWidth - currentTrackWidth) / 2, y: max(0, min(thumbY - currentThumbHeight / 2, h - currentThumbHeight)))
                             .scaleEffect(isHovered || isDragging ? 1.08 : 1.0)
                     }
                     .contentShape(Rectangle())
@@ -163,8 +192,6 @@ public struct UMUIVerticalSlider: View {
                                 isDragging = true
                                 let locationY = gesture.location.y
                                 let rawPercent = Double(locationY / h)
-                                // If inverted, 0 is at top (percent increases downward).
-                                // If NOT inverted, 0 is at bottom (percent increases upward).
                                 let percent = min(max(inverted ? rawPercent : 1.0 - rawPercent, 0.0), 1.0)
                                 let rangeSpan = range.upperBound - range.lowerBound
                                 let newValue = range.lowerBound + percent * rangeSpan
@@ -178,7 +205,7 @@ public struct UMUIVerticalSlider: View {
                             }
                     )
                 }
-                .frame(width: 22, height: height)
+                .frame(width: currentThumbWidth + 2, height: currentHeight)
                 
                 // Graduation Tick-marks (0%, 25%, 50%, 75%, 100%)
                 VStack(alignment: .leading, spacing: 0) {
@@ -188,7 +215,7 @@ public struct UMUIVerticalSlider: View {
                             // Small white graduation line
                             Rectangle()
                                 .fill(Color.secondary.opacity(0.4))
-                                .frame(width: 5, height: 1)
+                                .frame(width: size == .normal ? 6 : 4, height: 1)
                             
                             // Proportional label
                             if step == 1.0 || step == 0.5 || step == 0.0 {
@@ -198,18 +225,17 @@ public struct UMUIVerticalSlider: View {
                                     return range.lowerBound + actualStep * span
                                 }()
                                 Text(String(format: "%.0f", labelValue))
-                                    .font(.system(size: 8, weight: .regular, design: .monospaced))
+                                    .font(.system(size: size == .normal ? 8 : 7, weight: .regular, design: .monospaced))
                                     .foregroundStyle(.secondary)
                             }
                         }
                         .frame(height: 1)
-                        // Proportional vertical spacing
                         if step > 0.0 {
                             Spacer(minLength: 0)
                         }
                     }
                 }
-                .frame(height: height)
+                .frame(height: currentHeight)
             }
         }
     }
@@ -237,7 +263,7 @@ struct UMUIVerticalSlider_Previews: PreviewProvider {
                         label: "Gain (dB)",
                         value: $gain,
                         range: -48...12,
-                        height: 150,
+                        size: .normal,
                         labelWidth: 55
                     )
                     
@@ -245,7 +271,7 @@ struct UMUIVerticalSlider_Previews: PreviewProvider {
                         label: "Pitch",
                         value: $pitch,
                         range: 0...100,
-                        height: 150,
+                        size: .small,
                         inverted: true,
                         labelWidth: 40
                     )

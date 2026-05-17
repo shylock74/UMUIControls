@@ -70,7 +70,7 @@ public struct UMUITextField: View {
         label: String? = nil,
         placeholder: String = "",
         value: Binding<String>,
-        size: UMUITextFieldSize = .normal,
+        size: UMUITextFieldSize = .small,
         isSecure: Bool = false,
         labelWidth: CGFloat = 80
     ) {

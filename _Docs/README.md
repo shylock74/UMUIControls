@@ -2,7 +2,7 @@
 
 `UMUIControls` is a premium, lightweight, self-contained SwiftUI control library specifically tailored for macOS 14+. It provides a comprehensive set of highly customizable, consistent, and accent-color-aware UI components designed for settings forms, inspector panels, and utility views.
 
-This document serves as the complete, exhaustive, and synthetic API reference for all package controls.
+All controls support consistent sizing modes (`.normal` and `.small`), and **now default to `.small`** to suit standard dense Mac preference pages and sidebars.
 
 ---
 
@@ -13,9 +13,9 @@ This document serves as the complete, exhaustive, and synthetic API reference fo
    - [UMUITextField](#2-umuitextfield)
    - [UMUIKnobControl](#3-umuiknobcontrol)
    - [UMUIColorPalettePicker](#4-umuicolorpalettepicker)
-   - [UMUISlider](#5-umuislider-new)
-   - [UMUIVerticalSlider](#6-umuiverticalslider-new)
-   - [UMUISegmentedBar & UMUIMultiSegmentedBar](#7-umisegmentedbar--umuimultisegmentedbar-new)
+   - [UMUISlider](#5-umuislider)
+   - [UMUIVerticalSlider](#6-umuiverticalslider)
+   - [UMUISegmentedBar & UMUIMultiSegmentedBar](#7-umuisegmentedbar--umuimultisegmentedbar)
    - [UMUINumberControl](#8-umuinumbercontrol)
    - [UMUIAngleControl](#9-umuianglecontrol)
    - [UMUIPositionGrid](#10-umuipositiongrid)
@@ -34,6 +34,7 @@ This document serves as the complete, exhaustive, and synthetic API reference fo
 - **macOS Oriented:** Designed strictly for macOS 14.0+ (`.macOS(.v14)`).
 - **Accent-Color Aware:** Controls dynamically adapt to system or parent-level `.tint(_:)` / `.accentColor(_:)` styling without hardcoded values.
 - **Dynamic Color Contrast:** High-contrast text color selector calculated via W3C relative luminance.
+- **Unified Sizing Sweep:** All controls support `.normal` and `.small` sizing modes, defaulting to `.small` for premium visual density.
 - **Zero Third-Party Dependencies:** 100% native SwiftUI and Swift Concurrency.
 
 ---
@@ -48,7 +49,7 @@ A capsule-shaped button styled with responsive tactile micro-interactions and dy
 // 1. Generic Content ViewBuilder
 public init(
     style: UMUICapsuleButtonStyle = .gray,
-    size: UMUICapsuleButtonSize = .normal,
+    size: UMUICapsuleButtonSize = .small,
     action: @escaping () -> Void,
     @ViewBuilder label: () -> Label
 )
@@ -57,7 +58,7 @@ public init(
 public init(
     _ title: String,
     style: UMUICapsuleButtonStyle = .gray,
-    size: UMUICapsuleButtonSize = .normal,
+    size: UMUICapsuleButtonSize = .small,
     action: @escaping () -> Void
 ) where Label == Text
 
@@ -66,7 +67,7 @@ public init(
     _ title: String,
     systemImage: String,
     style: UMUICapsuleButtonStyle = .gray,
-    size: UMUICapsuleButtonSize = .normal,
+    size: UMUICapsuleButtonSize = .small,
     action: @escaping () -> Void
 ) where Label == SwiftUI.Label<Text, Image>
 ```
@@ -75,7 +76,7 @@ public init(
 | Parameter | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
 | `style` | `UMUICapsuleButtonStyle` | `.gray` | The color theme: `.gray`, `.accent`, or `.custom(Color)`. |
-| `size` | `UMUICapsuleButtonSize` | `.normal` | The sizing configuration: `.large`, `.normal`, or `.small`. |
+| `size` | `UMUICapsuleButtonSize` | `.small` | The sizing configuration: `.large`, `.normal`, or `.small`. |
 | `action` | `() -> Void` | *Required* | Closure invoked when the button is clicked. |
 | `label` | `View` | *Required* | SwiftUI content layout wrapped inside the capsule. |
 
@@ -112,7 +113,7 @@ public init(
     label: String? = nil,
     placeholder: String = "",
     value: Binding<String>,
-    size: UMUITextFieldSize = .normal,
+    size: UMUITextFieldSize = .small,
     isSecure: Bool = false,
     labelWidth: CGFloat = 80
 )
@@ -124,7 +125,7 @@ public init(
 | `label` | `String?` | `nil` | Optional label displayed horizontally on the left of the input. |
 | `placeholder` | `String` | `""` | Helper placeholder string. |
 | `value` | `Binding<String>` | *Required* | Parent binding updated via debounce/commit. |
-| `size` | `UMUITextFieldSize` | `.normal` | Size configuration: `.normal` or `.small` (caption-sized). |
+| `size` | `UMUITextFieldSize` | `.small` | Size configuration: `.normal` or `.small` (caption-sized). |
 | `isSecure` | `Bool` | `false` | Enables password hide/reveal mode (bullets vs characters). |
 | `labelWidth` | `CGFloat` | `80` | Horizontal width allocated for the leading label. |
 
@@ -145,7 +146,8 @@ public init(
     value: Binding<Double>,
     range: ClosedRange<Double> = 0...1,
     defaultValue: Double? = nil,
-    size: CGFloat = 40,
+    size: UMUIKnobControlSize = .small,
+    customDiameter: CGFloat? = nil,
     labelWidth: CGFloat = 80
 )
 ```
@@ -157,7 +159,8 @@ public init(
 | `value` | `Binding<Double>` | *Required* | Bound double value adjusted by the knob. |
 | `range` | `ClosedRange<Double>`| `0...1` | Active clamped bounds for values. |
 | `defaultValue`| `Double?` | `nil` | Optional default value reset on double-click. |
-| `size` | `CGFloat` | `40` | Outer diameter of the knob circle. |
+| `size` | `UMUIKnobControlSize` | `.small` | Sizing configuration: `.normal` (40pt diameter) or `.small` (26pt diameter). |
+| `customDiameter`| `CGFloat?` | `nil` | Optional custom diameter override in points. |
 | `labelWidth` | `CGFloat` | `80` | Horizontal width reserved for label. |
 
 #### Premium Features
@@ -176,6 +179,7 @@ public init(
     label: String? = nil,
     selection: Binding<Color>,
     palette: [Color] = defaultPalette,
+    size: UMUIColorPalettePickerSize = .small,
     labelWidth: CGFloat = 80
 )
 ```
@@ -186,6 +190,7 @@ public init(
 | `label` | `String?` | `nil` | Optional leading label. |
 | `selection` | `Binding<Color>` | *Required* | Bound selected Color. |
 | `palette` | `[Color]` | `defaultPalette`| Preset swatches (HSL-harmonized list). |
+| `size` | `UMUIColorPalettePickerSize`| `.small` | Sizing configuration: `.normal` or `.small`. |
 | `labelWidth` | `CGFloat` | `80` | Horizontal space reserved for label. |
 
 #### Thread Safety & Custom Colors
@@ -194,7 +199,7 @@ public init(
 
 ---
 
-### 5. `UMUISlider` [NEW]
+### 5. `UMUISlider`
 A custom premium horizontal slider matching Apple's macOS Control Center styling. Features a glassmorphic bar, dynamic accent fill, and a zoom thumb handle that displays only on interaction.
 
 #### Signature & Initializer
@@ -203,6 +208,7 @@ public init(
     label: String? = nil,
     value: Binding<Double>,
     range: ClosedRange<Double> = 0...1,
+    size: UMUISliderSize = .small,
     labelWidth: CGFloat = 80
 )
 ```
@@ -213,6 +219,7 @@ public init(
 | `label` | `String?` | `nil` | Optional leading label. |
 | `value` | `Binding<Double>` | *Required* | Bound numeric value. |
 | `range` | `ClosedRange<Double>`| `0...1` | Dynamic limits for the fader. |
+| `size` | `UMUISliderSize` | `.small` | Sizing configuration: `.normal` (12pt track, 16pt thumb) or `.small` (8pt track, 12pt thumb). |
 | `labelWidth` | `CGFloat` | `80` | Horizontal space reserved for label. |
 
 #### Micro-Interactions
@@ -221,7 +228,7 @@ public init(
 
 ---
 
-### 6. `UMUIVerticalSlider` [NEW]
+### 6. `UMUIVerticalSlider`
 A high-fidelity vertical fader control with side tick-marks, a mixing desk horizontal pill fader knob, and coordinate reversing modes.
 
 #### Signature & Initializer
@@ -230,7 +237,8 @@ public init(
     label: String? = nil,
     value: Binding<Double>,
     range: ClosedRange<Double> = 0...1,
-    height: CGFloat = 120,
+    height: CGFloat? = nil,
+    size: UMUIVerticalSliderSize = .small,
     inverted: Bool = false,
     labelWidth: CGFloat = 80
 )
@@ -242,7 +250,8 @@ public init(
 | `label` | `String?` | `nil` | Optional leading label text. |
 | `value` | `Binding<Double>` | *Required* | Bound double value. |
 | `range` | `ClosedRange<Double>`| `0...1` | Clamped range bounds. |
-| `height` | `CGFloat` | `120` | Dynamic vertical height. |
+| `height` | `CGFloat?` | `nil` | Dynamic vertical height. Defaults to 150px in `.normal` and 110px in `.small`. |
+| `size` | `UMUIVerticalSliderSize`| `.small` | Sizing configuration: `.normal` or `.small`. |
 | `inverted` | `Bool` | `false` | If true, max value is at the bottom (increases downward). |
 | `labelWidth` | `CGFloat` | `80` | Label frame width. |
 
@@ -252,7 +261,7 @@ public init(
 
 ---
 
-### 7. `UMUISegmentedBar` & `UMUIMultiSegmentedBar` [NEW]
+### 7. `UMUISegmentedBar` & `UMUIMultiSegmentedBar`
 Visual segmented selection bars. Supports single-selection with a magnetic sliding pill backdrop, and multi-selection with individual glowing status slots.
 
 #### Signatures
@@ -262,6 +271,7 @@ public init(
     label: String? = nil,
     options: [String],
     selection: Binding<String>,
+    size: UMUISegmentedBarSize = .small,
     labelWidth: CGFloat = 80
 )
 
@@ -270,6 +280,7 @@ public init(
     label: String? = nil,
     options: [String],
     selection: Binding<Set<String>>,
+    size: UMUISegmentedBarSize = .small,
     labelWidth: CGFloat = 80
 )
 ```
@@ -280,6 +291,7 @@ public init(
 | `label` | `String?` | `nil` | Optional leading label. |
 | `options` | `[String]` | *Required* | Set of text string items. |
 | `selection` | `Binding` | *Required* | Bound selection (a `String` or a `Set<String>`). |
+| `size` | `UMUISegmentedBarSize`| `.small` | Sizing configuration: `.normal` or `.small`. |
 | `labelWidth` | `CGFloat` | `80` | Horizontal width reserved for label. |
 
 #### Gliding Mechanisms
@@ -300,6 +312,7 @@ public init(
     isPercentage: Bool = false,
     unit: String? = nil,
     decimals: Int = 0,
+    size: UMUINumberControlSize = .small,
     labelWidth: CGFloat = 50,
     fieldWidth: CGFloat = 60
 )
@@ -314,6 +327,7 @@ public init(
 | `isPercentage`| `Bool` | `false` | If true, multiplies display value by 100 and sets unit to `%`. |
 | `unit` | `String?` | `nil` | Appended text unit (e.g. "px", "s"). |
 | `decimals` | `Int` | `0` | Fraction precision of text box. |
+| `size` | `UMUINumberControlSize`| `.small` | Sizing configuration: `.normal` or `.small`. |
 | `labelWidth` | `CGFloat` | `50` | Horizontal space reserved for label. |
 | `fieldWidth` | `CGFloat` | `60` | Horizontal space reserved for input. |
 
@@ -326,7 +340,8 @@ A rotary dial knob designed to edit angles visually.
 ```swift
 public init(
     angle: Binding<Double>,
-    size: CGFloat = 80
+    size: UMUIAngleControlSize = .small,
+    customDiameter: CGFloat? = nil
 )
 ```
 
@@ -334,7 +349,8 @@ public init(
 | Parameter | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
 | `angle` | `Binding<Double>` | *Required* | Angle value in degrees, clamped between `-180` and `180`. |
-| `size` | `CGFloat` | `80` | Knob diameter. |
+| `size` | `UMUIAngleControlSize` | `.small` | Sizing configuration: `.normal` (80pt diameter) or `.small` (50pt diameter). |
+| `customDiameter`| `CGFloat?` | `nil` | Optional custom diameter override in points. |
 
 #### Snapping Modifier
 - Pressing `Command (⌘)` while rotating snaps the value to local `15°` increments.
@@ -348,6 +364,7 @@ A 3×3 anchor selection panel mapping coordinates visually.
 ```swift
 public init(
     selection: Binding<UMUIPosition>,
+    size: UMUIPositionGridSize = .small,
     action: (() -> Void)? = nil
 )
 ```
@@ -356,6 +373,7 @@ public init(
 | Parameter | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
 | `selection` | `Binding<UMUIPosition>`| *Required* | Bound coordinate state. |
+| `size` | `UMUIPositionGridSize` | `.small` | Sizing configuration: `.normal` (26pt buttons) or `.small` (20pt buttons). |
 | `action` | `(() -> Void)?` | `nil` | Callback executed after selected coordinate changes. |
 
 > [!IMPORTANT]
@@ -373,6 +391,7 @@ A minimalist circular radio button using SF Symbols.
 ```swift
 public init(
     selected: Bool,
+    size: UMUIRadioButtonSize = .small,
     action: @escaping () -> Void
 )
 ```
@@ -381,6 +400,7 @@ public init(
 | Parameter | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
 | `selected` | `Bool` | *Required* | Filled/Selected visual state indicator. |
+| `size` | `UMUIRadioButtonSize`| `.small` | Sizing configuration: `.normal` (body font size) or `.small` (caption font size). |
 | `action` | `() -> Void` | *Required* | Click action. |
 
 > [!IMPORTANT]
@@ -393,7 +413,19 @@ Sized wrappers for standard SwiftUI toggle switches, optimized for dense sidebar
 
 #### Signatures
 ```swift
-public init(_ title: String, isOn: Binding<Bool>)
+// UMUIMiniSwitch (extremely compact layout)
+public init(
+    _ title: String, 
+    isOn: Binding<Bool>, 
+    size: UMUISwitchSize = .small
+)
+
+// UMUISmallSwitch (standard sidebar layout)
+public init(
+    _ title: String, 
+    isOn: Binding<Bool>, 
+    size: UMUISwitchSize = .small
+)
 ```
 
 #### Parameters
@@ -401,6 +433,7 @@ public init(_ title: String, isOn: Binding<Bool>)
 | :--- | :--- | :--- | :--- |
 | `title` | `String` | *Required* | Text tag adjacent to the toggle. |
 | `isOn` | `Binding<Bool>`| *Required* | Target boolean state. |
+| `size` | `UMUISwitchSize` | `.small` | Sizing configuration: `.normal` or `.small`. |
 
 ---
 
@@ -411,6 +444,7 @@ A grouped container holding child components inside a consistent subtle border.
 ```swift
 public init(
     _ title: String? = nil,
+    size: UMUISectionSize = .small,
     @ViewBuilder content: () -> Content
 )
 ```
@@ -419,6 +453,7 @@ public init(
 | Parameter | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
 | `title` | `String?` | `nil` | Optional header title rendered in small bold text. |
+| `size` | `UMUISectionSize` | `.small` | Sizing configuration: `.normal` or `.small`. |
 | `content` | `() -> Content` | *Required* | SwiftUI components grouped inside the card. |
 
 ---
@@ -430,7 +465,8 @@ A horizontal scrolling strip displaying selectable tags.
 ```swift
 public init(
     tags: [String],
-    selectedTags: Binding<Set<String>>
+    selectedTags: Binding<Set<String>>,
+    size: UMUITagBarSize = .small
 )
 ```
 
@@ -439,6 +475,7 @@ public init(
 | :--- | :--- | :--- | :--- |
 | `tags` | `[String]` | *Required* | Array of tags. |
 | `selectedTags`| `Binding<Set<String>>`| *Required* | Currently active tags. Selection toggles membership. |
+| `size` | `UMUITagBarSize` | `.small` | Sizing configuration: `.normal` or `.small`. |
 
 ---
 
@@ -449,7 +486,8 @@ An editable flow panel supporting addition, removal, and suggested popular tags.
 ```swift
 public init(
     tags: Binding<[String]>,
-    availableTags: [String] = []
+    availableTags: [String] = [],
+    size: UMUITagEditorSize = .small
 )
 ```
 
@@ -458,6 +496,7 @@ public init(
 | :--- | :--- | :--- | :--- |
 | `tags` | `Binding<[String]>` | *Required* | Array of applied active tags. |
 | `availableTags`| `[String]` | `[]` | Suggested popular tags in popover editor. |
+| `size` | `UMUITagEditorSize`| `.small` | Sizing configuration: `.normal` or `.small`. |
 
 ---
 
@@ -467,7 +506,8 @@ A lightweight checkerboard pattern to overlay transparency in images or assets.
 #### Signature
 ```swift
 public init(
-    squareSize: CGFloat = 20,
+    size: UMUICheckerboardSize = .small,
+    squareSize: CGFloat? = nil,
     color1: Color = .white,
     color2: Color = Color.gray.opacity(0.3)
 )
@@ -476,7 +516,8 @@ public init(
 #### Parameters
 | Parameter | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
-| `squareSize` | `CGFloat` | `20` | Size of checkerboard squares. |
+| `size` | `UMUICheckerboardSize`| `.small` | Sizing configuration: `.normal` or `.small`. |
+| `squareSize` | `CGFloat?` | `nil` | Optional custom square size override (overrides sizing mode). |
 | `color1` | `Color` | `.white` | Color of primary checker tiles. |
 | `color2` | `Color` | `.gray.opacity(0.3)` | Color of secondary checker tiles. |
 

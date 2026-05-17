@@ -9,6 +9,12 @@
 
 import SwiftUI
 
+/// Sizing modes for Segmented Controls.
+public enum UMUISegmentedBarSize: Sendable, Equatable {
+    case normal
+    case small
+}
+
 /// A premium visual segmented bar for single selection of String options.
 ///
 /// Features a sliding pill backdrop that glides smoothly behind selected options
@@ -16,7 +22,7 @@ import SwiftUI
 ///
 /// Usage:
 /// ```swift
-/// UMUISegmentedBar(label: "Layout", options: ["Left", "Center", "Right"], selection: $alignment)
+/// UMUISegmentedBar(label: "Layout", options: ["Left", "Center", "Right"], selection: $alignment, size: .normal)
 /// ```
 public struct UMUISegmentedBar: View {
     /// The optional label displayed on the leading edge.
@@ -27,6 +33,9 @@ public struct UMUISegmentedBar: View {
     
     /// Binding to the currently selected string option.
     @Binding public var selection: String
+    
+    /// The sizing mode of the segmented control.
+    public let size: UMUISegmentedBarSize
     
     /// The width allocated for the optional leading label.
     public let labelWidth: CGFloat
@@ -39,17 +48,32 @@ public struct UMUISegmentedBar: View {
     ///   - label: Optional leading label text.
     ///   - options: Array of text choices.
     ///   - selection: Binding to the active selection.
+    ///   - size: Sizing mode (default is `.normal`).
     ///   - labelWidth: Horizontal width reserved for label (default is `80`).
     public init(
         label: String? = nil,
         options: [String],
         selection: Binding<String>,
+        size: UMUISegmentedBarSize = .small,
         labelWidth: CGFloat = 80
     ) {
         self.label = label
         self.options = options
         self._selection = selection
+        self.size = size
         self.labelWidth = labelWidth
+    }
+    
+    private var optionFont: Font {
+        return size == .normal ? .body.bold() : .caption.bold()
+    }
+    
+    private var horizontalPadding: CGFloat {
+        return size == .normal ? 16 : 12
+    }
+    
+    private var verticalPadding: CGFloat {
+        return size == .normal ? 7 : 5
     }
     
     public var body: some View {
@@ -58,7 +82,7 @@ public struct UMUISegmentedBar: View {
             if let label = label {
                 HStack(spacing: 0) {
                     Text(label)
-                        .font(.caption)
+                        .font(size == .normal ? .body : .caption)
                         .lineLimit(1)
                         .foregroundStyle(.primary)
                     Spacer(minLength: 0)
@@ -76,12 +100,11 @@ public struct UMUISegmentedBar: View {
                         }
                     } label: {
                         Text(option)
-                            .font(.caption)
-                            .bold()
+                            .font(optionFont)
                             .foregroundStyle(selection == option ? Color.accentColor : Color.secondary)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 5)
-                            .frame(minWidth: 45)
+                            .padding(.horizontal, horizontalPadding)
+                            .padding(.vertical, verticalPadding)
+                            .frame(minWidth: size == .normal ? 55 : 45)
                             .contentShape(Rectangle())
                             .background(
                                 // Sliding Capsule Backdrop
@@ -131,7 +154,7 @@ public struct UMUISegmentedBar: View {
 ///
 /// Usage:
 /// ```swift
-/// UMUIMultiSegmentedBar(label: "Attributes", options: ["Bold", "Italic", "Underline"], selection: $appliedStyles)
+/// UMUIMultiSegmentedBar(label: "Attributes", options: ["Bold", "Italic", "Underline"], selection: $appliedStyles, size: .normal)
 /// ```
 public struct UMUIMultiSegmentedBar: View {
     /// The optional label displayed on the leading edge.
@@ -143,6 +166,9 @@ public struct UMUIMultiSegmentedBar: View {
     /// Binding to the Set of currently selected options.
     @Binding public var selection: Set<String>
     
+    /// The sizing mode of the segmented control.
+    public let size: UMUISegmentedBarSize
+    
     /// The width allocated for the optional leading label.
     public let labelWidth: CGFloat
     
@@ -153,17 +179,32 @@ public struct UMUIMultiSegmentedBar: View {
     ///   - label: Optional leading label text.
     ///   - options: Array of text choices.
     ///   - selection: Binding to the active Set of selections.
+    ///   - size: Sizing mode (default is `.normal`).
     ///   - labelWidth: Horizontal width reserved for label (default is `80`).
     public init(
         label: String? = nil,
         options: [String],
         selection: Binding<Set<String>>,
+        size: UMUISegmentedBarSize = .small,
         labelWidth: CGFloat = 80
     ) {
         self.label = label
         self.options = options
         self._selection = selection
+        self.size = size
         self.labelWidth = labelWidth
+    }
+    
+    private var optionFont: Font {
+        return size == .normal ? .body.bold() : .caption.bold()
+    }
+    
+    private var horizontalPadding: CGFloat {
+        return size == .normal ? 16 : 12
+    }
+    
+    private var verticalPadding: CGFloat {
+        return size == .normal ? 7 : 5
     }
     
     public var body: some View {
@@ -172,7 +213,7 @@ public struct UMUIMultiSegmentedBar: View {
             if let label = label {
                 HStack(spacing: 0) {
                     Text(label)
-                        .font(.caption)
+                        .font(size == .normal ? .body : .caption)
                         .lineLimit(1)
                         .foregroundStyle(.primary)
                     Spacer(minLength: 0)
@@ -195,12 +236,11 @@ public struct UMUIMultiSegmentedBar: View {
                         }
                     } label: {
                         Text(option)
-                            .font(.caption)
-                            .bold()
+                            .font(optionFont)
                             .foregroundStyle(isSelected ? Color.accentColor : Color.secondary)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 5)
-                            .frame(minWidth: 45)
+                            .padding(.horizontal, horizontalPadding)
+                            .padding(.vertical, verticalPadding)
+                            .frame(minWidth: size == .normal ? 55 : 45)
                             .contentShape(Rectangle())
                             .background(
                                 // Individual active backgrounds
@@ -256,24 +296,26 @@ struct UMUISegmentedBar_Previews: PreviewProvider {
                     .font(.headline)
                 
                 VStack(alignment: .leading, spacing: 20) {
-                    Text("Single Selection (Gliding Pill)")
+                    Text("Single Selection Normal:")
                         .font(.subheadline).foregroundStyle(.secondary)
                     
                     UMUISegmentedBar(
                         label: "Alignment",
                         options: ["Left", "Center", "Right"],
-                        selection: $singleSelection
+                        selection: $singleSelection,
+                        size: .normal
                     )
                     
                     Divider()
                     
-                    Text("Multi Selection (Individual Slots)")
+                    Text("Multi Selection Small:")
                         .font(.subheadline).foregroundStyle(.secondary)
                     
                     UMUIMultiSegmentedBar(
                         label: "Text Style",
                         options: ["Bold", "Italic", "Underline"],
-                        selection: $multiSelection
+                        selection: $multiSelection,
+                        size: .small
                     )
                 }
                 

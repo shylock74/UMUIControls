@@ -70,7 +70,7 @@ public struct UMUICapsuleButton<Label: View>: View {
     ///   - label: The content inside the button.
     public init(
         style: UMUICapsuleButtonStyle = .gray,
-        size: UMUICapsuleButtonSize = .normal,
+        size: UMUICapsuleButtonSize = .small,
         action: @escaping () -> Void,
         @ViewBuilder label: () -> Label
     ) {
@@ -101,7 +101,7 @@ public extension UMUICapsuleButton where Label == Text {
     init(
         _ title: String,
         style: UMUICapsuleButtonStyle = .gray,
-        size: UMUICapsuleButtonSize = .normal,
+        size: UMUICapsuleButtonSize = .small,
         action: @escaping () -> Void
     ) {
         self.init(style: style, size: size, action: action) {
@@ -122,7 +122,7 @@ public extension UMUICapsuleButton where Label == SwiftUI.Label<Text, Image> {
         _ title: String,
         systemImage: String,
         style: UMUICapsuleButtonStyle = .gray,
-        size: UMUICapsuleButtonSize = .normal,
+        size: UMUICapsuleButtonSize = .small,
         action: @escaping () -> Void
     ) {
         self.init(style: style, size: size, action: action) {

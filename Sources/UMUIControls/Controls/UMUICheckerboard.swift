@@ -7,15 +7,24 @@
 
 import SwiftUI
 
+/// Sizing modes for UMUICheckerboard.
+public enum UMUICheckerboardSize: Sendable, Equatable {
+    case normal
+    case small
+}
+
 /// A view that draws a checkerboard pattern, useful for representing transparent backgrounds.
 ///
 /// Usage:
 /// ```swift
-/// UMUICheckerboard(squareSize: 20, color1: .white, color2: .gray.opacity(0.3))
+/// UMUICheckerboard(size: .normal)
 /// ```
 public struct UMUICheckerboard: View {
-    /// The size of each square in the checkerboard pattern.
-    public let squareSize: CGFloat
+    /// The sizing mode of the checkerboard.
+    public let size: UMUICheckerboardSize
+    
+    /// Optional custom square size to override standard sizing.
+    public let customSquareSize: CGFloat?
     
     /// The primary color of the checkerboard.
     public let color1: Color
@@ -25,32 +34,43 @@ public struct UMUICheckerboard: View {
     
     /// Creates a checkerboard view.
     /// - Parameters:
-    ///   - squareSize: Size of the squares (default 20).
+    ///   - size: Sizing mode (default is `.normal`).
+    ///   - squareSize: Optional custom square size (overrides the sizing mode).
     ///   - color1: First color (default white).
     ///   - color2: Second color (default light gray).
     public init(
-        squareSize: CGFloat = 20,
+        size: UMUICheckerboardSize = .small,
+        squareSize: CGFloat? = nil,
         color1: Color = .white,
         color2: Color = .gray.opacity(0.3)
     ) {
-        self.squareSize = squareSize
+        self.size = size
+        self.customSquareSize = squareSize
         self.color1 = color1
         self.color2 = color2
+    }
+    
+    private var resolvedSquareSize: CGFloat {
+        if let customSquareSize = customSquareSize {
+            return customSquareSize
+        }
+        return size == .normal ? 20 : 10
     }
     
     public var body: some View {
         GeometryReader { geometry in
             Canvas { context, size in
-                let rows = Int(ceil(size.height / squareSize))
-                let cols = Int(ceil(size.width / squareSize))
+                let sqSize = resolvedSquareSize
+                let rows = Int(ceil(size.height / sqSize))
+                let cols = Int(ceil(size.width / sqSize))
                 
                 for row in 0..<rows {
                     for col in 0..<cols {
                         let rect = CGRect(
-                            x: CGFloat(col) * squareSize,
-                            y: CGFloat(row) * squareSize,
-                            width: squareSize,
-                            height: squareSize
+                            x: CGFloat(col) * sqSize,
+                            y: CGFloat(row) * sqSize,
+                            width: sqSize,
+                            height: sqSize
                         )
                         
                         let isEven = (row + col) % 2 == 0

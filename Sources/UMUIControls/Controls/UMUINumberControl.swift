@@ -8,12 +8,17 @@
 
 import SwiftUI
 
+/// Sizing modes for UMUINumberControl.
+public enum UMUINumberControlSize: Sendable, Equatable {
+    case normal
+    case small
+}
+
 /// A compact horizontal control for editing a numeric value with a label, slider, text field, and optional unit.
 ///
 /// Usage:
 /// ```swift
-/// UMUINumberControl(title: "Opacity", value: $opacity, range: 0...1, isPercentage: true)
-/// UMUINumberControl(title: "Radius", value: $radius, range: 0...50, unit: "px", decimals: 1)
+/// UMUINumberControl(title: "Opacity", value: $opacity, range: 0...1, isPercentage: true, size: .normal)
 /// ```
 public struct UMUINumberControl: View {
     /// The label displayed at the leading edge.
@@ -34,6 +39,9 @@ public struct UMUINumberControl: View {
     /// The number of decimal places shown in the text field.
     public var decimals: Int
     
+    /// The sizing mode of the number control.
+    public let size: UMUINumberControlSize
+    
     /// The width of the label area.
     public var labelWidth: CGFloat
     
@@ -48,6 +56,7 @@ public struct UMUINumberControl: View {
     ///   - isPercentage: Whether to display/edit as percentage (value * 100).
     ///   - unit: Optional unit string.
     ///   - decimals: Number of decimal places (default 0).
+    ///   - size: Sizing mode (default is `.normal`).
     ///   - labelWidth: Width of the label area (default 50).
     ///   - fieldWidth: Width of the text field (default 60).
     public init(
@@ -57,6 +66,7 @@ public struct UMUINumberControl: View {
         isPercentage: Bool = false,
         unit: String? = nil,
         decimals: Int = 0,
+        size: UMUINumberControlSize = .small,
         labelWidth: CGFloat = 50,
         fieldWidth: CGFloat = 60
     ) {
@@ -66,6 +76,7 @@ public struct UMUINumberControl: View {
         self.isPercentage = isPercentage
         self.unit = unit
         self.decimals = decimals
+        self.size = size
         self.labelWidth = labelWidth
         self.fieldWidth = fieldWidth
     }
@@ -89,7 +100,7 @@ public struct UMUINumberControl: View {
             // Label
             HStack(spacing: 0) {
                 Text(title)
-                    .font(.caption)
+                    .font(size == .normal ? .body : .caption)
                     .lineLimit(1)
                 Spacer(minLength: 0)
             }
@@ -98,19 +109,21 @@ public struct UMUINumberControl: View {
             // Slider
             Slider(value: $value, in: range)
                 .labelsHidden()
-                .controlSize(.mini)
+                .controlSize(size == .normal ? .small : .mini)
             
             // Text Field
             TextField("", value: displayBinding,
                       format: .number.precision(.fractionLength(decimals)))
-                .font(.caption)
+                .font(size == .normal ? .body : .caption)
                 .textFieldStyle(.roundedBorder)
-                .controlSize(.mini)
+                .controlSize(size == .normal ? .small : .mini)
                 .frame(width: fieldWidth)
                 .multilineTextAlignment(.trailing)
             
             // Unit
-            UMUICaptionGrayText(computedUnit)
+            Text(computedUnit)
+                .font(size == .normal ? .caption : .caption2)
+                .foregroundStyle(.secondary)
                 .frame(width: 16, alignment: .leading)
         }
     }

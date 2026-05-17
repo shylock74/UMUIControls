@@ -12,6 +12,12 @@ import SwiftUI
 import AppKit
 #endif
 
+/// Sizing modes for UMUIColorPalettePicker.
+public enum UMUIColorPalettePickerSize: Sendable, Equatable {
+    case normal
+    case small
+}
+
 /// A compact color picker featuring customizable palette swatches and a native system-wide eyedropper.
 ///
 /// If a custom color is picked using the eyedropper that is not in the predefined palette,
@@ -20,7 +26,7 @@ import AppKit
 ///
 /// Usage:
 /// ```swift
-/// UMUIColorPalettePicker(label: "Fill Color", selection: $shapeFill)
+/// UMUIColorPalettePicker(label: "Fill Color", selection: $shapeFill, size: .normal)
 /// ```
 public struct UMUIColorPalettePicker: View {
     /// The optional label displayed on the leading edge.
@@ -31,6 +37,9 @@ public struct UMUIColorPalettePicker: View {
     
     /// The custom list of predefined swatches.
     public let palette: [Color]
+    
+    /// The sizing mode of the color palette picker.
+    public let size: UMUIColorPalettePickerSize
     
     /// The width allocated for the optional leading label.
     public let labelWidth: CGFloat
@@ -47,21 +56,36 @@ public struct UMUIColorPalettePicker: View {
     ///   - label: Optional leading label text.
     ///   - selection: Binding to the selected Color.
     ///   - palette: Predefined color swatch palette (defaults to a high-quality HSL-shaded list).
+    ///   - size: Sizing mode (default is `.normal`).
     ///   - labelWidth: Width reserved for the label (default is `80`).
     public init(
         label: String? = nil,
         selection: Binding<Color>,
         palette: [Color] = defaultPalette,
+        size: UMUIColorPalettePickerSize = .small,
         labelWidth: CGFloat = 80
     ) {
         self.label = label
         self._selection = selection
         self.palette = palette
+        self.size = size
         self.labelWidth = labelWidth
     }
     
     private var isCustomSelected: Bool {
         !palette.contains(selection)
+    }
+    
+    private var swatchSize: CGFloat {
+        return size == .normal ? 18 : 12
+    }
+    
+    private var indicatorDotSize: CGFloat {
+        return size == .normal ? 6 : 4
+    }
+    
+    private var eyedropperSize: CGFloat {
+        return size == .normal ? 20 : 14
     }
     
     public var body: some View {
@@ -70,7 +94,7 @@ public struct UMUIColorPalettePicker: View {
             if let label = label {
                 HStack(spacing: 0) {
                     Text(label)
-                        .font(.caption)
+                        .font(size == .normal ? .body : .caption)
                         .lineLimit(1)
                         .foregroundStyle(.primary)
                     Spacer(minLength: 0)
@@ -80,7 +104,7 @@ public struct UMUIColorPalettePicker: View {
             
             // Swatch Flow Container
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 8) {
+                HStack(spacing: size == .normal ? 8 : 6) {
                     // Predefined Palette Swatches
                     ForEach(palette, id: \.self) { color in
                         Button {
@@ -90,7 +114,7 @@ public struct UMUIColorPalettePicker: View {
                         } label: {
                             Circle()
                                 .fill(color)
-                                .frame(width: 18, height: 18)
+                                .frame(width: swatchSize, height: swatchSize)
                                 .overlay(
                                     Circle()
                                         .stroke(Color.primary.opacity(0.2), lineWidth: 1)
@@ -101,7 +125,7 @@ public struct UMUIColorPalettePicker: View {
                                         if selection == color {
                                             Circle()
                                                 .fill(Color.white)
-                                                .frame(width: 6, height: 6)
+                                                .frame(width: indicatorDotSize, height: indicatorDotSize)
                                                 .shadow(color: .black.opacity(0.3), radius: 1)
                                                 .transition(.scale)
                                         }
@@ -116,15 +140,15 @@ public struct UMUIColorPalettePicker: View {
                     if isCustomSelected {
                         Circle()
                             .fill(selection)
-                            .frame(width: 18, height: 18)
+                            .frame(width: swatchSize, height: swatchSize)
                             .overlay(
                                 Circle()
-                                    .stroke(Color.accentColor, lineWidth: 2)
+                                    .stroke(Color.accentColor, lineWidth: size == .normal ? 2 : 1.2)
                             )
                             .overlay(
                                 Circle()
                                     .fill(Color.white)
-                                    .frame(width: 6, height: 6)
+                                    .frame(width: indicatorDotSize, height: indicatorDotSize)
                                     .shadow(color: .black.opacity(0.3), radius: 1)
                             )
                             .scaleEffect(1.15)
@@ -132,21 +156,21 @@ public struct UMUIColorPalettePicker: View {
                     }
                     
                     Divider()
-                        .frame(height: 14)
+                        .frame(height: size == .normal ? 14 : 10)
                     
                     // Native Eyedropper Button
                     Button {
                         triggerEyedropper()
                     } label: {
                         Image(systemName: "eyedropper")
-                            .font(.caption2)
+                            .font(size == .normal ? .caption2 : .system(size: 8))
                             .foregroundStyle(Color.secondary)
-                            .frame(width: 20, height: 20)
+                            .frame(width: eyedropperSize, height: eyedropperSize)
                             .background(Color.secondary.opacity(0.1))
                             .clipShape(Circle())
                             .overlay(
                                 Circle()
-                                    .stroke(Color.secondary.opacity(0.2), lineWidth: 1)
+                                    .stroke(Color.secondary.opacity(0.2), lineWidth: 0.5)
                             )
                     }
                     .buttonStyle(.plain)
@@ -193,19 +217,24 @@ struct UMUIColorPalettePicker_Previews: PreviewProvider {
                     .font(.headline)
                 
                 VStack(alignment: .leading, spacing: 15) {
-                    Text("Select a color swatch or click the eyedropper tool to pick any color on your monitor.")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .multilineTextAlignment(.leading)
+                    Text("Normal Size:")
+                        .font(.caption).bold()
                     
                     UMUIColorPalettePicker(
                         label: "Font Color",
-                        selection: $fontColor
+                        selection: $fontColor,
+                        size: .normal
                     )
+                    
+                    Divider()
+                    
+                    Text("Small Size:")
+                        .font(.caption).bold()
                     
                     UMUIColorPalettePicker(
                         label: "Border Color",
-                        selection: $borderFill
+                        selection: $borderFill,
+                        size: .small
                     )
                 }
                 

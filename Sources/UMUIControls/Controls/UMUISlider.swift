@@ -9,6 +9,12 @@
 
 import SwiftUI
 
+/// Sizing modes for UMUISlider.
+public enum UMUISliderSize: Sendable, Equatable {
+    case normal
+    case small
+}
+
 /// A premium, customizable horizontal slider styled similarly to macOS Control Center controls.
 ///
 /// Features click-to-snap, dragging, and a clean minimalist design where the circular
@@ -16,7 +22,7 @@ import SwiftUI
 ///
 /// Usage:
 /// ```swift
-/// UMUISlider(label: "Brightness", value: $brightness)
+/// UMUISlider(label: "Brightness", value: $brightness, size: .normal)
 /// ```
 public struct UMUISlider: View {
     /// The optional label displayed on the leading edge.
@@ -27,6 +33,9 @@ public struct UMUISlider: View {
     
     /// The range for the slider's value (default is 0...1).
     public let range: ClosedRange<Double>
+    
+    /// The sizing mode of the slider.
+    public let size: UMUISliderSize
     
     /// The width allocated for the optional leading label.
     public let labelWidth: CGFloat
@@ -41,16 +50,19 @@ public struct UMUISlider: View {
     ///   - label: Optional leading label text.
     ///   - value: Binding to the double value.
     ///   - range: Active bounds for the value (default is `0...1`).
+    ///   - size: Sizing mode (default is `.normal`).
     ///   - labelWidth: Horizontal width reserved for label (default is `80`).
     public init(
         label: String? = nil,
         value: Binding<Double>,
         range: ClosedRange<Double> = 0...1,
+        size: UMUISliderSize = .small,
         labelWidth: CGFloat = 80
     ) {
         self.label = label
         self._value = value
         self.range = range
+        self.size = size
         self.labelWidth = labelWidth
     }
     
@@ -60,13 +72,21 @@ public struct UMUISlider: View {
         return min(max((value - range.lowerBound) / span, 0.0), 1.0)
     }
     
+    private var trackHeight: CGFloat {
+        return size == .normal ? 12 : 8
+    }
+    
+    private var thumbSize: CGFloat {
+        return size == .normal ? 16 : 12
+    }
+    
     public var body: some View {
         HStack(alignment: .center, spacing: 8) {
             // Optional Label
             if let label = label {
                 HStack(spacing: 0) {
                     Text(label)
-                        .font(.caption)
+                        .font(size == .normal ? .body : .caption)
                         .lineLimit(1)
                         .foregroundStyle(.primary)
                     Spacer(minLength: 0)
@@ -78,32 +98,34 @@ public struct UMUISlider: View {
             GeometryReader { geometry in
                 let width = geometry.size.width
                 let fillWidth = CGFloat(fraction) * width
+                let tSize = thumbSize
+                let tHeight = trackHeight
                 
                 ZStack(alignment: .leading) {
                     // Backglass track
-                    RoundedRectangle(cornerRadius: 5)
+                    RoundedRectangle(cornerRadius: tHeight / 2)
                         .fill(Color.secondary.opacity(0.12))
-                        .frame(height: 10)
+                        .frame(height: tHeight)
                         .overlay(
-                            RoundedRectangle(cornerRadius: 5)
+                            RoundedRectangle(cornerRadius: tHeight / 2)
                                 .stroke(Color.secondary.opacity(0.15), lineWidth: 0.5)
                         )
                     
                     // Front active fill
-                    RoundedRectangle(cornerRadius: 5)
+                    RoundedRectangle(cornerRadius: tHeight / 2)
                         .fill(Color.accentColor)
-                        .frame(width: fillWidth, height: 10)
+                        .frame(width: fillWidth, height: tHeight)
                     
                     // Circular Grab Handle (Thumb) - scales up on hover/drag
                     Circle()
                         .fill(Color.white)
-                        .frame(width: 14, height: 14)
+                        .frame(width: tSize, height: tSize)
                         .shadow(color: .black.opacity(0.25), radius: 1.5, y: 1)
-                        .offset(x: max(0, min(fillWidth - 7, width - 14)))
+                        .offset(x: max(0, min(fillWidth - tSize / 2, width - tSize)))
                         .scaleEffect(isHovered || isDragging ? 1.0 : 0.0)
                         .opacity(isHovered || isDragging ? 1.0 : 0.0)
                 }
-                .frame(height: 14)
+                .frame(height: tSize)
                 .contentShape(Rectangle())
                 .onHover { hovering in
                     withAnimation(.spring(response: 0.2, dampingFraction: 0.75)) {
@@ -129,7 +151,7 @@ public struct UMUISlider: View {
                         }
                 )
             }
-            .frame(height: 14)
+            .frame(height: thumbSize)
         }
     }
 }
@@ -152,16 +174,24 @@ struct UMUISlider_Previews: PreviewProvider {
                     .foregroundStyle(.secondary)
                 
                 VStack(spacing: 20) {
+                    Text("Normal Sized Brightness:")
+                        .font(.caption).bold()
                     UMUISlider(
                         label: "Brightness",
                         value: $brightness,
-                        range: 0...1
+                        range: 0...1,
+                        size: .normal
                     )
                     
+                    Divider()
+                    
+                    Text("Small Sized Opacity:")
+                        .font(.caption).bold()
                     UMUISlider(
                         label: "Opacity",
                         value: $opacity,
-                        range: 0...1
+                        range: 0...1,
+                        size: .small
                     )
                 }
                 
