@@ -11,18 +11,21 @@ This document serves as the complete, exhaustive, and synthetic API reference fo
 2. [Component Index & Reference](#component-index--reference)
    - [UMUICapsuleButton](#1-umuicapsulebutton)
    - [UMUITextField](#2-umuitextfield)
-   - [UMUIKnobControl](#3-umuiknobcontrol-new)
-   - [UMUIColorPalettePicker](#4-umuicolorpalettepicker-new)
-   - [UMUINumberControl](#5-umuinumbercontrol)
-   - [UMUIAngleControl](#6-umuianglecontrol)
-   - [UMUIPositionGrid](#7-umuipositiongrid)
-   - [UMUIRadioButton](#8-umuiradiobutton)
-   - [UMUIMiniSwitch & UMUISmallSwitch](#9-umuiminiswitch--umuismallswitch)
-   - [UMUISection](#10-umuisection)
-   - [UMUITagBar](#11-umuitagbar)
-   - [UMUITagEditor](#12-umuitageditor)
-   - [UMUICheckerboard](#13-umuicheckerboard)
-3. [Helper Extensions](#14-helper-extensions)
+   - [UMUIKnobControl](#3-umuiknobcontrol)
+   - [UMUIColorPalettePicker](#4-umuicolorpalettepicker)
+   - [UMUISlider](#5-umuislider-new)
+   - [UMUIVerticalSlider](#6-umuiverticalslider-new)
+   - [UMUISegmentedBar & UMUIMultiSegmentedBar](#7-umisegmentedbar--umuimultisegmentedbar-new)
+   - [UMUINumberControl](#8-umuinumbercontrol)
+   - [UMUIAngleControl](#9-umuianglecontrol)
+   - [UMUIPositionGrid](#10-umuipositiongrid)
+   - [UMUIRadioButton](#11-umuiradiobutton)
+   - [UMUIMiniSwitch & UMUISmallSwitch](#12-umuiminiswitch--umuismallswitch)
+   - [UMUISection](#13-umuisection)
+   - [UMUITagBar](#14-umuitagbar)
+   - [UMUITagEditor](#15-umuitageditor)
+   - [UMUICheckerboard](#16-umuicheckerboard)
+3. [Helper Extensions](#17-helper-extensions)
 4. [Theming & Integration](#theming--integration)
 
 ---
@@ -132,7 +135,7 @@ public init(
 
 ---
 
-### 3. `UMUIKnobControl` [NEW]
+### 3. `UMUIKnobControl`
 A professional-grade visual rotary dial knob optimized for creative, parameter-dense inspectors (like audio volume/panning VST layouts).
 
 #### Signature & Initializer
@@ -164,7 +167,7 @@ public init(
 
 ---
 
-### 4. `UMUIColorPalettePicker` [NEW]
+### 4. `UMUIColorPalettePicker`
 A compact color selection strip combining preconfigured swatches with a system-wide magnifying glass eyedropper tool.
 
 #### Signature & Initializer
@@ -191,7 +194,101 @@ public init(
 
 ---
 
-### 5. `UMUINumberControl`
+### 5. `UMUISlider` [NEW]
+A custom premium horizontal slider matching Apple's macOS Control Center styling. Features a glassmorphic bar, dynamic accent fill, and a zoom thumb handle that displays only on interaction.
+
+#### Signature & Initializer
+```swift
+public init(
+    label: String? = nil,
+    value: Binding<Double>,
+    range: ClosedRange<Double> = 0...1,
+    labelWidth: CGFloat = 80
+)
+```
+
+#### Parameters
+| Parameter | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `label` | `String?` | `nil` | Optional leading label. |
+| `value` | `Binding<Double>` | *Required* | Bound numeric value. |
+| `range` | `ClosedRange<Double>`| `0...1` | Dynamic limits for the fader. |
+| `labelWidth` | `CGFloat` | `80` | Horizontal space reserved for label. |
+
+#### Micro-Interactions
+- **Zero-Distance Click-to-Snap:** Clicking anywhere along the path immediately snaps the slider value to that horizontal coordinate.
+- **Interactive Thumb Reveal:** The white circular grab thumb remains hidden inside the bar to avoid visual clutter and scales up to full size (`1.0`) only when the mouse hovers or drags.
+
+---
+
+### 6. `UMUIVerticalSlider` [NEW]
+A high-fidelity vertical fader control with side tick-marks, a mixing desk horizontal pill fader knob, and coordinate reversing modes.
+
+#### Signature & Initializer
+```swift
+public init(
+    label: String? = nil,
+    value: Binding<Double>,
+    range: ClosedRange<Double> = 0...1,
+    height: CGFloat = 120,
+    inverted: Bool = false,
+    labelWidth: CGFloat = 80
+)
+```
+
+#### Parameters
+| Parameter | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `label` | `String?` | `nil` | Optional leading label text. |
+| `value` | `Binding<Double>` | *Required* | Bound double value. |
+| `range` | `ClosedRange<Double>`| `0...1` | Clamped range bounds. |
+| `height` | `CGFloat` | `120` | Dynamic vertical height. |
+| `inverted` | `Bool` | `false` | If true, max value is at the bottom (increases downward). |
+| `labelWidth` | `CGFloat` | `80` | Label frame width. |
+
+#### Graduation & Thumb Style
+- **Graduation ticks:** Draws a structural ticks panel with precise step markers at `0%`, `25%`, `50%`, `75%`, and `100%`.
+- **Fader Grip:** Emulates professional recording studio mixing faders using a wide rectangular grip handle featuring central horizontal guide lines.
+
+---
+
+### 7. `UMUISegmentedBar` & `UMUIMultiSegmentedBar` [NEW]
+Visual segmented selection bars. Supports single-selection with a magnetic sliding pill backdrop, and multi-selection with individual glowing status slots.
+
+#### Signatures
+```swift
+// 1. Single Selection
+public init(
+    label: String? = nil,
+    options: [String],
+    selection: Binding<String>,
+    labelWidth: CGFloat = 80
+)
+
+// 2. Multi Selection
+public init(
+    label: String? = nil,
+    options: [String],
+    selection: Binding<Set<String>>,
+    labelWidth: CGFloat = 80
+)
+```
+
+#### Parameters
+| Parameter | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `label` | `String?` | `nil` | Optional leading label. |
+| `options` | `[String]` | *Required* | Set of text string items. |
+| `selection` | `Binding` | *Required* | Bound selection (a `String` or a `Set<String>`). |
+| `labelWidth` | `CGFloat` | `80` | Horizontal width reserved for label. |
+
+#### Gliding Mechanisms
+- **Gliding Pill (Single-Selection):** Employs SwiftUI's `@Namespace` and hardware-accelerated `matchedGeometryEffect` to perform buttery-smooth gliding animations from one segment to the next.
+- **Individual Glow (Multi-Selection):** Toggles individual options instantly, and active items glow in the accent color, matching the look of side-panel state toggles.
+
+---
+
+### 8. `UMUINumberControl`
 A compact horizontal slider/field combo for fine-tuning double values.
 
 #### Signature
@@ -222,7 +319,7 @@ public init(
 
 ---
 
-### 6. `UMUIAngleControl`
+### 9. `UMUIAngleControl`
 A rotary dial knob designed to edit angles visually.
 
 #### Signature
@@ -244,7 +341,7 @@ public init(
 
 ---
 
-### 7. `UMUIPositionGrid`
+### 10. `UMUIPositionGrid`
 A 3×3 anchor selection panel mapping coordinates visually.
 
 #### Signature
@@ -269,7 +366,7 @@ public init(
 
 ---
 
-### 8. `UMUIRadioButton`
+### 11. `UMUIRadioButton`
 A minimalist circular radio button using SF Symbols.
 
 #### Signature
@@ -291,7 +388,7 @@ public init(
 
 ---
 
-### 9. `UMUIMiniSwitch` & `UMUISmallSwitch`
+### 12. `UMUIMiniSwitch` & `UMUISmallSwitch`
 Sized wrappers for standard SwiftUI toggle switches, optimized for dense sidebar layouts.
 
 #### Signatures
@@ -307,7 +404,7 @@ public init(_ title: String, isOn: Binding<Bool>)
 
 ---
 
-### 10. `UMUISection`
+### 13. `UMUISection`
 A grouped container holding child components inside a consistent subtle border.
 
 #### Signature
@@ -326,7 +423,7 @@ public init(
 
 ---
 
-### 11. `UMUITagBar`
+### 14. `UMUITagBar`
 A horizontal scrolling strip displaying selectable tags.
 
 #### Signature
@@ -345,7 +442,7 @@ public init(
 
 ---
 
-### 12. `UMUITagEditor`
+### 15. `UMUITagEditor`
 An editable flow panel supporting addition, removal, and suggested popular tags.
 
 #### Signature
@@ -364,7 +461,7 @@ public init(
 
 ---
 
-### 13. `UMUICheckerboard`
+### 16. `UMUICheckerboard`
 A lightweight checkerboard pattern to overlay transparency in images or assets.
 
 #### Signature
@@ -385,7 +482,7 @@ public init(
 
 ---
 
-## 14. Helper Extensions
+## 17. Helper Extensions
 
 #### Text Elements
 - **`UMUICaptionText`**: `Text` view formatted using `.caption` font.
