@@ -9,18 +9,20 @@ This document serves as the complete, exhaustive, and synthetic API reference fo
 ## Table of Contents
 1. [Core Features](#core-features)
 2. [Component Index & Reference](#component-index--reference)
-   - [UMUICapsuleButton](#1-umuicapsulebutton-new)
-   - [UMUITextField](#2-umuitextfield-new)
-   - [UMUINumberControl](#3-umuinumbercontrol)
-   - [UMUIAngleControl](#4-umuianglecontrol)
-   - [UMUIPositionGrid](#5-umuipositiongrid)
-   - [UMUIRadioButton](#6-umuiradiobutton)
-   - [UMUIMiniSwitch & UMUISmallSwitch](#7-umuiminiswitch--umuismallswitch)
-   - [UMUISection](#8-umuisection)
-   - [UMUITagBar](#9-umuitagbar)
-   - [UMUITagEditor](#10-umuitageditor)
-   - [UMUICheckerboard](#11-umuicheckerboard)
-3. [Helper Extensions](#12-helper-extensions)
+   - [UMUICapsuleButton](#1-umuicapsulebutton)
+   - [UMUITextField](#2-umuitextfield)
+   - [UMUIKnobControl](#3-umuiknobcontrol-new)
+   - [UMUIColorPalettePicker](#4-umuicolorpalettepicker-new)
+   - [UMUINumberControl](#5-umuinumbercontrol)
+   - [UMUIAngleControl](#6-umuianglecontrol)
+   - [UMUIPositionGrid](#7-umuipositiongrid)
+   - [UMUIRadioButton](#8-umuiradiobutton)
+   - [UMUIMiniSwitch & UMUISmallSwitch](#9-umuiminiswitch--umuismallswitch)
+   - [UMUISection](#10-umuisection)
+   - [UMUITagBar](#11-umuitagbar)
+   - [UMUITagEditor](#12-umuitageditor)
+   - [UMUICheckerboard](#13-umuicheckerboard)
+3. [Helper Extensions](#14-helper-extensions)
 4. [Theming & Integration](#theming--integration)
 
 ---
@@ -35,7 +37,7 @@ This document serves as the complete, exhaustive, and synthetic API reference fo
 
 ## Component Index & Reference
 
-### 1. `UMUICapsuleButton` [NEW]
+### 1. `UMUICapsuleButton`
 A capsule-shaped button styled with responsive tactile micro-interactions and dynamic high-contrast text color detection.
 
 #### Signatures & Initializers
@@ -74,6 +76,9 @@ public init(
 | `action` | `() -> Void` | *Required* | Closure invoked when the button is clicked. |
 | `label` | `View` | *Required* | SwiftUI content layout wrapped inside the capsule. |
 
+> [!IMPORTANT]
+> **Memory Safety:** If the `action` closure captures reference types (like view controllers or view models), ensure you capture them weakly (e.g. `[weak self]`) to prevent strong reference cycles and memory leaks.
+
 #### Color & Sizing Enums
 ```swift
 public enum UMUICapsuleButtonStyle: Sendable, Equatable {
@@ -95,8 +100,8 @@ public enum UMUICapsuleButtonSize: Sendable, Equatable {
 
 ---
 
-### 2. `UMUITextField` [NEW]
-A text entry control featuring an optional leading label, custom rounded-rect styling with focus ring glow, secure entry support, and a non-blocking 0.3s debounced binding.
+### 2. `UMUITextField`
+A text entry control featuring an optional leading label, custom rounded-rect styling with focus ring glow, secure entry support, and a non-blocking 0.3s background-threaded debounced binding.
 
 #### Signature & Initializer
 ```swift
@@ -121,13 +126,72 @@ public init(
 | `labelWidth` | `CGFloat` | `80` | Horizontal width allocated for the leading label. |
 
 #### Timing & Focus Logic
-- **0.3s Debounce:** Local keystrokes update local state instantly for latency-free typing. Sychronization to `value` is debounced by `300ms` using Swift Concurrency.
-- **Instant Sync:** Sychronizes immediately (bypassing debounce) on **Enter/Return**, **blur (losing focus)**, or **disappear (`onDisappear`)**.
+- **0.3s Debounce:** Local keystrokes update local state instantly for latency-free typing. Synchronization to `value` is debounced by `300ms` completely in a background queue (`DispatchQueue.global(qos: .userInteractive)`), leaving the MainActor entirely unencumbered.
+- **Instant Sync:** Synchronizes immediately (bypassing debounce) on **Enter/Return**, **blur (losing focus)**, or **disappear (`onDisappear`)**.
 - **Eye Toggle:** Retains keyboard focus on the field programmatically so typing is never interrupted when toggling password visibility.
 
 ---
 
-### 3. `UMUINumberControl`
+### 3. `UMUIKnobControl` [NEW]
+A professional-grade visual rotary dial knob optimized for creative, parameter-dense inspectors (like audio volume/panning VST layouts).
+
+#### Signature & Initializer
+```swift
+public init(
+    label: String? = nil,
+    value: Binding<Double>,
+    range: ClosedRange<Double> = 0...1,
+    defaultValue: Double? = nil,
+    size: CGFloat = 40,
+    labelWidth: CGFloat = 80
+)
+```
+
+#### Parameters
+| Parameter | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `label` | `String?` | `nil` | Optional leading label text. |
+| `value` | `Binding<Double>` | *Required* | Bound double value adjusted by the knob. |
+| `range` | `ClosedRange<Double>`| `0...1` | Active clamped bounds for values. |
+| `defaultValue`| `Double?` | `nil` | Optional default value reset on double-click. |
+| `size` | `CGFloat` | `40` | Outer diameter of the knob circle. |
+| `labelWidth` | `CGFloat` | `80` | Horizontal width reserved for label. |
+
+#### Premium Features
+- **Vertical Drag Gestures:** Dragging vertically up increases value, dragging down decreases it. Bypasses standard circular tracking to guarantee industry-grade control precision.
+- **Double-Click Reset:** Double-clicking the knob triggers a quick spring transition back to its `defaultValue`.
+- **Value Tooltip:** Hovering or dragging triggers a dynamic tooltip popup centered over the dial, revealing the decimal value in real-time.
+
+---
+
+### 4. `UMUIColorPalettePicker` [NEW]
+A compact color selection strip combining preconfigured swatches with a system-wide magnifying glass eyedropper tool.
+
+#### Signature & Initializer
+```swift
+public init(
+    label: String? = nil,
+    selection: Binding<Color>,
+    palette: [Color] = defaultPalette,
+    labelWidth: CGFloat = 80
+)
+```
+
+#### Parameters
+| Parameter | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `label` | `String?` | `nil` | Optional leading label. |
+| `selection` | `Binding<Color>` | *Required* | Bound selected Color. |
+| `palette` | `[Color]` | `defaultPalette`| Preset swatches (HSL-harmonized list). |
+| `labelWidth` | `CGFloat` | `80` | Horizontal space reserved for label. |
+
+#### Thread Safety & Custom Colors
+- **Thread Safety:** Integrates macOS native `NSColorSampler` for system color picking. The system callback executes on a background utility thread; the control explicitly dispatches back to `DispatchQueue.main` for binding writes to prevent background thread warnings.
+- **Dynamic Swatch Addition:** If the eyedropper selects a custom color not in the `palette`, it generates a temporary selected "+ Custom" swatch in the flow list so the custom color is instantly visible and editable.
+
+---
+
+### 5. `UMUINumberControl`
 A compact horizontal slider/field combo for fine-tuning double values.
 
 #### Signature
@@ -158,7 +222,7 @@ public init(
 
 ---
 
-### 4. `UMUIAngleControl`
+### 6. `UMUIAngleControl`
 A rotary dial knob designed to edit angles visually.
 
 #### Signature
@@ -180,7 +244,7 @@ public init(
 
 ---
 
-### 5. `UMUIPositionGrid`
+### 7. `UMUIPositionGrid`
 A 3×3 anchor selection panel mapping coordinates visually.
 
 #### Signature
@@ -197,12 +261,15 @@ public init(
 | `selection` | `Binding<UMUIPosition>`| *Required* | Bound coordinate state. |
 | `action` | `(() -> Void)?` | `nil` | Callback executed after selected coordinate changes. |
 
+> [!IMPORTANT]
+> **Memory Safety:** If the `action` closure captures reference types (like view controllers or view models), ensure you capture them weakly (e.g. `[weak self]`) to prevent strong reference cycles and memory leaks.
+
 #### UMUIPosition Enum Cases
 `topLeft`, `top`, `topRight`, `left`, `center`, `right`, `bottomLeft`, `bottom`, `bottomRight`.
 
 ---
 
-### 6. `UMUIRadioButton`
+### 8. `UMUIRadioButton`
 A minimalist circular radio button using SF Symbols.
 
 #### Signature
@@ -219,9 +286,12 @@ public init(
 | `selected` | `Bool` | *Required* | Filled/Selected visual state indicator. |
 | `action` | `() -> Void` | *Required* | Click action. |
 
+> [!IMPORTANT]
+> **Memory Safety:** If the `action` closure captures reference types (like view controllers or view models), ensure you capture them weakly (e.g. `[weak self]`) to prevent strong reference cycles and memory leaks.
+
 ---
 
-### 7. `UMUIMiniSwitch` & `UMUISmallSwitch`
+### 9. `UMUIMiniSwitch` & `UMUISmallSwitch`
 Sized wrappers for standard SwiftUI toggle switches, optimized for dense sidebar layouts.
 
 #### Signatures
@@ -237,7 +307,7 @@ public init(_ title: String, isOn: Binding<Bool>)
 
 ---
 
-### 8. `UMUISection`
+### 10. `UMUISection`
 A grouped container holding child components inside a consistent subtle border.
 
 #### Signature
@@ -256,7 +326,7 @@ public init(
 
 ---
 
-### 9. `UMUITagBar`
+### 11. `UMUITagBar`
 A horizontal scrolling strip displaying selectable tags.
 
 #### Signature
@@ -275,7 +345,7 @@ public init(
 
 ---
 
-### 10. `UMUITagEditor`
+### 12. `UMUITagEditor`
 An editable flow panel supporting addition, removal, and suggested popular tags.
 
 #### Signature
@@ -294,7 +364,7 @@ public init(
 
 ---
 
-### 11. `UMUICheckerboard`
+### 13. `UMUICheckerboard`
 A lightweight checkerboard pattern to overlay transparency in images or assets.
 
 #### Signature
@@ -315,7 +385,7 @@ public init(
 
 ---
 
-## 12. Helper Extensions
+## 14. Helper Extensions
 
 #### Text Elements
 - **`UMUICaptionText`**: `Text` view formatted using `.caption` font.
