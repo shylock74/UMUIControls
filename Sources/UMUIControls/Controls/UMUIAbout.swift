@@ -333,6 +333,7 @@ struct RollingLineView: View {
         } else {
             Text(line.text)
                 .font(.system(.body, design: .rounded))
+                .fontWeight(.light)
                 .foregroundStyle(.primary.opacity(0.85))
         }
     }
@@ -347,6 +348,7 @@ struct TypingTextView: View {
     var body: some View {
         Text(displayedText)
             .font(.system(.body, design: .rounded))
+            .fontWeight(.light)
             .foregroundStyle(.primary.opacity(0.85))
             .onAppear {
                 startTyping()
