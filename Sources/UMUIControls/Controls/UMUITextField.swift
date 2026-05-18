@@ -147,17 +147,17 @@ public struct UMUITextField: View {
         .onAppear {
             localText = value
         }
-        .onChange(of: value) { _, newValue in
+        .onChange(of: value) { newValue in
             if localText != newValue {
                 localText = newValue
             }
         }
         // Debounce text updates after key strokes
-        .onChange(of: localText) { _, newValue in
+        .onChange(of: localText) { _ in
             startDebounce()
         }
         // Commit immediately on blur (losing focus)
-        .onChange(of: isFocused) { _, focused in
+        .onChange(of: isFocused) { focused in
             if !focused {
                 commitChanges()
             }

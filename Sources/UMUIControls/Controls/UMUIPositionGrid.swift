@@ -149,18 +149,18 @@ public struct UMUIPositionGrid: View {
     }
     
     public var body: some View {
-        Grid(horizontalSpacing: 2, verticalSpacing: 2) {
-            GridRow {
+        VStack(spacing: 2) {
+            HStack(spacing: 2) {
                 UMUIPositionButton(position: .topLeft, current: $selection, size: size, action: action)
                 UMUIPositionButton(position: .top, current: $selection, size: size, action: action)
                 UMUIPositionButton(position: .topRight, current: $selection, size: size, action: action)
             }
-            GridRow {
+            HStack(spacing: 2) {
                 UMUIPositionButton(position: .left, current: $selection, size: size, action: action)
                 UMUIPositionButton(position: .center, current: $selection, size: size, action: action)
                 UMUIPositionButton(position: .right, current: $selection, size: size, action: action)
             }
-            GridRow {
+            HStack(spacing: 2) {
                 UMUIPositionButton(position: .bottomLeft, current: $selection, size: size, action: action)
                 UMUIPositionButton(position: .bottom, current: $selection, size: size, action: action)
                 UMUIPositionButton(position: .bottomRight, current: $selection, size: size, action: action)

@@ -222,13 +222,19 @@ struct CapsuleButtonStyle: ButtonStyle {
 public extension Color {
     /// Returns either `.black` or `.white` depending on which provides better contrast against this color.
     func contrastingTextColor(in environment: EnvironmentValues) -> Color {
-        let resolved = self.resolve(in: environment)
-        // Convert to Double for precision and type safety
-        let r = Double(resolved.red)
-        let g = Double(resolved.green)
-        let b = Double(resolved.blue)
+        #if os(macOS)
+        let nsColor = NSColor(self)
+        guard let rgbColor = nsColor.usingColorSpace(.deviceRGB) else {
+            return .white
+        }
+        let r = Double(rgbColor.redComponent)
+        let g = Double(rgbColor.greenComponent)
+        let b = Double(rgbColor.blueComponent)
         let luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b
         return luminance > 0.5 ? .black : .white
+        #else
+        return .white
+        #endif
     }
 }
 
