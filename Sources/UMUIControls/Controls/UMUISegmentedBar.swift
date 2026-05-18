@@ -105,29 +105,29 @@ public struct UMUISegmentedBar: View {
                             .padding(.horizontal, horizontalPadding)
                             .padding(.vertical, verticalPadding)
                             .frame(minWidth: size == .normal ? 55 : 45)
-                            .contentShape(Rectangle())
-                            .background(
-                                // Sliding Capsule Backdrop
-                                Group {
-                                    if selection == option {
-                                        RoundedRectangle(cornerRadius: 4)
-                                            .fill(Color(nsColor: .controlBackgroundColor))
-                                            .shadow(color: .black.opacity(0.12), radius: 1.5, y: 1)
-                                            .overlay(
-                                                RoundedRectangle(cornerRadius: 4)
-                                                    .stroke(Color.secondary.opacity(0.1), lineWidth: 0.5)
-                                            )
-                                            .matchedGeometryEffect(id: "activeSegment", in: animationNamespace)
-                                    }
-                                }
-                            )
-                            // Subtle hover overlay
-                            .background(
-                                RoundedRectangle(cornerRadius: 4)
-                                    .fill(hoveredOption == option && selection != option ? Color.primary.opacity(0.04) : Color.clear)
-                            )
                     }
                     .buttonStyle(.plain)
+                    .contentShape(Rectangle())
+                    .background(
+                        // Sliding Capsule Backdrop
+                        Group {
+                            if selection == option {
+                                RoundedRectangle(cornerRadius: 4)
+                                    .fill(Color(nsColor: .controlBackgroundColor))
+                                    .shadow(color: .black.opacity(0.12), radius: 1.5, y: 1)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 4)
+                                            .stroke(Color.secondary.opacity(0.1), lineWidth: 0.5)
+                                    )
+                                    .matchedGeometryEffect(id: "activeSegment", in: animationNamespace)
+                            }
+                        }
+                    )
+                    // Subtle hover overlay
+                    .background(
+                        RoundedRectangle(cornerRadius: 4)
+                            .fill(hoveredOption == option && selection != option ? Color.primary.opacity(0.04) : Color.clear)
+                    )
                     .onHover { hovering in
                         hoveredOption = hovering ? option : nil
                     }
@@ -241,29 +241,29 @@ public struct UMUIMultiSegmentedBar: View {
                             .padding(.horizontal, horizontalPadding)
                             .padding(.vertical, verticalPadding)
                             .frame(minWidth: size == .normal ? 55 : 45)
-                            .contentShape(Rectangle())
-                            .background(
-                                // Individual active backgrounds
-                                Group {
-                                    if isSelected {
-                                        RoundedRectangle(cornerRadius: 4)
-                                            .fill(Color(nsColor: .controlBackgroundColor))
-                                            .shadow(color: .black.opacity(0.12), radius: 1.5, y: 1)
-                                            .overlay(
-                                                RoundedRectangle(cornerRadius: 4)
-                                                    .stroke(Color.accentColor.opacity(0.15), lineWidth: 0.5)
-                                            )
-                                            .transition(.scale.combined(with: .opacity))
-                                    }
-                                }
-                            )
-                            // Subtle hover overlay
-                            .background(
-                                RoundedRectangle(cornerRadius: 4)
-                                    .fill(hoveredOption == option && !isSelected ? Color.primary.opacity(0.04) : Color.clear)
-                            )
                     }
                     .buttonStyle(.plain)
+                    .contentShape(Rectangle())
+                    .background(
+                        // Individual active backgrounds
+                        Group {
+                            if isSelected {
+                                RoundedRectangle(cornerRadius: 4)
+                                    .fill(Color(nsColor: .controlBackgroundColor))
+                                    .shadow(color: .black.opacity(0.12), radius: 1.5, y: 1)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 4)
+                                            .stroke(Color.accentColor.opacity(0.15), lineWidth: 0.5)
+                                    )
+                                    .transition(.scale.combined(with: .opacity))
+                            }
+                        }
+                    )
+                    // Subtle hover overlay
+                    .background(
+                        RoundedRectangle(cornerRadius: 4)
+                            .fill(hoveredOption == option && !isSelected ? Color.primary.opacity(0.04) : Color.clear)
+                    )
                     .onHover { hovering in
                         hoveredOption = hovering ? option : nil
                     }
