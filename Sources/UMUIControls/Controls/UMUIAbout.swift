@@ -93,8 +93,8 @@ public struct UMUIAbout: View {
                 )
             
             // Dynamic Typing Slogans
-            UMCyclicTypingView(texts: texts)
-                .frame(height: 24)
+            UMRollingThreeLinesView(texts: texts)
+                .frame(height: 80, alignment: .topLeading)
             
             // Spacer to replicate UMVSpacer(10)
             Spacer()
@@ -250,20 +250,104 @@ internal struct VisualEffectView: NSViewRepresentable {
 
 // MARK: - Typing & Animation Subviews
 
-struct UMTypeText: View {
+struct RollingText: Identifiable, Equatable {
+    let id: UUID
+    let text: String
+    var shouldType: Bool
+}
+
+struct UMRollingThreeLinesView: View {
+    let texts: [String]
+    
+    @State private var displayedLines: [RollingText] = []
+    @State private var nextIndex = 0
+    @State private var timer: Timer? = nil
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            ForEach(displayedLines) { line in
+                RollingLineView(line: line)
+                    .transition(
+                        .asymmetric(
+                            insertion: .move(edge: .bottom).combined(with: .opacity),
+                            removal: .move(edge: .top).combined(with: .opacity)
+                        )
+                    )
+            }
+        }
+        .onAppear {
+            startScrolling()
+        }
+        .onDisappear {
+            timer?.invalidate()
+        }
+    }
+    
+    private func startScrolling() {
+        guard !texts.isEmpty else { return }
+        
+        // Populate initial lines (up to 3)
+        if texts.count >= 3 {
+            displayedLines = [
+                RollingText(id: UUID(), text: texts[0], shouldType: false),
+                RollingText(id: UUID(), text: texts[1], shouldType: false),
+                RollingText(id: UUID(), text: texts[2], shouldType: false)
+            ]
+            nextIndex = 3
+        } else {
+            displayedLines = texts.map { RollingText(id: UUID(), text: $0, shouldType: false) }
+            nextIndex = 0
+        }
+        
+        // Only schedule cycling if there are more than 3 texts to cycle
+        guard texts.count > 3 else { return }
+        
+        timer = Timer.scheduledTimer(withTimeInterval: 4.0, repeats: true) { _ in
+            cycleLines()
+        }
+    }
+    
+    private func cycleLines() {
+        let nextText = texts[nextIndex]
+        nextIndex = (nextIndex + 1) % texts.count
+        
+        withAnimation(.easeInOut(duration: 0.8)) {
+            // Remove the top line (which triggers the .top transition)
+            if !displayedLines.isEmpty {
+                displayedLines.removeFirst()
+            }
+            
+            // Append the new line at the bottom (which triggers the .bottom transition)
+            let newLine = RollingText(id: UUID(), text: nextText, shouldType: true)
+            displayedLines.append(newLine)
+        }
+    }
+}
+
+struct RollingLineView: View {
+    let line: RollingText
+    
+    var body: some View {
+        if line.shouldType {
+            TypingTextView(fullText: line.text)
+        } else {
+            Text(line.text)
+                .font(.system(.body, design: .rounded))
+                .foregroundStyle(.primary.opacity(0.85))
+        }
+    }
+}
+
+struct TypingTextView: View {
     let fullText: String
-    let onComplete: () -> Void
     
     @State private var displayedText = ""
     @State private var currentIndex = 0
-    @State private var isFadingOut = false
     
     var body: some View {
         Text(displayedText)
             .font(.system(.body, design: .rounded))
-            .foregroundStyle(.primary)
-            .opacity(isFadingOut ? 0 : 1)
-            .animation(.easeInOut(duration: 2.0), value: isFadingOut)
+            .foregroundStyle(.primary.opacity(0.85))
             .onAppear {
                 startTyping()
             }
@@ -272,7 +356,6 @@ struct UMTypeText: View {
     private func startTyping() {
         displayedText = ""
         currentIndex = 0
-        isFadingOut = false
         
         Timer.scheduledTimer(withTimeInterval: 0.03, repeats: true) { timer in
             if currentIndex < fullText.count {
@@ -281,43 +364,7 @@ struct UMTypeText: View {
                 currentIndex += 1
             } else {
                 timer.invalidate()
-                
-                // Start fade out after typing is complete
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                    isFadingOut = true
-                }
-                
-                // Notify complete after the 2.0s fade out animation
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                    onComplete()
-                }
             }
-        }
-    }
-}
-
-struct UMCyclicTypingView: View {
-    let texts: [String]
-    @State private var currentIndex = 0
-    
-    var body: some View {
-        Group {
-            if texts.isEmpty {
-                Text("")
-            } else {
-                UMTypeText(fullText: texts[currentIndex]) {
-                    goToNext()
-                }
-                .id(currentIndex)
-            }
-        }
-    }
-    
-    private func goToNext() {
-        if currentIndex < texts.count - 1 {
-            currentIndex += 1
-        } else {
-            currentIndex = 0 // Restart cycle
         }
     }
 }
