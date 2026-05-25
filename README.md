@@ -6,6 +6,17 @@ All controls support consistent sizing modes (`.normal` and `.small`), and **def
 
 ---
 
+## Directory Structure
+
+To maintain a clean modular architecture, components are structured into dedicated subfolders under `Sources/UMUIControls/Controls/`:
+- **`UMTabBarUIView/`**: Tabs and horizontal navigation bar components.
+- **`UMDisclosureGroup/`**: Flexible custom expandable disclosure cards and helpers.
+- **`UMHSpacer/`**: Structured horizontal and vertical visual spacers.
+- **`UMLeftObjectView/`**: Layout and text baseline positioning modifiers.
+- Custom controls (e.g., `UMBoxView.swift`, `UMTappableSection.swift`, `UMCenter.swift`, `UMZInset.swift`) are organized as single, self-contained structural files.
+
+---
+
 ## Table of Contents
 1. [Core Features](#core-features)
 2. [Component Index & Reference](#component-index--reference)
