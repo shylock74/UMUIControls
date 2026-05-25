@@ -45,3 +45,6 @@ public struct UMUICaptionGrayText: View {
             .foregroundColor(.secondary)
     }
 }
+
+/// A backward-compatible alias for caption gray text.
+public typealias CaptionText = UMUICaptionGrayText

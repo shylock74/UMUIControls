@@ -11,6 +11,12 @@ public extension Color {
     /// A standardized dark gray color.
     static let darkGray = Color(white: 0.2)
     
+    /// A standardized mild dark gray color.
+    static let mildDarkGray = Color(white: 0.3)
+    
+    /// A standardized box gray color for disclosure backgrounds.
+    static let boxGray = Color(white: 0.15)
+    
     /// A backward-compatible mint color.
     static var umMint: Color {
         if #available(macOS 12.0, *) {
