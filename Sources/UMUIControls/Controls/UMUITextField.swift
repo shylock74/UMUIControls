@@ -44,28 +44,7 @@ public struct UMUITextField: View {
     /// The width allocated for the leading label.
     public let labelWidth: CGFloat
     
-    // MARK: - Internal States
-    
-    /// The local text buffer that updates instantly with keystrokes.
-    @State private var localText: String = ""
-    
-    /// The visibility state for secure fields.
-    @State private var isPasswordVisible: Bool = false
-    
-    /// Thread-safe Dispatch debouncer to prevent @MainActor clogging.
-    @State private var debouncer = TextFieldDebouncer()
-    
-    /// SwiftUI focus tracker.
-    @FocusState private var isFocused: Bool
-    
     /// Creates a new premium text field.
-    /// - Parameters:
-    ///   - label: Optional leading label string.
-    ///   - placeholder: Placeholder text (default is empty).
-    ///   - value: Binding to the text value.
-    ///   - size: Sizing option (default is `.normal`).
-    ///   - isSecure: Whether to enable secure password input with eye toggle (default is `false`).
-    ///   - labelWidth: Width allocated for the label (default is `80`).
     public init(
         label: String? = nil,
         placeholder: String = "",
@@ -83,20 +62,72 @@ public struct UMUITextField: View {
     }
     
     public var body: some View {
+        if #available(macOS 12.0, *) {
+            UMUITextFieldModern(
+                label: label,
+                placeholder: placeholder,
+                value: $value,
+                size: size,
+                isSecure: isSecure,
+                labelWidth: labelWidth
+            )
+        } else {
+            UMUITextFieldLegacy(
+                label: label,
+                placeholder: placeholder,
+                value: $value,
+                size: size,
+                isSecure: isSecure,
+                labelWidth: labelWidth
+            )
+        }
+    }
+}
+
+/// The modern implementation of UMUITextField using modern FocusState.
+@available(macOS 12.0, *)
+struct UMUITextFieldModern: View {
+    public let label: String?
+    public let placeholder: String
+    @Binding public var value: String
+    public let size: UMUITextFieldSize
+    public let isSecure: Bool
+    public let labelWidth: CGFloat
+    
+    @State private var localText: String = ""
+    @State private var isPasswordVisible: Bool = false
+    @State private var debouncer = TextFieldDebouncer()
+    @FocusState private var isFocused: Bool
+    
+    public init(
+        label: String?,
+        placeholder: String,
+        value: Binding<String>,
+        size: UMUITextFieldSize,
+        isSecure: Bool,
+        labelWidth: CGFloat
+    ) {
+        self.label = label
+        self.placeholder = placeholder
+        self._value = value
+        self.size = size
+        self.isSecure = isSecure
+        self.labelWidth = labelWidth
+    }
+    
+    public var body: some View {
         HStack(alignment: .center, spacing: 6) {
-            // Leading Label (if provided)
             if let label = label {
                 HStack(spacing: 0) {
                     Text(label)
                         .font(labelFont)
                         .lineLimit(1)
-                        .foregroundStyle(.primary)
+                        .foregroundColor(.primary)
                     Spacer(minLength: 0)
                 }
                 .frame(width: labelWidth)
             }
             
-            // Text Field Input Container
             HStack(spacing: 4) {
                 if isSecure && !isPasswordVisible {
                     SecureField(placeholder, text: $localText)
@@ -112,16 +143,14 @@ public struct UMUITextField: View {
                         .onSubmit { commitChanges() }
                 }
                 
-                // Secure Visibility Toggle
                 if isSecure {
                     Button {
                         isPasswordVisible.toggle()
-                        // Programmatically retain keyboard focus
                         isFocused = true
                     } label: {
                         Image(systemName: isPasswordVisible ? "eye.slash" : "eye")
                             .font(size == .small ? .caption2 : .body)
-                            .foregroundStyle(.secondary)
+                            .foregroundColor(.secondary)
                     }
                     .buttonStyle(.plain)
                     .focusable(false)
@@ -131,7 +160,7 @@ public struct UMUITextField: View {
             .padding(.vertical, size == .small ? 4 : 6)
             .background(
                 RoundedRectangle(cornerRadius: 6)
-                    .fill(Color(nsColor: .controlBackgroundColor))
+                    .fill(Color(.controlBackgroundColor))
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 6)
@@ -143,7 +172,6 @@ public struct UMUITextField: View {
             )
             .animation(.easeOut(duration: 0.12), value: isFocused)
         }
-        // Sync local buffer on appear and when external binding changes
         .onAppear {
             localText = value
         }
@@ -152,23 +180,18 @@ public struct UMUITextField: View {
                 localText = newValue
             }
         }
-        // Debounce text updates after key strokes
         .onChange(of: localText) { _ in
             startDebounce()
         }
-        // Commit immediately on blur (losing focus)
         .onChange(of: isFocused) { focused in
             if !focused {
                 commitChanges()
             }
         }
-        // Commit immediately on disappear
         .onDisappear {
             commitChanges()
         }
     }
-    
-    // MARK: - Helper Computeds
     
     private var fieldFont: Font {
         switch size {
@@ -188,14 +211,149 @@ public struct UMUITextField: View {
         }
     }
     
-    // MARK: - Synchronization & Debounce Logic
+    private func startDebounce() {
+        let currentText = localText
+        debouncer.debounce(delay: 0.3) {
+            if self.value != currentText {
+                DispatchQueue.main.async {
+                    self.value = currentText
+                }
+            }
+        }
+    }
+    
+    private func commitChanges() {
+        debouncer.cancel()
+        if value != localText {
+            value = localText
+        }
+    }
+}
+
+/// The legacy implementation of UMUITextField supporting macOS 11 without FocusState.
+struct UMUITextFieldLegacy: View {
+    public let label: String?
+    public let placeholder: String
+    @Binding public var value: String
+    public let size: UMUITextFieldSize
+    public let isSecure: Bool
+    public let labelWidth: CGFloat
+    
+    @State private var localText: String = ""
+    @State private var isPasswordVisible: Bool = false
+    @State private var debouncer = TextFieldDebouncer()
+    @State private var isFocused: Bool = false
+    
+    public init(
+        label: String?,
+        placeholder: String,
+        value: Binding<String>,
+        size: UMUITextFieldSize,
+        isSecure: Bool,
+        labelWidth: CGFloat
+    ) {
+        self.label = label
+        self.placeholder = placeholder
+        self._value = value
+        self.size = size
+        self.isSecure = isSecure
+        self.labelWidth = labelWidth
+    }
+    
+    public var body: some View {
+        HStack(alignment: .center, spacing: 6) {
+            if let label = label {
+                HStack(spacing: 0) {
+                    Text(label)
+                        .font(labelFont)
+                        .lineLimit(1)
+                        .foregroundColor(.primary)
+                    Spacer(minLength: 0)
+                }
+                .frame(width: labelWidth)
+            }
+            
+            HStack(spacing: 4) {
+                if isSecure && !isPasswordVisible {
+                    SecureField(placeholder, text: $localText, onCommit: { commitChanges() })
+                        .textFieldStyle(.plain)
+                        .font(fieldFont)
+                } else {
+                    TextField(placeholder, text: $localText, onEditingChanged: { editing in
+                        isFocused = editing
+                    }, onCommit: {
+                        commitChanges()
+                    })
+                    .textFieldStyle(.plain)
+                    .font(fieldFont)
+                }
+                
+                if isSecure {
+                    Button {
+                        isPasswordVisible.toggle()
+                    } label: {
+                        Image(systemName: isPasswordVisible ? "eye.slash" : "eye")
+                            .font(size == .small ? .caption2 : .body)
+                            .foregroundColor(.secondary)
+                    }
+                    .buttonStyle(.plain)
+                    .focusable(false)
+                }
+            }
+            .padding(.horizontal, size == .small ? 8 : 10)
+            .padding(.vertical, size == .small ? 4 : 6)
+            .background(
+                RoundedRectangle(cornerRadius: 6)
+                    .fill(Color(.controlBackgroundColor))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 6)
+                    .stroke(
+                        isFocused ? Color.accentColor : Color.secondary.opacity(0.3),
+                        lineWidth: isFocused ? 1.5 : 1.0
+                    )
+                    .shadow(color: isFocused ? Color.accentColor.opacity(0.25) : Color.clear, radius: isFocused ? 3 : 0)
+            )
+            .animation(.easeOut(duration: 0.12), value: isFocused)
+        }
+        .onAppear {
+            localText = value
+        }
+        .onChange(of: value) { newValue in
+            if localText != newValue {
+                localText = newValue
+            }
+        }
+        .onChange(of: localText) { _ in
+            startDebounce()
+        }
+        .onDisappear {
+            commitChanges()
+        }
+    }
+    
+    private var fieldFont: Font {
+        switch size {
+        case .normal:
+            return .body
+        case .small:
+            return .caption
+        }
+    }
+    
+    private var labelFont: Font {
+        switch size {
+        case .normal:
+            return .body
+        case .small:
+            return .caption
+        }
+    }
     
     private func startDebounce() {
         let currentText = localText
         debouncer.debounce(delay: 0.3) {
-            // Verify changes in the background thread!
             if self.value != currentText {
-                // Return to the Main Queue ONLY for the binding state write
                 DispatchQueue.main.async {
                     self.value = currentText
                 }
@@ -252,7 +410,7 @@ struct UMUITextField_Previews: PreviewProvider {
                 VStack(alignment: .leading, spacing: 15) {
                     Text("Standard Text Fields")
                         .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .foregroundColor(.secondary)
                     
                     UMUITextField(
                         label: "Username",
@@ -274,7 +432,7 @@ struct UMUITextField_Previews: PreviewProvider {
                 VStack(alignment: .leading, spacing: 15) {
                     Text("Secure Password with Eye Toggle")
                         .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .foregroundColor(.secondary)
                     
                     UMUITextField(
                         label: "Password",
@@ -291,7 +449,7 @@ struct UMUITextField_Previews: PreviewProvider {
                 VStack(alignment: .leading, spacing: 10) {
                     Text("🔍 Real-time Debounce Debugger")
                         .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .foregroundColor(.secondary)
                     
                     VStack(alignment: .leading, spacing: 4) {
                         HStack {
@@ -302,7 +460,7 @@ struct UMUITextField_Previews: PreviewProvider {
                         }
                         Text("\"\(textNormal)\"")
                             .font(.system(.caption, design: .monospaced))
-                            .foregroundStyle(Color.accentColor)
+                            .foregroundColor(Color.accentColor)
                             .padding(.horizontal, 8)
                             .padding(.vertical, 4)
                             .background(Color.accentColor.opacity(0.1))

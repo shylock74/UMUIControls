@@ -111,7 +111,7 @@ public struct UMUIVerticalSlider: View {
                     Text(label)
                         .font(size == .normal ? .body : .caption)
                         .lineLimit(1)
-                        .foregroundStyle(.primary)
+                        .foregroundColor(.primary)
                     Spacer(minLength: 0)
                 }
                 .frame(width: labelWidth)
@@ -226,7 +226,7 @@ public struct UMUIVerticalSlider: View {
                                 }()
                                 Text(String(format: "%.0f", labelValue))
                                     .font(.system(size: size == .normal ? 8 : 7, weight: .regular, design: .monospaced))
-                                    .foregroundStyle(.secondary)
+                                    .foregroundColor(.secondary)
                             }
                         }
                         .frame(height: 1)
@@ -256,7 +256,7 @@ struct UMUIVerticalSlider_Previews: PreviewProvider {
                 
                 Text("Professional vertical mixing deck faders with tick marks.")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundColor(.secondary)
                 
                 HStack(spacing: 35) {
                     UMUIVerticalSlider(
@@ -287,7 +287,7 @@ struct UMUIVerticalSlider_Previews: PreviewProvider {
                         Spacer()
                         Text(String(format: "%.2f dB", gain))
                             .font(.system(.caption2, design: .monospaced))
-                            .foregroundStyle(Color.accentColor)
+                            .foregroundColor(Color.accentColor)
                     }
                     HStack {
                         Text("Pitch (Inverted):")
@@ -295,7 +295,7 @@ struct UMUIVerticalSlider_Previews: PreviewProvider {
                         Spacer()
                         Text(String(format: "%.1f", pitch))
                             .font(.system(.caption2, design: .monospaced))
-                            .foregroundStyle(Color.accentColor)
+                            .foregroundColor(Color.accentColor)
                     }
                 }
             }

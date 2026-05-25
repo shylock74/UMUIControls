@@ -95,6 +95,14 @@ public struct UMUINumberControl: View {
         return isPercentage ? "%" : ""
     }
     
+    private var numberFormatter: NumberFormatter {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.minimumFractionDigits = decimals
+        formatter.maximumFractionDigits = decimals
+        return formatter
+    }
+    
     public var body: some View {
         HStack(alignment: .center, spacing: 4) {
             // Label
@@ -112,8 +120,7 @@ public struct UMUINumberControl: View {
                 .controlSize(size == .normal ? .small : .mini)
             
             // Text Field
-            TextField("", value: displayBinding,
-                      format: .number.precision(.fractionLength(decimals)))
+            TextField("", value: displayBinding, formatter: numberFormatter)
                 .font(size == .normal ? .body : .caption)
                 .textFieldStyle(.roundedBorder)
                 .controlSize(size == .normal ? .small : .mini)
@@ -123,7 +130,7 @@ public struct UMUINumberControl: View {
             // Unit
             Text(computedUnit)
                 .font(size == .normal ? .caption : .caption2)
-                .foregroundStyle(.secondary)
+                .foregroundColor(.secondary)
                 .frame(width: 16, alignment: .leading)
         }
     }

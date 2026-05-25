@@ -69,17 +69,23 @@ public struct UMUIAbout: View {
     
     public var body: some View {
         VStack(alignment: .leading, spacing: 20) {
-            // App Title
-            Text(title)
-                .font(.system(.title, design: .rounded))
-                .fontWeight(.bold)
-                .foregroundStyle(
-                    LinearGradient(
-                        colors: [.primary, .primary.opacity(0.7)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
+            if #available(macOS 12.0, *) {
+                Text(title)
+                    .font(.system(.title, design: .rounded))
+                    .fontWeight(.bold)
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [.primary, .primary.opacity(0.7)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
                     )
-                )
+            } else {
+                Text(title)
+                    .font(.system(.title, design: .rounded))
+                    .bold()
+                    .foregroundColor(.primary)
+            }
             
             // App Logo / Banner
             image
@@ -332,9 +338,8 @@ struct RollingLineView: View {
             TypingTextView(fullText: line.text)
         } else {
             Text(line.text)
-                .font(.system(.body, design: .rounded))
-                .fontWeight(.light)
-                .foregroundStyle(.primary.opacity(0.85))
+                .font(.system(.body, design: .rounded).weight(.light))
+                .foregroundColor(Color.primary.opacity(0.85))
         }
     }
 }
@@ -347,9 +352,8 @@ struct TypingTextView: View {
     
     var body: some View {
         Text(displayedText)
-            .font(.system(.body, design: .rounded))
-            .fontWeight(.light)
-            .foregroundStyle(.primary.opacity(0.85))
+            .font(.system(.body, design: .rounded).weight(.light))
+            .foregroundColor(Color.primary.opacity(0.85))
             .onAppear {
                 startTyping()
             }

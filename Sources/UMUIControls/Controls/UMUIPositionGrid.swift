@@ -96,7 +96,7 @@ public struct UMUIPositionButton: View {
     }
     
     public var body: some View {
-        Button {
+        let button = Button {
             current = position
             action?()
         } label: {
@@ -104,10 +104,25 @@ public struct UMUIPositionButton: View {
                 .font(.system(size: fontSize, weight: .bold))
                 .frame(width: buttonDimension, height: buttonDimension)
         }
-        .buttonStyle(.bordered)
-        .labelStyle(.iconOnly)
-        .tint(current == position ? .accentColor : .secondary)
-        .controlSize(size == .normal ? .small : .mini)
+        
+        if #available(macOS 12.0, *) {
+            button
+                .buttonStyle(.bordered)
+                .labelStyle(.iconOnly)
+                .tint(current == position ? .accentColor : .secondary)
+                .controlSize(size == .normal ? .small : .mini)
+        } else {
+            button
+                .buttonStyle(.plain)
+                .labelStyle(.iconOnly)
+                .padding(size == .normal ? 2 : 1)
+                .background(
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(current == position ? Color.accentColor : Color.secondary.opacity(0.15))
+                )
+                .foregroundColor(current == position ? Color.white : Color.primary)
+                .controlSize(size == .normal ? .small : .mini)
+        }
     }
 }
 

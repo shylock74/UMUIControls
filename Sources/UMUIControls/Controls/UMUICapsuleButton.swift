@@ -154,7 +154,7 @@ struct CapsuleButtonStyle: ButtonStyle {
         
         return configuration.label
             .font(fontForSize.weight(.semibold))
-            .foregroundStyle(foregroundColor)
+            .foregroundColor(foregroundColor)
             .padding(.horizontal, horizontalPadding)
             .padding(.vertical, verticalPadding)
             .background(
@@ -252,7 +252,7 @@ struct UMUICapsuleButton_Previews: PreviewProvider {
                 VStack(alignment: .leading, spacing: 10) {
                     Text("Sizes (.large, .normal, .small)")
                         .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .foregroundColor(.secondary)
                     
                     HStack(alignment: .bottom, spacing: 12) {
                         UMUICapsuleButton("Large Button", style: .accent, size: .large) {
@@ -274,7 +274,7 @@ struct UMUICapsuleButton_Previews: PreviewProvider {
                 VStack(alignment: .leading, spacing: 10) {
                     Text("Styles (Gray, Accent, Custom Colors)")
                         .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .foregroundColor(.secondary)
                     
                     HStack(spacing: 15) {
                         UMUICapsuleButton("Gray Button", style: .gray) {
@@ -300,7 +300,7 @@ struct UMUICapsuleButton_Previews: PreviewProvider {
                 VStack(alignment: .leading, spacing: 10) {
                     Text("Icons & Custom Views")
                         .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .foregroundColor(.secondary)
                     
                     HStack(spacing: 15) {
                         UMUICapsuleButton("With Icon", systemImage: "star.fill", style: .accent, size: .normal) {

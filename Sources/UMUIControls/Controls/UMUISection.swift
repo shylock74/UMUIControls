@@ -54,7 +54,7 @@ public struct UMUISection<Content: View>: View {
             if let title = title {
                 Text(title)
                     .font(size == .normal ? .subheadline.bold() : .caption2.bold())
-                    .foregroundStyle(.primary)
+                    .foregroundColor(.primary)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.top, size == .normal ? 8 : 6)
                     .padding(.horizontal, size == .normal ? 10 : 8)

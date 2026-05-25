@@ -109,7 +109,7 @@ public struct UMUIKnobControl: View {
                     Text(label)
                         .font(size == .normal ? .body : .caption)
                         .lineLimit(1)
-                        .foregroundStyle(.primary)
+                        .foregroundColor(.primary)
                     Spacer(minLength: 0)
                 }
                 .frame(width: labelWidth)
@@ -136,7 +136,7 @@ public struct UMUIKnobControl: View {
                 
                 // Rotatable inner knob body
                 Circle()
-                    .fill(Color(nsColor: .windowBackgroundColor))
+                    .fill(Color( .windowBackgroundColor))
                     .frame(width: diameter - innerGap, height: diameter - innerGap)
                     .shadow(color: .black.opacity(isDragging ? 0.25 : 0.15), radius: isDragging ? 3 : 1.5, y: 1)
                     .overlay(
@@ -169,7 +169,7 @@ public struct UMUIKnobControl: View {
                             .font(.system(size: size == .normal ? 9 : 8, weight: .bold, design: .monospaced))
                             .padding(.horizontal, size == .normal ? 6 : 4)
                             .padding(.vertical, size == .normal ? 3 : 2)
-                            .background(Color(nsColor: .controlBackgroundColor))
+                            .background(Color( .controlBackgroundColor))
                             .cornerRadius(4)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 4)
@@ -273,7 +273,7 @@ struct UMUIKnobControl_Previews: PreviewProvider {
                 
                 Text("Drag vertically up/down to adjust values. Double-click to reset.")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundColor(.secondary)
                     .multilineTextAlignment(.center)
                 
                 VStack(spacing: 20) {
@@ -304,7 +304,7 @@ struct UMUIKnobControl_Previews: PreviewProvider {
                         Spacer()
                         Text(String(format: "%.3f dB", volume))
                             .font(.system(.caption2, design: .monospaced))
-                            .foregroundStyle(Color.accentColor)
+                            .foregroundColor(Color.accentColor)
                     }
                     HStack {
                         Text("Panning Value:")
@@ -312,7 +312,7 @@ struct UMUIKnobControl_Previews: PreviewProvider {
                         Spacer()
                         Text(String(format: "%.3f", panning))
                             .font(.system(.caption2, design: .monospaced))
-                            .foregroundStyle(Color.accentColor)
+                            .foregroundColor(Color.accentColor)
                     }
                 }
             }

@@ -88,7 +88,7 @@ public struct UMUISlider: View {
                     Text(label)
                         .font(size == .normal ? .body : .caption)
                         .lineLimit(1)
-                        .foregroundStyle(.primary)
+                        .foregroundColor(.primary)
                     Spacer(minLength: 0)
                 }
                 .frame(width: labelWidth)
@@ -171,7 +171,7 @@ struct UMUISlider_Previews: PreviewProvider {
                 
                 Text("Move your cursor over a slider to reveal its grab thumb.")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundColor(.secondary)
                 
                 VStack(spacing: 20) {
                     Text("Normal Sized Brightness:")
@@ -205,7 +205,7 @@ struct UMUISlider_Previews: PreviewProvider {
                         Spacer()
                         Text(String(format: "%.1f%%", brightness * 100))
                             .font(.system(.caption2, design: .monospaced))
-                            .foregroundStyle(Color.accentColor)
+                            .foregroundColor(Color.accentColor)
                     }
                     HStack {
                         Text("Opacity:")
@@ -213,7 +213,7 @@ struct UMUISlider_Previews: PreviewProvider {
                         Spacer()
                         Text(String(format: "%.0f%%", opacity * 100))
                             .font(.system(.caption2, design: .monospaced))
-                            .foregroundStyle(Color.accentColor)
+                            .foregroundColor(Color.accentColor)
                     }
                 }
             }

@@ -68,7 +68,7 @@ public struct UMUITagEditor: View {
             } label: {
                 Label("Add Tag", systemImage: "plus.circle")
                     .font(buttonFont)
-                    .foregroundStyle(Color.secondary)
+                    .foregroundColor(Color.secondary)
             }
             .buttonStyle(.bordered)
             .controlSize(size == .normal ? .regular : .small)
@@ -121,7 +121,7 @@ public struct UMUITagEditor: View {
                             .padding(.horizontal, 8)
                             .padding(.vertical, 4)
                             .background(tags.contains(tag) ? Color.accentColor : Color.secondary.opacity(0.1))
-                            .foregroundStyle(tags.contains(tag) ? Color.white : Color.primary)
+                            .foregroundColor(tags.contains(tag) ? Color.white : Color.primary)
                             .cornerRadius(8)
                     }
                     .buttonStyle(.plain)
@@ -133,8 +133,7 @@ public struct UMUITagEditor: View {
             
             HStack {
                 Image(systemName: "tag")
-                TextField("New Tag", text: $newTagText)
-                    .onSubmit { addTag(newTagText) }
+                TextField("New Tag", text: $newTagText, onCommit: { addTag(newTagText) })
                 Button {
                     addTag(newTagText)
                 } label: {

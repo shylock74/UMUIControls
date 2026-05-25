@@ -84,7 +84,7 @@ public struct UMUISegmentedBar: View {
                     Text(label)
                         .font(size == .normal ? .body : .caption)
                         .lineLimit(1)
-                        .foregroundStyle(.primary)
+                        .foregroundColor(.primary)
                     Spacer(minLength: 0)
                 }
                 .frame(width: labelWidth)
@@ -101,7 +101,7 @@ public struct UMUISegmentedBar: View {
                     } label: {
                         Text(option)
                             .font(optionFont)
-                            .foregroundStyle(selection == option ? Color.accentColor : Color.secondary)
+                            .foregroundColor(selection == option ? Color.accentColor : Color.secondary)
                             .padding(.horizontal, horizontalPadding)
                             .padding(.vertical, verticalPadding)
                             .frame(minWidth: size == .normal ? 55 : 45)
@@ -113,7 +113,7 @@ public struct UMUISegmentedBar: View {
                         Group {
                             if selection == option {
                                 RoundedRectangle(cornerRadius: 4)
-                                    .fill(Color(nsColor: .controlBackgroundColor))
+                                    .fill(Color( .controlBackgroundColor))
                                     .shadow(color: .black.opacity(0.12), radius: 1.5, y: 1)
                                     .overlay(
                                         RoundedRectangle(cornerRadius: 4)
@@ -215,7 +215,7 @@ public struct UMUIMultiSegmentedBar: View {
                     Text(label)
                         .font(size == .normal ? .body : .caption)
                         .lineLimit(1)
-                        .foregroundStyle(.primary)
+                        .foregroundColor(.primary)
                     Spacer(minLength: 0)
                 }
                 .frame(width: labelWidth)
@@ -237,7 +237,7 @@ public struct UMUIMultiSegmentedBar: View {
                     } label: {
                         Text(option)
                             .font(optionFont)
-                            .foregroundStyle(isSelected ? Color.accentColor : Color.secondary)
+                            .foregroundColor(isSelected ? Color.accentColor : Color.secondary)
                             .padding(.horizontal, horizontalPadding)
                             .padding(.vertical, verticalPadding)
                             .frame(minWidth: size == .normal ? 55 : 45)
@@ -249,7 +249,7 @@ public struct UMUIMultiSegmentedBar: View {
                         Group {
                             if isSelected {
                                 RoundedRectangle(cornerRadius: 4)
-                                    .fill(Color(nsColor: .controlBackgroundColor))
+                                    .fill(Color( .controlBackgroundColor))
                                     .shadow(color: .black.opacity(0.12), radius: 1.5, y: 1)
                                     .overlay(
                                         RoundedRectangle(cornerRadius: 4)
@@ -297,7 +297,7 @@ struct UMUISegmentedBar_Previews: PreviewProvider {
                 
                 VStack(alignment: .leading, spacing: 20) {
                     Text("Single Selection Normal:")
-                        .font(.subheadline).foregroundStyle(.secondary)
+                        .font(.subheadline).foregroundColor(.secondary)
                     
                     UMUISegmentedBar(
                         label: "Alignment",
@@ -309,7 +309,7 @@ struct UMUISegmentedBar_Previews: PreviewProvider {
                     Divider()
                     
                     Text("Multi Selection Small:")
-                        .font(.subheadline).foregroundStyle(.secondary)
+                        .font(.subheadline).foregroundColor(.secondary)
                     
                     UMUIMultiSegmentedBar(
                         label: "Text Style",
@@ -329,7 +329,7 @@ struct UMUISegmentedBar_Previews: PreviewProvider {
                         Spacer()
                         Text(singleSelection)
                             .font(.system(.caption2, design: .monospaced))
-                            .foregroundStyle(Color.accentColor)
+                            .foregroundColor(Color.accentColor)
                     }
                     HStack {
                         Text("Active Styles:")
@@ -337,7 +337,7 @@ struct UMUISegmentedBar_Previews: PreviewProvider {
                         Spacer()
                         Text(multiSelection.sorted().joined(separator: ", "))
                             .font(.system(.caption2, design: .monospaced))
-                            .foregroundStyle(Color.accentColor)
+                            .foregroundColor(Color.accentColor)
                     }
                 }
             }

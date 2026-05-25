@@ -10,4 +10,14 @@ import SwiftUI
 public extension Color {
     /// A standardized dark gray color.
     static let darkGray = Color(white: 0.2)
+    
+    /// A backward-compatible mint color.
+    static var umMint: Color {
+        if #available(macOS 12.0, *) {
+            return Color.mint
+        } else {
+            // Standard system mint RGB: R: 0.0, G: 0.78, B: 0.75
+            return Color(red: 0.0, green: 0.78, blue: 0.75)
+        }
+    }
 }

@@ -59,7 +59,7 @@ public struct UMUIDropArea: View {
             HStack(spacing: 4) {
                 Text(title)
                     .font(.system(size: 9, weight: .black))
-                    .foregroundStyle(.secondary)
+                    .foregroundColor(.secondary)
                 
                 if let count = count {
                     Text("\(count)")
@@ -75,12 +75,12 @@ public struct UMUIDropArea: View {
             VStack(spacing: 6) {
                 Image(systemName: icon)
                     .font(.title2)
-                    .foregroundStyle(isTargeted ? Color.accentColor : .secondary)
+                    .foregroundColor(isTargeted ? Color.accentColor : .secondary)
                 
                 Text(subtitle ?? "Drop items here")
                     .font(.system(size: 9, weight: .bold))
                     .lineLimit(1)
-                    .foregroundStyle(subtitle != nil ? Color.primary : Color.secondary.opacity(0.5))
+                    .foregroundColor(subtitle != nil ? Color.primary : Color.secondary.opacity(0.5))
             }
             .frame(maxWidth: .infinity)
             .frame(height: 70)

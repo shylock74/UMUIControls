@@ -59,25 +59,43 @@ public struct UMUICheckerboard: View {
     
     public var body: some View {
         GeometryReader { geometry in
-            Canvas { context, size in
-                let sqSize = resolvedSquareSize
-                let rows = Int(ceil(size.height / sqSize))
-                let cols = Int(ceil(size.width / sqSize))
-                
-                for row in 0..<rows {
-                    for col in 0..<cols {
-                        let rect = CGRect(
-                            x: CGFloat(col) * sqSize,
-                            y: CGFloat(row) * sqSize,
-                            width: sqSize,
-                            height: sqSize
-                        )
-                        
-                        let isEven = (row + col) % 2 == 0
-                        context.fill(Path(rect), with: .color(isEven ? color2 : color1))
-                    }
+            let sqSize = resolvedSquareSize
+            let rows = Int(ceil(geometry.size.height / sqSize))
+            let cols = Int(ceil(geometry.size.width / sqSize))
+            
+            ZStack {
+                color1
+                CheckerboardShape(squareSize: sqSize, rows: rows, cols: cols)
+                    .fill(color2)
+            }
+        }
+    }
+}
+
+/// A highly-efficient Shape that calculates and draws only the secondary tiles in a checkerboard pattern.
+struct CheckerboardShape: Shape {
+    let squareSize: CGFloat
+    let rows: Int
+    let cols: Int
+    
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        
+        for row in 0..<rows {
+            for col in 0..<cols {
+                // Draw secondary squares at even positions
+                if (row + col) % 2 == 0 {
+                    let tileRect = CGRect(
+                        x: CGFloat(col) * squareSize,
+                        y: CGFloat(row) * squareSize,
+                        width: squareSize,
+                        height: squareSize
+                    )
+                    path.addRect(tileRect)
                 }
             }
         }
+        
+        return path
     }
 }

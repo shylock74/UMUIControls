@@ -48,7 +48,7 @@ public struct UMUIColorPalettePicker: View {
     
     /// A premium, harmonious default HSL-shaded color palette.
     public static let defaultPalette: [Color] = [
-        .red, .orange, .yellow, .green, .mint, .blue, .purple, .pink, .gray
+        .red, .orange, .yellow, .green, .umMint, .blue, .purple, .pink, .gray
     ]
     
     /// Creates a color palette picker.
@@ -96,7 +96,7 @@ public struct UMUIColorPalettePicker: View {
                     Text(label)
                         .font(size == .normal ? .body : .caption)
                         .lineLimit(1)
-                        .foregroundStyle(.primary)
+                        .foregroundColor(.primary)
                     Spacer(minLength: 0)
                 }
                 .frame(width: labelWidth)
@@ -164,7 +164,7 @@ public struct UMUIColorPalettePicker: View {
                     } label: {
                         Image(systemName: "eyedropper")
                             .font(size == .normal ? .caption2 : .system(size: 8))
-                            .foregroundStyle(Color.secondary)
+                            .foregroundColor(Color.secondary)
                             .frame(width: eyedropperSize, height: eyedropperSize)
                             .background(Color.secondary.opacity(0.1))
                             .clipShape(Circle())
@@ -189,7 +189,7 @@ public struct UMUIColorPalettePicker: View {
         let sampler = NSColorSampler()
         sampler.show { color in
             guard let color = color else { return } // user cancelled
-            let pickedColor = Color(nsColor: color)
+            let pickedColor = Color( color)
             
             // NSColorSampler triggers its callback on a system background thread.
             // We MUST return to the Main Thread for safety to write to the Binding!

@@ -42,6 +42,6 @@ public struct UMUICaptionGrayText: View {
     public var body: some View {
         Text(text)
             .font(.caption)
-            .foregroundStyle(.secondary)
+            .foregroundColor(.secondary)
     }
 }

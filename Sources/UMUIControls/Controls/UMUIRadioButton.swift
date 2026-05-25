@@ -57,7 +57,7 @@ public struct UMUIRadioButton: View {
         Button(action: action) {
             Image(systemName: selected ? "largecircle.fill.circle" : "circle")
                 .font(size == .normal ? .body : .caption)
-                .foregroundStyle(selected ? Color.accentColor : .gray)
+                .foregroundColor(selected ? Color.accentColor : .gray)
         }
         .buttonStyle(.plain)
     }
