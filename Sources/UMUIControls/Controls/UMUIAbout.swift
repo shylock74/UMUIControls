@@ -99,7 +99,7 @@ public struct UMUIAbout: View {
                 )
             
             // Dynamic Typing Slogans
-            UMRollingThreeLinesView(texts: texts)
+            UMUIRollingThreeLinesView(texts: texts)
                 .frame(height: 80, alignment: .topLeading)
             
             // Spacer to replicate UMVSpacer(10)
@@ -262,7 +262,7 @@ struct RollingText: Identifiable, Equatable {
     var shouldType: Bool
 }
 
-struct UMRollingThreeLinesView: View {
+struct UMUIRollingThreeLinesView: View {
     let texts: [String]
     
     @State private var displayedLines: [RollingText] = []

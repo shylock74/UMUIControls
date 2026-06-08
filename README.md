@@ -9,11 +9,11 @@ All controls support consistent sizing modes (`.normal` and `.small`), and **def
 ## Directory Structure
 
 To maintain a clean modular architecture, components are structured into dedicated subfolders under `Sources/UMUIControls/Controls/`:
-- **`UMTabBarUIView/`**: Tabs and horizontal navigation bar components.
-- **`UMDisclosureGroup/`**: Flexible custom expandable disclosure cards and helpers.
-- **`UMHSpacer/`**: Structured horizontal and vertical visual spacers.
-- **`UMLeftObjectView/`**: Layout and text baseline positioning modifiers.
-- Custom controls (e.g., `UMBoxView.swift`, `UMTappableSection.swift`, `UMCenter.swift`, `UMZInset.swift`) are organized as single, self-contained structural files.
+- **`UMUITabBarUIView/`**: Tabs and horizontal navigation bar components.
+- **`UMUIDisclosureGroup/`**: Flexible custom expandable disclosure cards and helpers.
+- **`UMUIHSpacer/`**: Structured horizontal and vertical visual spacers.
+- **`UMUILeftObjectView/`**: Layout and text baseline positioning modifiers.
+- Custom controls (e.g., `UMUIBoxView.swift`, `UMUITappableSection.swift`, `UMUICenter.swift`, `UMUIZInset.swift`) are organized as single, self-contained structural files.
 
 ---
 
@@ -36,14 +36,14 @@ To maintain a clean modular architecture, components are structured into dedicat
    - [UMUITagBar](#14-umuitagbar)
    - [UMUITagEditor](#15-umuitageditor)
    - [UMUICheckerboard](#16-umuicheckerboard)
-   - [UMTabBarUIView & UMTabBarButton](#17-umtabbaruiview--umtabbarbutton)
-   - [UMDisclosureGroup & Variants](#18-umdisclosuregroup--variants)
-   - [UMTappableSection](#19-umtappablesection)
-   - [UMBoxView](#20-umboxview)
-   - [UMHSpacer & UMVSpacer](#21-umhspacer--umvspacer)
-   - [UMCenter](#22-umcenter)
-   - [UMLeftObjectView & Alignment Modifiers](#23-umleftobjectview--alignment-modifiers)
-   - [UMZInset](#24-umzinset)
+   - [UMUITabBarUIView & UMUITabBarButton](#17-umtabbaruiview--umtabbarbutton)
+   - [UMUIDisclosureGroup & Variants](#18-umdisclosuregroup--variants)
+   - [UMUITappableSection](#19-umtappablesection)
+   - [UMUIBoxView](#20-umboxview)
+   - [UMUIHSpacer & UMUIVSpacer](#21-umhspacer--umvspacer)
+   - [UMUICenter](#22-umcenter)
+   - [UMUILeftObjectView & Alignment Modifiers](#23-umleftobjectview--alignment-modifiers)
+   - [UMUIZInset](#24-umzinset)
 3. [Helper Extensions](#25-helper-extensions)
 4. [Theming & Integration](#theming--integration)
 
@@ -544,7 +544,7 @@ public init(
 
 ---
 
-### 17. `UMTabBarUIView` & `UMTabBarButton`
+### 17. `UMUITabBarUIView` & `UMUITabBarButton`
 A segmented horizontal tab bar controller with responsive bounding background highlights and custom rounded corner layouts.
 
 #### Initializer
@@ -567,25 +567,25 @@ public struct LabelAndId: Identifiable, Equatable {
 
 ---
 
-### 18. `UMDisclosureGroup` & Variants
+### 18. `UMUIDisclosureGroup` & Variants
 A rich set of expandable disclosure card containers styled with clean bounding containers. Available in five configurations:
-- **`UMDisclosureGroup`**: Standard expandable toggle group card.
-- **`UMExpansionDisclosureGroup`**: An interactive text field header with expandable content.
-- **`UMSwitchExpansionDisclosureGroup`**: Expandable layout tied directly to a compact switch control.
-- **`UMExpansionDisclosureSGroup`**: Expandable card with minimal visual noise.
-- **`UMGeneralDisclosureGroup`**: Expandable group using a fully customized header ViewBuilder.
+- **`UMUIDisclosureGroup`**: Standard expandable toggle group card.
+- **`UMUIExpansionDisclosureGroup`**: An interactive text field header with expandable content.
+- **`UMUISwitchExpansionDisclosureGroup`**: Expandable layout tied directly to a compact switch control.
+- **`UMUIExpansionDisclosureSGroup`**: Expandable card with minimal visual noise.
+- **`UMUIGeneralDisclosureGroup`**: Expandable group using a fully customized header ViewBuilder.
 
 **Usage Example:**
 ```swift
 @State private var isExpanded = false
-UMDisclosureGroup("Advanced Tuning", expanded: $isExpanded) {
+UMUIDisclosureGroup("Advanced Tuning", expanded: $isExpanded) {
     Text("Configure fine variables here...")
 }
 ```
 
 ---
 
-### 19. `UMTappableSection`
+### 19. `UMUITappableSection`
 A beautiful expandable card section container that expands/collapses when tapping anywhere on the title segment. Leverages `UMUISection` under the hood.
 
 #### Signature
@@ -599,7 +599,7 @@ public init(
 
 ---
 
-### 20. `UMBoxView`
+### 20. `UMUIBoxView`
 A visual decorative layout grouping container drawing a continuous rounded stroke border and dynamic background overlay.
 
 #### Signature
@@ -614,34 +614,34 @@ public init(
 
 ---
 
-### 21. `UMHSpacer` & `UMVSpacer`
+### 21. `UMUIHSpacer` & `UMUIVSpacer`
 Clean, native horizontal and vertical spacing layout boxes drawing empty spacing areas.
-- **`UMHSpacer(20)`**: Adds a horizontal transparent gap.
-- **`UMVSpacer(10)`**: Adds a vertical transparent gap.
+- **`UMUIHSpacer(20)`**: Adds a horizontal transparent gap.
+- **`UMUIVSpacer(10)`**: Adds a vertical transparent gap.
 
 ---
 
-### 22. `UMCenter`
+### 22. `UMUICenter`
 A layout ViewModifier utility that centers any target view horizontally, vertically, or in both directions.
 
 #### Extension Method
-`someView.umCenter(_ direction: UMCenter.Direction)`
+`someView.umCenter(_ direction: UMUICenter.Direction)`
 
 ---
 
-### 23. `UMLeftObjectView` & Alignment Modifiers
+### 23. `UMUILeftObjectView` & Alignment Modifiers
 A rich collection of layout positioning ViewModifiers that position elements within dynamic frames:
-- **`.leftObject(width: CGFloat?)`**: Left-aligns a view (optionally restricting its width).
-- **`.umCentered()`**: Centers a view horizontally.
-- **`.umZCentered()`**: Centers a view vertically.
+- **`.left(width: CGFloat?)`**: Left-aligns a view (optionally restricting its width).
+- **`.centered()` / `.hCentered()`**: Centers a view horizontally.
+- **`.zCentered()` / `.vCentered()`**: Centers a view vertically.
 
 ---
 
-### 24. `UMZInset`
+### 24. `UMUIZInset`
 A bounding layout modifier that positions inner content toward a specific corner or edge inside structural grid blocks.
 
 #### Extension Method
-`someView.umZInset(_ corner: UMZInset.Corner)`
+`someView.umZInset(_ corner: UMUIZInset.Corner)`
 
 ---
 

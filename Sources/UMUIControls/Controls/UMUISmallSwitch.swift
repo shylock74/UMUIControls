@@ -7,38 +7,116 @@
 //
 
 import SwiftUI
+import UMOmniaFramework
 
-/// A small-sized toggle with an inline label.
-///
-/// Usage:
-/// ```swift
-/// UMUISmallSwitch("Custom Bitrate", isOn: $enableBitrate, size: .normal)
-/// ```
+@available(macOS 11.0, *)
 public struct UMUISmallSwitch: View {
-    /// The label text displayed beside the toggle.
-    public let title: String
-    
-    /// Binding to the toggle state.
-    @Binding public var isOn: Bool
-    
-    /// The sizing mode of the switch.
-    public let size: UMUISwitchSize
-    
-    /// Creates a small switch.
-    /// - Parameters:
-    ///   - title: The label text.
-    ///   - isOn: Binding to the boolean state.
-    ///   - size: Sizing mode (default is `.normal`).
-    public init(_ title: String, isOn: Binding<Bool>, size: UMUISwitchSize = .small) {
-        self.title = title
-        self._isOn = isOn
-        self.size = size
-    }
-    
-    public var body: some View {
-        Toggle(title, isOn: $isOn)
-            .font(size == .normal ? .body : .caption)
-            .controlSize(size == .normal ? .regular : .small)
-            .toggleStyle(.switch)
-    }
+	
+	public enum Size {
+		case normal
+		case small
+		case mini
+	}
+	
+	var label :         String?
+	var size :          Size
+	@Binding var isOn : Bool
+	
+	var animate :       Bool
+	var callback :      ((Bool) -> ())?
+	
+	var onColor : Color {
+		UMAccentColorChecker.getAppAccentColor () ?? .red
+	}
+	
+	var offColor : Color {
+		if UMAccentColorChecker.getAppAccentColor () != nil {
+			return .gray
+		}
+		return .red
+	}
+	
+	var scale : CGFloat {
+		switch size {
+			case .normal:
+				return 1
+			case .small:
+				return 0.75
+			case .mini:
+				return 0.65
+		}
+	}
+	
+	private let pressureQueue = UMPressureTask ()
+	@State private var forceUpdate = false
+	
+	// Il parametro size ora ha come default .mini
+	public init (_ label :  String? = nil,
+				 isOn :     Binding <Bool>,
+				 size :     Size =  .mini,
+				 animate :  Bool =  true,
+				 callback : ((Bool) -> ())? = nil) {
+		self.label = label
+		self.size = size
+		self._isOn = isOn
+		self.animate = animate
+		self.callback = callback
+	}
+	
+	public var body: some View {
+		// HStack dispone gli elementi da sinistra a destra: Switch -> Testo
+		HStack (spacing: 4) {
+			
+			// 1. Switch (Sinistra)
+			ZStack {
+				Color.buttonBackgroundGray
+					.clipShape (RoundedRectangle (cornerRadius: 10))
+					.scaleEffect (0.9)
+				RoundedRectangle (cornerRadius: 10)
+					.strokeBorder (Color.gray, lineWidth: 1)
+					.scaleEffect (0.9)
+				ZStack {
+					Circle ()
+						.foregroundColor (isOn ? onColor : offColor)
+					Group {
+						Image (systemName: "checkmark")
+							.opacity (isOn ? 0.5 : 0)
+						Image (systemName: "xmark")
+							.opacity (isOn ? 0 : 0.5)
+					}
+					.foregroundColor (Color.white)
+					.scaleEffect (scale * 0.8)
+				}
+				.frame (width: 16, height: 16)
+				.offset (x : isOn ? 10 : -10, y: 0)
+			}
+			.frame (width: 40 * scale, height: 20 * scale)
+			.scaleEffect (scale)
+			
+			// 2. Scritta (Destra)
+			if let label {
+				if size == .mini {
+					CaptionText (label)
+				} else {
+					Text (label)
+				}
+			}
+		}
+		.animation (.easeInOut, value: isOn)
+		.onTapGesture {
+			isOn.toggle ()
+			callback? (isOn)
+		}
+		.onChange (of: isOn) { newValue in
+			forceUpdate.toggle ()
+		}
+	}
+}
+
+@available(macOS 11.0, *)
+struct UMUISmallSwitch_Previews: PreviewProvider {
+	@State static var isOn : Bool = false
+	static var previews: some View {
+		UMUISmallSwitch ("Testo", isOn : $isOn)
+	}
 }

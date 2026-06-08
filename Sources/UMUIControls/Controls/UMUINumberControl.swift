@@ -81,13 +81,8 @@ public struct UMUINumberControl: View {
         self.fieldWidth = fieldWidth
     }
     
-    /// Binding that converts between internal value and display value (for percentage mode).
-    private var displayBinding: Binding<Double> {
-        Binding(
-            get: { isPercentage ? self.value * 100 : self.value },
-            set: { self.value = isPercentage ? $0 / 100 : $0 }
-        )
-    }
+    /// Local text value representing the input field value to bypass SwiftUI formatter bugs.
+    @State private var textValue: String = ""
     
     /// The computed unit string to display.
     private var computedUnit: String {
@@ -95,12 +90,33 @@ public struct UMUINumberControl: View {
         return isPercentage ? "%" : ""
     }
     
-    private var numberFormatter: NumberFormatter {
+    private var displayValue: Double {
+        isPercentage ? value * 100 : value
+    }
+    
+    private func formatNumber(_ val: Double) -> String {
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal
         formatter.minimumFractionDigits = decimals
         formatter.maximumFractionDigits = decimals
-        return formatter
+        return formatter.string(from: NSNumber(value: val)) ?? ""
+    }
+    
+    private func parseDouble(_ str: String) -> Double? {
+        let cleaned = str.replacingOccurrences(of: ",", with: ".")
+        if let doubleVal = Double(cleaned) {
+            return doubleVal
+        }
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        return formatter.number(from: str)?.doubleValue
+    }
+    
+    private func updateValue(from parsed: Double) {
+        let actualVal = isPercentage ? parsed / 100 : parsed
+        // Clamp to range
+        let clamped = min(max(actualVal, range.lowerBound), range.upperBound)
+        value = clamped
     }
     
     public var body: some View {
@@ -120,18 +136,50 @@ public struct UMUINumberControl: View {
                 .controlSize(size == .normal ? .small : .mini)
             
             // Text Field
-            TextField("", value: displayBinding, formatter: numberFormatter)
-                .font(size == .normal ? .body : .caption)
-                .textFieldStyle(.roundedBorder)
-                .controlSize(size == .normal ? .small : .mini)
-                .frame(width: fieldWidth)
-                .multilineTextAlignment(.trailing)
+            TextField(
+                "",
+                text: $textValue,
+                onEditingChanged: { isEditing in
+                    if !isEditing {
+                        // When focus is lost, format the text value nicely
+                        textValue = formatNumber(displayValue)
+                    }
+                },
+                onCommit: {
+                    textValue = formatNumber(displayValue)
+                }
+            )
+            .font(size == .normal ? .body : .caption)
+            .textFieldStyle(.roundedBorder)
+            .controlSize(size == .normal ? .small : .mini)
+            .frame(width: fieldWidth)
+            .multilineTextAlignment(.trailing)
+            .onChange(of: textValue) { newValue in
+                if let parsed = parseDouble(newValue) {
+                    updateValue(from: parsed)
+                }
+            }
             
             // Unit
             Text(computedUnit)
                 .font(size == .normal ? .caption : .caption2)
                 .foregroundColor(.secondary)
                 .frame(width: 16, alignment: .leading)
+        }
+        .onAppear {
+            textValue = formatNumber(displayValue)
+        }
+        .onChange(of: value) { newValue in
+            // Only update textValue if the parsed double from textValue is different from displayValue.
+            // This prevents cursor jumping and infinite loops when typing.
+            if let parsed = parseDouble(textValue) {
+                let actualVal = isPercentage ? parsed / 100 : parsed
+                if abs(actualVal - newValue) > 0.0001 {
+                    textValue = formatNumber(displayValue)
+                }
+            } else {
+                textValue = formatNumber(displayValue)
+            }
         }
     }
 }
