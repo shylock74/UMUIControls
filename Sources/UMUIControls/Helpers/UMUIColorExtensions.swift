@@ -17,6 +17,9 @@ public extension Color {
     /// A standardized box gray color for disclosure backgrounds.
     static let boxGray = Color(white: 0.15)
     
+    /// A standardized button background gray color.
+    static let buttonBackgroundGray = Color(white: 0.25)
+    
     /// A backward-compatible mint color.
     static var umMint: Color {
         if #available(macOS 12.0, *) {

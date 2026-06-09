@@ -7,7 +7,6 @@
 //
 
 import SwiftUI
-import UMOmniaFramework
 
 @available(macOS 11.0, *)
 public struct UMUISmallSwitch: View {
@@ -26,14 +25,11 @@ public struct UMUISmallSwitch: View {
 	var callback :      ((Bool) -> ())?
 	
 	var onColor : Color {
-		UMAccentColorChecker.getAppAccentColor () ?? .red
+		.accentColor
 	}
 	
 	var offColor : Color {
-		if UMAccentColorChecker.getAppAccentColor () != nil {
-			return .gray
-		}
-		return .red
+		.gray
 	}
 	
 	var scale : CGFloat {
@@ -47,7 +43,6 @@ public struct UMUISmallSwitch: View {
 		}
 	}
 	
-	private let pressureQueue = UMPressureTask ()
 	@State private var forceUpdate = false
 	
 	// Il parametro size ora ha come default .mini
