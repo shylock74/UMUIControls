@@ -13,6 +13,7 @@ import SwiftUI
 /// ```swift
 /// UMUICaptionText("Name")
 /// ```
+@available(macOS 11.0, *)
 public struct UMUICaptionText: View {
     public let text: String
     
@@ -32,6 +33,7 @@ public struct UMUICaptionText: View {
 /// ```swift
 /// UMUICaptionGrayText("px")
 /// ```
+@available(macOS 11.0, *)
 public struct UMUICaptionGrayText: View {
     public let text: String
     
@@ -47,4 +49,5 @@ public struct UMUICaptionGrayText: View {
 }
 
 /// A backward-compatible alias for caption gray text.
+@available(macOS 11.0, *)
 public typealias CaptionText = UMUICaptionGrayText

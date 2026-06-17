@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+@available(macOS 11.0, *)
 public extension Color {
     /// A standardized dark gray color.
     static let darkGray = Color(white: 0.2)

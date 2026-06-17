@@ -9,6 +9,7 @@
 import SwiftUI
 
 // Structure:  u m u i tab bar u i view
+@available(macOS 11.0, *)
 public struct UMUITabBarUIView : View {
 	// A horizontal tab bar that manages the selection of tabs.
 

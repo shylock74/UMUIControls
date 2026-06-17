@@ -8,6 +8,7 @@
 import SwiftUI
 
 /// Sizing modes for UMUICheckerboard.
+@available(macOS 11.0, *)
 public enum UMUICheckerboardSize: Sendable, Equatable {
     case normal
     case small
@@ -19,6 +20,7 @@ public enum UMUICheckerboardSize: Sendable, Equatable {
 /// ```swift
 /// UMUICheckerboard(size: .normal)
 /// ```
+@available(macOS 11.0, *)
 public struct UMUICheckerboard: View {
     /// The sizing mode of the checkerboard.
     public let size: UMUICheckerboardSize
@@ -73,6 +75,7 @@ public struct UMUICheckerboard: View {
 }
 
 /// A highly-efficient Shape that calculates and draws only the secondary tiles in a checkerboard pattern.
+@available(macOS 11.0, *)
 struct CheckerboardShape: Shape {
     let squareSize: CGFloat
     let rows: Int

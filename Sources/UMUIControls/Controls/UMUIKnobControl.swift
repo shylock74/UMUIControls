@@ -10,6 +10,7 @@
 import SwiftUI
 
 /// Sizing modes for UMUIKnobControl.
+@available(macOS 11.0, *)
 public enum UMUIKnobControlSize: Sendable, Equatable {
     case normal
     case small
@@ -25,6 +26,7 @@ public enum UMUIKnobControlSize: Sendable, Equatable {
 /// ```swift
 /// UMUIKnobControl(label: "Gain", value: $gain, range: 0...10, defaultValue: 5.0, size: .normal)
 /// ```
+@available(macOS 11.0, *)
 public struct UMUIKnobControl: View {
     /// The optional label displayed alongside the knob.
     public let label: String?
@@ -222,6 +224,7 @@ public struct UMUIKnobControl: View {
 // MARK: - Radial Arc Shapes
 
 /// Path rendering the background boundary bounds from 130° to 410° (clockwise).
+@available(macOS 11.0, *)
 private struct KnobTrackShape: Shape {
     func path(in rect: CGRect) -> Path {
         var path = Path()
@@ -239,6 +242,7 @@ private struct KnobTrackShape: Shape {
 }
 
 /// Path rendering the active accent colored level dial fill.
+@available(macOS 11.0, *)
 private struct KnobActiveShape: Shape {
     let fraction: Double
     
@@ -260,6 +264,7 @@ private struct KnobActiveShape: Shape {
 // MARK: - Previews
 
 #if DEBUG
+@available(macOS 11.0, *)
 struct UMUIKnobControl_Previews: PreviewProvider {
     struct TestWrapper: View {
         @State private var volume: Double = 3.5

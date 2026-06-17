@@ -9,6 +9,7 @@
 import SwiftUI
 
 // Structure:  u m u i expansion disclosure group
+@available(macOS 11.0, *)
 public struct UMUIExpansionDisclosureGroup <Content : View> : View {
 	// A disclosure card featuring an inline text field as its header.
 	

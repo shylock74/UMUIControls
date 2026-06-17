@@ -9,12 +9,14 @@
 import SwiftUI
 
 /// Sizing modes for UMUIPositionGrid.
+@available(macOS 11.0, *)
 public enum UMUIPositionGridSize: Sendable, Equatable {
     case normal
     case small
 }
 
 /// Represents one of nine anchor positions in a 3×3 grid.
+@available(macOS 11.0, *)
 public enum UMUIPosition: String, CaseIterable, Identifiable, Codable, Sendable {
     case topLeft, top, topRight
     case left, center, right
@@ -56,6 +58,7 @@ public enum UMUIPosition: String, CaseIterable, Identifiable, Codable, Sendable 
 /// A single position button within the grid.
 ///
 /// Highlighted with `Color.accentColor` when its position matches the current selection.
+@available(macOS 11.0, *)
 public struct UMUIPositionButton: View {
     /// The position this button represents.
     public let position: UMUIPosition
@@ -138,6 +141,7 @@ public struct UMUIPositionButton: View {
 ///     self?.offset = .zero
 /// }
 /// ```
+@available(macOS 11.0, *)
 public struct UMUIPositionGrid: View {
     /// Binding to the currently selected position.
     @Binding public var selection: UMUIPosition

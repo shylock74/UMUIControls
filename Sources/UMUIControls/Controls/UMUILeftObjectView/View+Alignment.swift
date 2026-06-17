@@ -8,6 +8,7 @@
 
 import SwiftUI
 
+@available(macOS 11.0, *)
 public extension View {
 	/// Left-aligns this view inside its parent container.
 	func left (_ width : CGFloat? = nil) -> some View {

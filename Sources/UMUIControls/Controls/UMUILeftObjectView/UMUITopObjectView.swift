@@ -9,6 +9,7 @@
 import SwiftUI
 
 // Structure:  u m u i top object view
+@available(macOS 11.0, *)
 public struct UMUITopObjectView : ViewModifier {
 	// A layout view modifier that top-aligns content inside a vertical container.
 	

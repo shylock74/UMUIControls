@@ -9,6 +9,7 @@
 import SwiftUI
 
 // Structure:  u m u i switch expansion disclosure group
+@available(macOS 11.0, *)
 public struct UMUISwitchExpansionDisclosureGroup <Content : View> : View {
 	// A disclosure card where expansion state is controlled directly via a small Switch toggle.
 	

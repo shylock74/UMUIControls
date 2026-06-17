@@ -12,6 +12,7 @@ import AppKit
 #endif
 
 /// Sizing modes for UMUIAngleControl.
+@available(macOS 11.0, *)
 public enum UMUIAngleControlSize: Sendable, Equatable {
     case normal
     case small
@@ -27,6 +28,7 @@ public enum UMUIAngleControlSize: Sendable, Equatable {
 /// ```swift
 /// UMUIAngleControl(angle: $rotation, size: .normal)
 /// ```
+@available(macOS 11.0, *)
 public struct UMUIAngleControl: View {
     /// The angle in degrees, typically in the range -180...180.
     @Binding public var angle: Double

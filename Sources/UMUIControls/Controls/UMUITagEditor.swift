@@ -8,6 +8,7 @@
 import SwiftUI
 
 /// Sizing modes for UMUITagEditor.
+@available(macOS 11.0, *)
 public enum UMUITagEditorSize: Sendable, Equatable {
     case normal
     case small
@@ -19,6 +20,7 @@ public enum UMUITagEditorSize: Sendable, Equatable {
 /// ```swift
 /// UMUITagEditor(tags: $family.tags, availableTags: viewModel.allTags, size: .normal)
 /// ```
+@available(macOS 11.0, *)
 public struct UMUITagEditor: View {
     @Binding public var tags: [String]
     public let availableTags: [String]

@@ -9,6 +9,7 @@
 import SwiftUI
 
 // Structure:  u m u i disclosure group
+@available(macOS 11.0, *)
 public struct UMUIDisclosureGroup <Content : View> : View {
 	// A custom expandable disclosure group view component.
 	

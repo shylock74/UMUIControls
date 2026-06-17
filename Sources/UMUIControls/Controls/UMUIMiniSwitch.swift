@@ -9,6 +9,7 @@
 import SwiftUI
 
 /// Sizing modes for switches.
+@available(macOS 11.0, *)
 public enum UMUISwitchSize: Sendable, Equatable {
     case normal
     case small
@@ -20,6 +21,7 @@ public enum UMUISwitchSize: Sendable, Equatable {
 /// ```swift
 /// UMUIMiniSwitch("Force Aspect Ratio", isOn: $isForced, size: .normal)
 /// ```
+@available(macOS 11.0, *)
 public struct UMUIMiniSwitch: View {
     /// The label text displayed beside the toggle.
     public let title: String

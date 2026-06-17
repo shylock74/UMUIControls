@@ -9,6 +9,7 @@
 import SwiftUI
 
 /// Sizing modes for UMUISection.
+@available(macOS 11.0, *)
 public enum UMUISectionSize: Sendable, Equatable {
     case normal
     case small
@@ -24,6 +25,7 @@ public enum UMUISectionSize: Sendable, Equatable {
 ///     UMUINumberControl(title: "Scale", value: $scale, range: 0.05...3.0, isPercentage: true)
 /// }
 /// ```
+@available(macOS 11.0, *)
 public struct UMUISection<Content: View>: View {
     /// The optional section title displayed at the top.
     public let title: String?

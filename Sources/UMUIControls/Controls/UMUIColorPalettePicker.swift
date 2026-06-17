@@ -13,6 +13,7 @@ import AppKit
 #endif
 
 /// Sizing modes for UMUIColorPalettePicker.
+@available(macOS 11.0, *)
 public enum UMUIColorPalettePickerSize: Sendable, Equatable {
     case normal
     case small
@@ -28,6 +29,7 @@ public enum UMUIColorPalettePickerSize: Sendable, Equatable {
 /// ```swift
 /// UMUIColorPalettePicker(label: "Fill Color", selection: $shapeFill, size: .normal)
 /// ```
+@available(macOS 11.0, *)
 public struct UMUIColorPalettePicker: View {
     /// The optional label displayed on the leading edge.
     public let label: String?
@@ -206,6 +208,7 @@ public struct UMUIColorPalettePicker: View {
 // MARK: - Previews
 
 #if DEBUG
+@available(macOS 11.0, *)
 struct UMUIColorPalettePicker_Previews: PreviewProvider {
     struct TestWrapper: View {
         @State private var fontColor: Color = .purple

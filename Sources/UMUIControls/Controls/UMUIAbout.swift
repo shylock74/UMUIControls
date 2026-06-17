@@ -14,6 +14,7 @@ import AppKit
 
 /// A premium, self-contained About view with dynamic cyclic typing text effects.
 /// Fits a standard width of 960 pixels and adapts its height automatically to the content.
+@available(macOS 11.0, *)
 public struct UMUIAbout: View {
     
     public let title: String
@@ -140,6 +141,7 @@ public struct UMUIAbout: View {
 // MARK: - Native Windows Launcher (macOS)
 
 #if os(macOS)
+@available(macOS 11.0, *)
 public extension UMUIAbout {
     
     /// Internal reference to ensure only one standalone About window remains active.
@@ -235,6 +237,7 @@ public extension UMUIAbout {
 }
 
 /// A helper view bridging AppKit's NSVisualEffectView to SwiftUI.
+@available(macOS 11.0, *)
 internal struct VisualEffectView: NSViewRepresentable {
     let material: NSVisualEffectView.Material
     let blendingMode: NSVisualEffectView.BlendingMode
@@ -256,12 +259,14 @@ internal struct VisualEffectView: NSViewRepresentable {
 
 // MARK: - Typing & Animation Subviews
 
+@available(macOS 11.0, *)
 struct RollingText: Identifiable, Equatable {
     let id: UUID
     let text: String
     var shouldType: Bool
 }
 
+@available(macOS 11.0, *)
 struct UMUIRollingThreeLinesView: View {
     let texts: [String]
     
@@ -330,6 +335,7 @@ struct UMUIRollingThreeLinesView: View {
     }
 }
 
+@available(macOS 11.0, *)
 struct RollingLineView: View {
     let line: RollingText
     
@@ -344,6 +350,7 @@ struct RollingLineView: View {
     }
 }
 
+@available(macOS 11.0, *)
 struct TypingTextView: View {
     let fullText: String
     

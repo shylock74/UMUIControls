@@ -5,7 +5,7 @@ import PackageDescription
 
 let package = Package(
     name: "UMUIControls",
-	platforms: [.macOS(.v11)],
+	platforms: [.macOS(.v10_12)],
     products: [
         .library(
             name: "UMUIControls",

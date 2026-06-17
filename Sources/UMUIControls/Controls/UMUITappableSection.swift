@@ -9,6 +9,7 @@
 import SwiftUI
 
 // Structure:  u m u i tappable section
+@available(macOS 11.0, *)
 public struct UMUITappableSection <Content : View> : View {
 	// A custom section container that toggles its expanded state when tapped.
 	

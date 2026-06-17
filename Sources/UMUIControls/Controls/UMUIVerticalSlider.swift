@@ -10,6 +10,7 @@
 import SwiftUI
 
 /// Sizing modes for UMUIVerticalSlider.
+@available(macOS 11.0, *)
 public enum UMUIVerticalSliderSize: Sendable, Equatable {
     case normal
     case small
@@ -24,6 +25,7 @@ public enum UMUIVerticalSliderSize: Sendable, Equatable {
 /// ```swift
 /// UMUIVerticalSlider(label: "Fader 1", value: $volume, range: -60...12, size: .normal)
 /// ```
+@available(macOS 11.0, *)
 public struct UMUIVerticalSlider: View {
     /// The optional label displayed alongside or above the fader.
     public let label: String?
@@ -244,6 +246,7 @@ public struct UMUIVerticalSlider: View {
 // MARK: - Previews
 
 #if DEBUG
+@available(macOS 11.0, *)
 struct UMUIVerticalSlider_Previews: PreviewProvider {
     struct TestWrapper: View {
         @State private var gain: Double = 0.0

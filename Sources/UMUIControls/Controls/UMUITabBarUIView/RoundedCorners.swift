@@ -9,6 +9,7 @@
 import SwiftUI
 
 // Structure:  rounded corners
+@available(macOS 11.0, *)
 public struct RoundedCorners : Shape {
 	// A custom shape permitting independent corner radiuses.
 	

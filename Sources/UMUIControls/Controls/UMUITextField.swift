@@ -10,6 +10,7 @@
 import SwiftUI
 
 /// The sizing options for `UMUITextField`.
+@available(macOS 11.0, *)
 public enum UMUITextFieldSize: Sendable, Equatable {
     /// Normal size (default) using standard `.body` font and paddings.
     case normal
@@ -25,6 +26,7 @@ public enum UMUITextFieldSize: Sendable, Equatable {
 /// UMUITextField(label: "Username", value: $username)
 /// UMUITextField(label: "Password", value: $password, isSecure: true)
 /// ```
+@available(macOS 11.0, *)
 public struct UMUITextField: View {
     /// The optional label displayed at the leading edge.
     public let label: String?
@@ -231,6 +233,7 @@ struct UMUITextFieldModern: View {
 }
 
 /// The legacy implementation of UMUITextField supporting macOS 11 without FocusState.
+@available(macOS 11.0, *)
 struct UMUITextFieldLegacy: View {
     public let label: String?
     public let placeholder: String
@@ -396,6 +399,7 @@ private final class TextFieldDebouncer {
 // MARK: - Previews
 
 #if DEBUG
+@available(macOS 11.0, *)
 struct UMUITextField_Previews: PreviewProvider {
     struct TestWrapper: View {
         @State private var textNormal = "Hello World"

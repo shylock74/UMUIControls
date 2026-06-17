@@ -10,6 +10,7 @@
 import SwiftUI
 
 /// Sizing modes for Segmented Controls.
+@available(macOS 11.0, *)
 public enum UMUISegmentedBarSize: Sendable, Equatable {
     case normal
     case small
@@ -24,6 +25,7 @@ public enum UMUISegmentedBarSize: Sendable, Equatable {
 /// ```swift
 /// UMUISegmentedBar(label: "Layout", options: ["Left", "Center", "Right"], selection: $alignment, size: .normal)
 /// ```
+@available(macOS 11.0, *)
 public struct UMUISegmentedBar: View {
     /// The optional label displayed on the leading edge.
     public let label: String?
@@ -69,7 +71,7 @@ public struct UMUISegmentedBar: View {
     }
     
     private var horizontalPadding: CGFloat {
-        return size == .normal ? 16 : 12
+        return size == .normal ? 24 : 18
     }
     
     private var verticalPadding: CGFloat {
@@ -101,6 +103,7 @@ public struct UMUISegmentedBar: View {
                     } label: {
                         Text(option)
                             .font(optionFont)
+                            .lineLimit(1)
                             .foregroundColor(selection == option ? Color.accentColor : Color.secondary)
                             .padding(.horizontal, horizontalPadding)
                             .padding(.vertical, verticalPadding)
@@ -156,6 +159,7 @@ public struct UMUISegmentedBar: View {
 /// ```swift
 /// UMUIMultiSegmentedBar(label: "Attributes", options: ["Bold", "Italic", "Underline"], selection: $appliedStyles, size: .normal)
 /// ```
+@available(macOS 11.0, *)
 public struct UMUIMultiSegmentedBar: View {
     /// The optional label displayed on the leading edge.
     public let label: String?
@@ -200,7 +204,7 @@ public struct UMUIMultiSegmentedBar: View {
     }
     
     private var horizontalPadding: CGFloat {
-        return size == .normal ? 16 : 12
+        return size == .normal ? 24 : 18
     }
     
     private var verticalPadding: CGFloat {
@@ -237,6 +241,7 @@ public struct UMUIMultiSegmentedBar: View {
                     } label: {
                         Text(option)
                             .font(optionFont)
+                            .lineLimit(1)
                             .foregroundColor(isSelected ? Color.accentColor : Color.secondary)
                             .padding(.horizontal, horizontalPadding)
                             .padding(.vertical, verticalPadding)
@@ -285,6 +290,7 @@ public struct UMUIMultiSegmentedBar: View {
 // MARK: - Previews
 
 #if DEBUG
+@available(macOS 11.0, *)
 struct UMUISegmentedBar_Previews: PreviewProvider {
     struct TestWrapper: View {
         @State private var singleSelection = "Center"

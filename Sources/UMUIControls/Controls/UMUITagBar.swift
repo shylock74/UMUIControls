@@ -8,6 +8,7 @@
 import SwiftUI
 
 /// Sizing modes for UMUITagBar.
+@available(macOS 11.0, *)
 public enum UMUITagBarSize: Sendable, Equatable {
     case normal
     case small
@@ -19,6 +20,7 @@ public enum UMUITagBarSize: Sendable, Equatable {
 /// ```swift
 /// UMUITagBar(tags: allTags, selectedTags: $selectedTags, size: .normal)
 /// ```
+@available(macOS 11.0, *)
 public struct UMUITagBar: View {
     /// The tag labels list.
     public let tags: [String]

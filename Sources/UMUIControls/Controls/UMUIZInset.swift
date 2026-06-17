@@ -9,6 +9,7 @@
 import SwiftUI
 
 // Structure:  u m u i z inset
+@available(macOS 11.0, *)
 public struct UMUIZInset : ViewModifier {
 	// A layout view modifier that positions content toward a specific corner or edge.
 	
@@ -79,14 +80,15 @@ public struct UMUIZInset : ViewModifier {
 	}
 }
 
+@available(macOS 11.0, *)
 public extension View {
 	/// Insets this view toward the specified corner of its container.
-	func umZInset (corner : UMUIZInset.Corner = .upperLeft) -> some View {
+	func zInset (corner : UMUIZInset.Corner = .upperLeft) -> some View {
 		self.modifier (UMUIZInset (corner: corner))
 	}
 	
 	/// Insets this view toward the specified corner of its container.
-	func umZInset (_ corner : UMUIZInset.Corner = .upperLeft) -> some View {
+	func zInset (_ corner : UMUIZInset.Corner = .upperLeft) -> some View {
 		self.modifier (UMUIZInset (corner: corner))
 	}
 }

@@ -9,6 +9,7 @@
 import SwiftUI
 
 // Structure:  u m u i tab bar button
+@available(macOS 11.0, *)
 public struct UMUITabBarButton : View {
 	// A single selectable tab button component in the tab bar.
 	

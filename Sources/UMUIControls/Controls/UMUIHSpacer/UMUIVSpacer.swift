@@ -9,6 +9,7 @@
 import SwiftUI
 
 // Structure:  u m u i v spacer
+@available(macOS 11.0, *)
 public struct UMUIVSpacer : View {
 	// A clean vertical spacer helper drawing transparent blocks.
 	

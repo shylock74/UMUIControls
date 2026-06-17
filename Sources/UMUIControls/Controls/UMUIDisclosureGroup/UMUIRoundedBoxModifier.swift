@@ -9,6 +9,7 @@
 import SwiftUI
 
 // Structure:  u m u i rounded box modifier
+@available(macOS 11.0, *)
 public struct UMUIRoundedBoxModifier : ViewModifier {
 	// A custom view modifier drawing standard rounded grouping borders and glassy backgrounds.
 	
@@ -34,6 +35,7 @@ public struct UMUIRoundedBoxModifier : ViewModifier {
 	}
 }
 
+@available(macOS 11.0, *)
 public extension View {
 	/// Enfolds a SwiftUI view within a standardized premium rounded box.
 	func umRoundedBox (backgroundColor : Color? = nil,

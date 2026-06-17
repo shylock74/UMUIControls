@@ -9,6 +9,7 @@
 import SwiftUI
 
 // Structure:  u m u i box view
+@available(macOS 11.0, *)
 public struct UMUIBoxView : View {
 	// A beautiful container box drawing a filled background and continuous stroke border.
 	

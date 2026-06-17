@@ -9,6 +9,7 @@
 import SwiftUI
 
 // Structure:  u m u i center
+@available(macOS 11.0, *)
 public struct UMUICenter : ViewModifier {
 	// A centering utility view modifier that centers content horizontally, vertically, or both.
 	
@@ -46,9 +47,10 @@ public struct UMUICenter : ViewModifier {
 	}
 }
 
+@available(macOS 11.0, *)
 public extension View {
 	/// Center a view horizontally, vertically, or in both directions.
-	func umCenter (_ direction : UMUICenter.Direction = .horizontally) -> some View {
+	func center (_ direction : UMUICenter.Direction = .horizontally) -> some View {
 		self.modifier (UMUICenter (direction: direction))
 	}
 }

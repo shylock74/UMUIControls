@@ -27,6 +27,7 @@ import SwiftUI
 /// - icon: The SF Symbol name to represent the area.
 /// - isTargeted: A boolean state tracking if an item is being dragged over.
 /// - onSelect: A closure triggered when the user taps the area manually.
+@available(macOS 11.0, *)
 public struct UMUIDropArea: View {
     public let title: String
     public var count: Int? = nil

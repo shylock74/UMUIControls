@@ -9,6 +9,7 @@
 import SwiftUI
 
 /// Sizing modes for UMUIRadioButton.
+@available(macOS 11.0, *)
 public enum UMUIRadioButtonSize: Sendable, Equatable {
     case normal
     case small
@@ -28,6 +29,7 @@ public enum UMUIRadioButtonSize: Sendable, Equatable {
 ///     self?.currentSelection = .option1
 /// }
 /// ```
+@available(macOS 11.0, *)
 public struct UMUIRadioButton: View {
     /// Whether the radio button is in its selected state.
     public let selected: Bool

@@ -9,6 +9,7 @@
 import SwiftUI
 
 // Structure:  u m u i expansion disclosure s group
+@available(macOS 11.0, *)
 public struct UMUIExpansionDisclosureSGroup <Content : View> : View {
 	// A sleek, minimal custom expansion card using an arrow indicator header.
 	

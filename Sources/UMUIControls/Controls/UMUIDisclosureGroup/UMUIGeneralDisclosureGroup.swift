@@ -9,6 +9,7 @@
 import SwiftUI
 
 // Structure:  u m u i general disclosure group
+@available(macOS 11.0, *)
 public struct UMUIGeneralDisclosureGroup <LabelContent : View, Content : View> : View {
 	// An expandable card grouping container permitting custom ViewBuilder header segments.
 	

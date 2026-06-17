@@ -9,6 +9,7 @@
 import SwiftUI
 
 /// The styling options for `UMUICapsuleButton`.
+@available(macOS 11.0, *)
 public enum UMUICapsuleButtonStyle: Sendable, Equatable {
     /// A neutral gray background with black or white text depending on contrast.
     case gray
@@ -21,6 +22,7 @@ public enum UMUICapsuleButtonStyle: Sendable, Equatable {
 }
 
 /// The sizing options for `UMUICapsuleButton`.
+@available(macOS 11.0, *)
 public enum UMUICapsuleButtonSize: Sendable, Equatable {
     /// Large size using standard `.title` font and larger padding.
     case large
@@ -47,6 +49,7 @@ public enum UMUICapsuleButtonSize: Sendable, Equatable {
 ///     self?.saveChanges()
 /// }
 /// ```
+@available(macOS 11.0, *)
 public struct UMUICapsuleButton<Label: View>: View {
     /// The style option for the button.
     public let style: UMUICapsuleButtonStyle
@@ -91,6 +94,7 @@ public struct UMUICapsuleButton<Label: View>: View {
     }
 }
 
+@available(macOS 11.0, *)
 public extension UMUICapsuleButton where Label == Text {
     /// Creates a capsule button with a text title.
     /// - Parameters:
@@ -110,6 +114,7 @@ public extension UMUICapsuleButton where Label == Text {
     }
 }
 
+@available(macOS 11.0, *)
 public extension UMUICapsuleButton where Label == SwiftUI.Label<Text, Image> {
     /// Creates a capsule button with a title and a system image.
     /// - Parameters:
@@ -133,6 +138,7 @@ public extension UMUICapsuleButton where Label == SwiftUI.Label<Text, Image> {
 
 // MARK: - Button Style Implementation
 
+@available(macOS 11.0, *)
 struct CapsuleButtonStyle: ButtonStyle {
     let style: UMUICapsuleButtonStyle
     let size: UMUICapsuleButtonSize
@@ -143,9 +149,8 @@ struct CapsuleButtonStyle: ButtonStyle {
     
     func makeBody(configuration: Configuration) -> some View {
         let isPressed = configuration.isPressed
-        
-        let backgroundColor = resolveBackgroundColor()
-        let foregroundColor = resolveForegroundColor(backgroundColor: backgroundColor)
+        let baseColor = resolveBackgroundColor()
+        let foregroundColor = resolveForegroundColor(backgroundColor: baseColor)
         
         // Interactive tactile micro-animations
         let scale: CGFloat = isPressed ? 0.96 : (isHovered ? 1.02 : 1.0)
@@ -159,7 +164,15 @@ struct CapsuleButtonStyle: ButtonStyle {
             .padding(.vertical, verticalPadding)
             .background(
                 Capsule()
-                    .fill(backgroundColor)
+                    .fill(baseColor)
+                    .overlay(
+                        Capsule()
+                            .fill(LinearGradient(
+                                colors: [Color.white.opacity(0.12), Color.clear, Color.black.opacity(0.12)],
+                                startPoint: .top,
+                                endPoint: .bottom
+                            ))
+                    )
                     .brightness(brightnessChange)
             )
             .scaleEffect(scale)
@@ -219,6 +232,7 @@ struct CapsuleButtonStyle: ButtonStyle {
 
 // MARK: - Color Extension for Relative Luminance
 
+@available(macOS 11.0, *)
 public extension Color {
     /// Returns either `.black` or `.white` depending on which provides better contrast against this color.
     func contrastingTextColor(in environment: EnvironmentValues) -> Color {
@@ -241,6 +255,7 @@ public extension Color {
 // MARK: - Previews
 
 #if DEBUG
+@available(macOS 11.0, *)
 struct UMUICapsuleButton_Previews: PreviewProvider {
     static var previews: some View {
         ScrollView {

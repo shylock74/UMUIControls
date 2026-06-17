@@ -10,6 +10,7 @@
 import SwiftUI
 
 /// Sizing modes for UMUISlider.
+@available(macOS 11.0, *)
 public enum UMUISliderSize: Sendable, Equatable {
     case normal
     case small
@@ -24,6 +25,7 @@ public enum UMUISliderSize: Sendable, Equatable {
 /// ```swift
 /// UMUISlider(label: "Brightness", value: $brightness, size: .normal)
 /// ```
+@available(macOS 11.0, *)
 public struct UMUISlider: View {
     /// The optional label displayed on the leading edge.
     public let label: String?
@@ -159,6 +161,7 @@ public struct UMUISlider: View {
 // MARK: - Previews
 
 #if DEBUG
+@available(macOS 11.0, *)
 struct UMUISlider_Previews: PreviewProvider {
     struct TestWrapper: View {
         @State private var brightness: Double = 0.65

@@ -9,6 +9,7 @@
 import SwiftUI
 
 /// Sizing modes for UMUINumberControl.
+@available(macOS 11.0, *)
 public enum UMUINumberControlSize: Sendable, Equatable {
     case normal
     case small
@@ -20,6 +21,7 @@ public enum UMUINumberControlSize: Sendable, Equatable {
 /// ```swift
 /// UMUINumberControl(title: "Opacity", value: $opacity, range: 0...1, isPercentage: true, size: .normal)
 /// ```
+@available(macOS 11.0, *)
 public struct UMUINumberControl: View {
     /// The label displayed at the leading edge.
     public let title: String
@@ -48,6 +50,9 @@ public struct UMUINumberControl: View {
     /// The width of the text field.
     public var fieldWidth: CGFloat
     
+    /// The width of the unit text area.
+    public var unitWidth: CGFloat
+    
     /// Creates a new number control.
     /// - Parameters:
     ///   - title: The label text.
@@ -68,7 +73,8 @@ public struct UMUINumberControl: View {
         decimals: Int = 0,
         size: UMUINumberControlSize = .small,
         labelWidth: CGFloat = 50,
-        fieldWidth: CGFloat = 60
+        fieldWidth: CGFloat = 60,
+        unitWidth: CGFloat = 16
     ) {
         self.title = title
         self._value = value
@@ -79,6 +85,7 @@ public struct UMUINumberControl: View {
         self.size = size
         self.labelWidth = labelWidth
         self.fieldWidth = fieldWidth
+        self.unitWidth = unitWidth
     }
     
     /// Local text value representing the input field value to bypass SwiftUI formatter bugs.
@@ -164,7 +171,7 @@ public struct UMUINumberControl: View {
             Text(computedUnit)
                 .font(size == .normal ? .caption : .caption2)
                 .foregroundColor(.secondary)
-                .frame(width: 16, alignment: .leading)
+                .frame(width: unitWidth, alignment: .leading)
         }
         .onAppear {
             textValue = formatNumber(displayValue)

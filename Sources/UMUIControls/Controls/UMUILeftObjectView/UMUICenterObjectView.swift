@@ -9,6 +9,7 @@
 import SwiftUI
 
 // Structure:  u m u i center object view
+@available(macOS 11.0, *)
 public struct UMUICenterObjectView : ViewModifier {
 	// A layout view modifier that center-aligns content horizontally.
 	

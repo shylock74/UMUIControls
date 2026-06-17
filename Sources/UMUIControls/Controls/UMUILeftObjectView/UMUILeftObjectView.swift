@@ -9,6 +9,7 @@
 import SwiftUI
 
 // Structure:  u m u i left object view
+@available(macOS 11.0, *)
 public struct UMUILeftObjectView : ViewModifier {
 	// A layout view modifier that left-aligns content inside a horizontal container.
 	

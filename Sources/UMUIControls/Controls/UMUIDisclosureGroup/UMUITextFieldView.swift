@@ -9,6 +9,7 @@
 import SwiftUI
 
 // Structure:  u m u i text field view
+@available(macOS 11.0, *)
 public struct UMUITextFieldView : View {
 	// A simple, backward-compatible text field wrapper struct.
 	
