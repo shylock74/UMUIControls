@@ -148,11 +148,16 @@ public struct UMUINumberControl: View {
                 text: $textValue,
                 onEditingChanged: { isEditing in
                     if !isEditing {
-                        // When focus is lost, format the text value nicely
+                        if let parsed = parseDouble(textValue) {
+                            updateValue(from: parsed)
+                        }
                         textValue = formatNumber(displayValue)
                     }
                 },
                 onCommit: {
+                    if let parsed = parseDouble(textValue) {
+                        updateValue(from: parsed)
+                    }
                     textValue = formatNumber(displayValue)
                 }
             )
@@ -161,11 +166,6 @@ public struct UMUINumberControl: View {
             .controlSize(size == .normal ? .small : .mini)
             .frame(width: fieldWidth)
             .multilineTextAlignment(.trailing)
-            .onChange(of: textValue) { newValue in
-                if let parsed = parseDouble(newValue) {
-                    updateValue(from: parsed)
-                }
-            }
             
             // Unit
             Text(computedUnit)
