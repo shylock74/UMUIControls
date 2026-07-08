@@ -32,6 +32,9 @@ public struct UMUINumberControl: View {
     /// The valid range for the slider and value.
     public let range: ClosedRange<Double>
     
+    /// The step value for the slider and text input.
+    public let step: Double?
+    
     /// When `true`, the displayed value is multiplied by 100 (and the unit defaults to "%").
     public var isPercentage: Bool
     
@@ -58,6 +61,7 @@ public struct UMUINumberControl: View {
     ///   - title: The label text.
     ///   - value: Binding to the numeric value.
     ///   - range: The valid range for the slider.
+    ///   - step: The step value for the slider.
     ///   - isPercentage: Whether to display/edit as percentage (value * 100).
     ///   - unit: Optional unit string.
     ///   - decimals: Number of decimal places (default 0).
@@ -68,6 +72,7 @@ public struct UMUINumberControl: View {
         title: String,
         value: Binding<Double>,
         range: ClosedRange<Double>,
+        step: Double? = nil,
         isPercentage: Bool = false,
         unit: String? = nil,
         decimals: Int = 0,
@@ -79,6 +84,7 @@ public struct UMUINumberControl: View {
         self.title = title
         self._value = value
         self.range = range
+        self.step = step
         self.isPercentage = isPercentage
         self.unit = unit
         self.decimals = decimals
@@ -122,7 +128,10 @@ public struct UMUINumberControl: View {
     private func updateValue(from parsed: Double) {
         let actualVal = isPercentage ? parsed / 100 : parsed
         // Clamp to range
-        let clamped = min(max(actualVal, range.lowerBound), range.upperBound)
+        var clamped = min(max(actualVal, range.lowerBound), range.upperBound)
+        if let step = step {
+            clamped = (clamped / step).rounded() * step
+        }
         value = clamped
     }
     
@@ -138,9 +147,15 @@ public struct UMUINumberControl: View {
             .frame(width: labelWidth)
             
             // Slider
-            Slider(value: $value, in: range)
-                .labelsHidden()
-                .controlSize(size == .normal ? .small : .mini)
+            if let step = step {
+                Slider(value: $value, in: range, step: step)
+                    .labelsHidden()
+                    .controlSize(size == .normal ? .small : .mini)
+            } else {
+                Slider(value: $value, in: range)
+                    .labelsHidden()
+                    .controlSize(size == .normal ? .small : .mini)
+            }
             
             // Text Field
             TextField(
