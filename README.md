@@ -21,6 +21,7 @@ To maintain a clean modular architecture, components are structured into dedicat
 1. [Core Features](#core-features)
 2. [Component Index & Reference](#component-index--reference)
    - [UMUICapsuleButton](#1-umuicapsulebutton)
+   - [UMUIMiniButton](#1b-umuiminibutton)
    - [UMUITextField](#2-umuitextfield)
    - [UMUIKnobControl](#3-umuiknobcontrol)
    - [UMUIColorPalettePicker](#4-umuicolorpalettepicker)
@@ -120,6 +121,60 @@ public enum UMUICapsuleButtonSize: Sendable, Equatable {
 #### Interactive Behavior
 - **Hover:** Scales to `1.02`, brightens by `+0.04`, and adds a soft shadow.
 - **Press:** Compresses to `0.96` and dims by `-0.08` for mechanical feedback.
+
+---
+
+### 1b. `UMUIMiniButton`
+A compact capsule-outlined button designed to be used in place of `UMBorderlessSmallButton` or whenever space is very limited and the UI needs to be kept extremely compact.
+
+#### Signatures & Initializers
+```swift
+// 1. Generic Content ViewBuilder
+public init(
+    style: UMUIMiniButtonStyle = .gray,
+    action: @escaping () -> Void,
+    @ViewBuilder label: () -> Label
+)
+
+// 2. Convenience Text Title
+public init(
+    _ title: String,
+    style: UMUIMiniButtonStyle = .gray,
+    action: @escaping () -> Void
+) where Label == Text
+
+// 3. Convenience Icon & Text (spaced at 4pt)
+public init(
+    _ title: String,
+    systemImage: String,
+    style: UMUIMiniButtonStyle = .gray,
+    action: @escaping () -> Void
+) where Label == HStack<TupleView<(Image, Text)>>
+```
+
+#### Parameters
+| Parameter | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `style` | `UMUIMiniButtonStyle` | `.gray` | The outline color theme: `.gray`, `.accent`, or `.custom(Color)`. |
+| `action` | `() -> Void` | *Required* | Closure invoked when the button is clicked. |
+| `label` | `View` | *Required* | SwiftUI content layout wrapped inside the outline capsule. |
+
+#### Color Enum
+```swift
+public enum UMUIMiniButtonStyle: Sendable, Equatable {
+    case gray                // Gray outline
+    case accent              // System accent outline
+    case custom(Color)       // Custom color outline
+}
+```
+
+#### Design & Interactive Behavior
+- **Typography:** Fixed `11pt` size with regular weight (non-bold).
+- **Border:** Capsule-shaped outline with a thin `1.0pt` stroke width.
+- **Padding:** Compact `6pt` horizontal and `2pt` vertical padding.
+- **Hover:** Fills the background with `10%` opacity of the border color.
+- **Press:** Fills the background with `20%` opacity of the border color.
+- **Disabled State:** Opacity is automatically reduced to `40%` for both text and border.
 
 ---
 
