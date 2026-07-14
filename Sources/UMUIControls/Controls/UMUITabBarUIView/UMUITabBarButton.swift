@@ -52,6 +52,7 @@ public struct UMUITabBarButton : View {
 				Text (label)
 					.font (.system (size: 11,
 									weight: isSelected ? .bold : .medium))
+					.lineLimit (1)
 			}
 			.padding (.horizontal, 10)
 			.padding (.vertical, 6)

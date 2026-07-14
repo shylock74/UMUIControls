@@ -74,9 +74,11 @@ public struct UMUIDropArea: View {
             
             // Main Interaction Area
             VStack(spacing: 6) {
-                Image(systemName: icon)
-                    .font(.title2)
-                    .foregroundColor(isTargeted ? Color.accentColor : .secondary)
+                if !icon.isEmpty {
+                    Image(systemName: icon)
+                        .font(.title2)
+                        .foregroundColor(isTargeted ? Color.accentColor : .secondary)
+                }
                 
                 Text(subtitle ?? "Drop items here")
                     .font(.system(size: 9, weight: .bold))

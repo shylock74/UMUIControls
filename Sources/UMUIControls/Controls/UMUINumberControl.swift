@@ -163,17 +163,21 @@ public struct UMUINumberControl: View {
                 text: $textValue,
                 onEditingChanged: { isEditing in
                     if !isEditing {
+                        DispatchQueue.main.async {
+                            if let parsed = parseDouble(textValue) {
+                                updateValue(from: parsed)
+                            }
+                            textValue = formatNumber(displayValue)
+                        }
+                    }
+                },
+                onCommit: {
+                    DispatchQueue.main.async {
                         if let parsed = parseDouble(textValue) {
                             updateValue(from: parsed)
                         }
                         textValue = formatNumber(displayValue)
                     }
-                },
-                onCommit: {
-                    if let parsed = parseDouble(textValue) {
-                        updateValue(from: parsed)
-                    }
-                    textValue = formatNumber(displayValue)
                 }
             )
             .font(size == .normal ? .body : .caption)
