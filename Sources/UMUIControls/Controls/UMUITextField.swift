@@ -217,9 +217,7 @@ struct UMUITextFieldModern: View {
         let currentText = localText
         debouncer.debounce(delay: 0.3) {
             if self.value != currentText {
-                DispatchQueue.main.async {
-                    self.value = currentText
-                }
+                self.value = currentText
             }
         }
     }
@@ -357,9 +355,7 @@ struct UMUITextFieldLegacy: View {
         let currentText = localText
         debouncer.debounce(delay: 0.3) {
             if self.value != currentText {
-                DispatchQueue.main.async {
-                    self.value = currentText
-                }
+                self.value = currentText
             }
         }
     }
@@ -383,8 +379,8 @@ private final class TextFieldDebouncer {
         let newWorkItem = DispatchWorkItem(block: action)
         workItem = newWorkItem
         
-        // Execute the delay timer and logic verification in a background interactive queue
-        DispatchQueue.global(qos: .userInteractive).asyncAfter(
+        // Execute the delay timer safely on the Main Queue
+        DispatchQueue.main.asyncAfter(
             deadline: .now() + delay,
             execute: newWorkItem
         )
