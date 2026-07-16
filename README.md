@@ -45,7 +45,8 @@ To maintain a clean modular architecture, components are structured into dedicat
    - [UMUICenter](#22-umcenter)
    - [UMUILeftObjectView & Alignment Modifiers](#23-umleftobjectview--alignment-modifiers)
    - [UMUIZInset](#24-umzinset)
-3. [Helper Extensions](#25-helper-extensions)
+   - [UMUIProgressView](#25-umuiprogressview)
+3. [Helper Extensions](#26-helper-extensions)
 4. [Theming & Integration](#theming--integration)
 
 ---
@@ -700,7 +701,48 @@ A bounding layout modifier that positions inner content toward a specific corner
 
 ---
 
-## 25. Helper Extensions
+### 25. `UMUIProgressView`
+A custom indeterminate progress indicator featuring concentric animated wheels. It contains strictly graphical components and no text elements, adapting dynamically to the parent frame and sizes.
+
+#### Signatures & Initializers
+```swift
+// 1. Progress View Initializer
+public init(style: UMUIProgressViewStyle = UMUIProgressViewStyle())
+
+// 2. Style Initializer
+public init(tintColor: Color? = nil)
+```
+
+#### Parameters
+##### `UMUIProgressView`
+| Parameter | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `style` | `UMUIProgressViewStyle` | `UMUIProgressViewStyle()` | The style configuration containing color preferences. |
+
+##### `UMUIProgressViewStyle`
+| Parameter | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `tintColor` | `Color?` | `nil` | The primary color of the progress indicator wheels. Defaults to gray if nil, falling back to accent color. |
+
+#### Design & Interactive Behavior
+- **Concentric Motion:** Features two rings rotating in opposite directions. The outer wheel rotates clockwise, and the inner wheel rotates counterclockwise at a different speed (`1.5x` speed).
+- **Responsive Scaling:** Dynamically adjusts the outer and inner stroke widths based on the allocated frame size (e.g. thinner strokes if size <= 24pt, thicker strokes if size > 24pt).
+- **Animation:** Runs a continuous, linear rotation animation triggered `onAppear`.
+
+#### Usage Examples
+```swift
+// Basic progress view with default style (gray color)
+UMUIProgressView()
+    .frame(width: 40, height: 40)
+
+// Progress view with a custom accent/tint color and compact size
+UMUIProgressView(style: UMUIProgressViewStyle(tintColor: .orange))
+    .frame(width: 20, height: 20)
+```
+
+---
+
+## 26. Helper Extensions
 
 #### Text Elements
 - **`UMUICaptionText`**: `Text` view formatted using `.caption` font.
