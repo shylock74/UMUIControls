@@ -10,16 +10,16 @@ import SwiftUI
 @available(macOS 11.0, *)
 public extension Color {
     /// A standardized dark gray color.
-    static let darkGray = Color(white: 0.2)
+    static let darkGray = Color(white: 0.12)
     
     /// A standardized mild dark gray color.
-    static let mildDarkGray = Color(white: 0.3)
+    static let mildDarkGray = Color(white: 0.16)
     
     /// A standardized box gray color for disclosure backgrounds.
-    static let boxGray = Color(white: 0.15)
+    static let boxGray = Color(white: 0.10)
     
     /// A standardized button background gray color.
-    static let buttonBackgroundGray = Color(white: 0.25)
+    static let buttonBackgroundGray = Color(white: 0.18)
     
     /// A backward-compatible mint color.
     static var umMint: Color {

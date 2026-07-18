@@ -46,6 +46,7 @@ To maintain a clean modular architecture, components are structured into dedicat
    - [UMUILeftObjectView & Alignment Modifiers](#23-umleftobjectview--alignment-modifiers)
    - [UMUIZInset](#24-umzinset)
    - [UMUIProgressView](#25-umuiprogressview)
+   - [UMUISettingsGlobalView & UMUISettingPaneView](#25b-umuisettingsglobalview--umuisettingpaneview)
 3. [Helper Extensions](#26-helper-extensions)
 4. [Theming & Integration](#theming--integration)
 
@@ -738,6 +739,105 @@ UMUIProgressView()
 // Progress view with a custom accent/tint color and compact size
 UMUIProgressView(style: UMUIProgressViewStyle(tintColor: .orange))
     .frame(width: 20, height: 20)
+```
+
+---
+
+### 25b. `UMUISettingsGlobalView` & `UMUISettingPaneView`
+A comprehensive, premium macOS-styled settings panel component featuring a left navigation sidebar with custom SF Symbols and text labels, and a right content container card with dynamic headers.
+
+#### Signatures & Initializers
+
+##### `UMUISettingPaneView`
+```swift
+public init<Content: View>(
+    id: String? = nil,
+    icon: String,
+    name: String,
+    @ViewBuilder content: () -> Content
+)
+```
+
+##### `UMUISettingsGlobalView`
+```swift
+// 1. Automatic Key-Based Persistence Initializer
+public init(
+    storageKey: String = "UMUIControls.Settings.selectedPane",
+    @UMUISettingPaneViewBuilder panes: () -> [UMUISettingPaneView]
+)
+
+// 2. External State Binding Initializer
+public init(
+    selectedPane: Binding<String>,
+    @UMUISettingPaneViewBuilder panes: () -> [UMUISettingPaneView]
+)
+```
+
+#### Parameters
+
+##### `UMUISettingPaneView`
+| Parameter | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `id` | `String?` | `nil` | Optional unique identifier. Defaults to the pane name if not provided. |
+| `icon` | `String` | *Required* | The SF Symbol name to represent this pane in the navigation sidebar. |
+| `name` | `String` | *Required* | The display name of the settings pane in the sidebar and header. |
+| `content` | `() -> Content` | *Required* | A `@ViewBuilder` closure returning the content view. |
+
+##### `UMUISettingsGlobalView`
+| Parameter | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `storageKey` | `String` | `"UMUIControls.Settings.selectedPane"` | The key string to automatically persist the selected pane index inside `UserDefaults`. |
+| `selectedPane` | `Binding<String>` | *Required* | An external binding to control the selected pane programmatically or bind to standard state. |
+| `panes` | `() -> [UMUISettingPaneView]` | *Required* | A `@ViewBuilder` result builder gathering settings pane views. |
+
+#### Design & Interactive Behavior
+- **Dual-Pane Layout:** Designed as a split-pane interface with a left sidebar (180px fixed width) containing scrollable item categories and a main settings frame on the right.
+- **Selection Visuals:** The active category button is highlighted in the standard system `.accentColor` or `.tint` with white text/icons. Unselected buttons render with subtle outlines and respond to mouse hover events.
+- **State Persistence:** Automatically remembers and retrieves the last open pane across app launches, using either the default/custom `storageKey` key under the hood or an external binding.
+- **Backwards Compatibility:** Includes a typealias alias `UMUISettingsGloablView` to support accidental typos.
+
+#### Usage Examples
+
+##### 1. Managed Persistence (Simplest)
+```swift
+struct MySettingsView: View {
+    var body: some View {
+        UMUISettingsGlobalView(storageKey: "app.settings.selected_pane") {
+            UMUISettingPaneView(icon: "gearshape", name: "General") {
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("General Configurations")
+                    Divider()
+                    // add other UMUIControls components...
+                }
+            }
+            UMUISettingPaneView(icon: "bell", name: "Notifications") {
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("Notification Settings")
+                    Divider()
+                }
+            }
+        }
+        .frame(width: 600, height: 400)
+    }
+}
+```
+
+##### 2. External Binding Control
+```swift
+struct CustomParentView: View {
+    @State private var activePane = "General"
+    
+    var body: some View {
+        UMUISettingsGlobalView(selectedPane: $activePane) {
+            UMUISettingPaneView(id: "General", icon: "gearshape", name: "General Settings") {
+                Text("General Settings Panel")
+            }
+            UMUISettingPaneView(id: "Advanced", icon: "slider.horizontal.3", name: "Advanced Tuning") {
+                Text("Advanced Parameter Settings")
+            }
+        }
+    }
+}
 ```
 
 ---
