@@ -56,6 +56,13 @@ public struct UMUIMiniSwitch: View {
             .labelsHidden ()
             .controlSize (size == .normal ? .small : .mini)
             .toggleStyle (.switch)
+            .scaleEffect (
+                size == .normal ? 0.85 : 0.75
+            )
+            .frame (
+                width: size == .normal ? 32 : 28,
+                height: size == .normal ? 18 : 16
+            )
             
             Text (title)
                 .font (size == .normal ? .body : .caption)
