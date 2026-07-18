@@ -68,10 +68,10 @@ public struct UMUINumberControl: View {
     ///   - size: Sizing mode (default is `.normal`).
     ///   - labelWidth: Width of the label area (default 50).
     ///   - fieldWidth: Width of the text field (default 60).
-    public init(
+    public init (
         title: String,
-        value: Binding<Double>,
-        range: ClosedRange<Double>,
+        value: Binding <Double>,
+        range: ClosedRange <Double>,
         step: Double? = nil,
         isPercentage: Bool = false,
         unit: String? = nil,
@@ -79,7 +79,7 @@ public struct UMUINumberControl: View {
         size: UMUINumberControlSize = .small,
         labelWidth: CGFloat = 50,
         fieldWidth: CGFloat = 60,
-        unitWidth: CGFloat = 16
+        unitWidth: CGFloat = 45
     ) {
         self.title = title
         self._value = value
@@ -187,10 +187,16 @@ public struct UMUINumberControl: View {
             .multilineTextAlignment(.trailing)
             
             // Unit
-            Text(computedUnit)
-                .font(size == .normal ? .caption : .caption2)
-                .foregroundColor(.secondary)
-                .frame(width: unitWidth, alignment: .leading)
+            Text (computedUnit)
+                .font (size == .normal ? .caption : .caption2)
+                .foregroundColor (.secondary)
+                .padding (.leading,
+                    4
+                )
+                .frame (
+                    width: unitWidth,
+                    alignment: .leading
+                )
         }
         .onAppear {
             textValue = formatNumber(displayValue)

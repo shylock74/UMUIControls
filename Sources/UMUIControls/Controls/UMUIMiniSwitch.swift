@@ -37,16 +37,28 @@ public struct UMUIMiniSwitch: View {
     ///   - title: The label text.
     ///   - isOn: Binding to the boolean state.
     ///   - size: Sizing mode (default is `.normal`).
-    public init(_ title: String, isOn: Binding<Bool>, size: UMUISwitchSize = .small) {
+    public init (
+        _ title: String,
+        isOn: Binding <Bool>,
+        size: UMUISwitchSize = .small
+    ) {
         self.title = title
         self._isOn = isOn
         self.size = size
     }
     
     public var body: some View {
-        Toggle(title, isOn: $isOn)
-            .font(size == .normal ? .body : .caption)
-            .controlSize(size == .normal ? .small : .mini)
-            .toggleStyle(.switch)
+        HStack (spacing: 8) {
+            Toggle (
+                "",
+                isOn: $isOn
+            )
+            .labelsHidden ()
+            .controlSize (size == .normal ? .small : .mini)
+            .toggleStyle (.switch)
+            
+            Text (title)
+                .font (size == .normal ? .body : .caption)
+        }
     }
 }
