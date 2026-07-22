@@ -13,7 +13,7 @@ To maintain a clean modular architecture, components are structured into dedicat
 - **`UMUIDisclosureGroup/`**: Flexible custom expandable disclosure cards and helpers.
 - **`UMUIHSpacer/`**: Structured horizontal and vertical visual spacers.
 - **`UMUILeftObjectView/`**: Layout and text baseline positioning modifiers.
-- Custom controls (e.g., `UMUIBoxView.swift`, `UMUITappableSection.swift`, `UMUICenter.swift`, `UMUIZInset.swift`) are organized as single, self-contained structural files.
+- Custom controls (e.g., `UMUIBoxView.swift`, `UMUITappableSection.swift`, `UMUICenter.swift`, `UMUIZInset.swift`, `UMUIFrameExtensions.swift`) are organized as single, self-contained structural files.
 
 ---
 
@@ -47,6 +47,7 @@ To maintain a clean modular architecture, components are structured into dedicat
    - [UMUIZInset](#24-umzinset)
    - [UMUIProgressView](#25-umuiprogressview)
    - [UMUISettingsGlobalView & UMUISettingPaneView](#25b-umuisettingsglobalview--umuisettingpaneview)
+   - [UMWidth, UMHeight & View Frame Extensions](#25c-umwidth-umheight--view-frame-extensions)
 3. [Helper Extensions](#26-helper-extensions)
 4. [Theming & Integration](#theming--integration)
 
@@ -838,6 +839,63 @@ struct CustomParentView: View {
         }
     }
 }
+```
+
+---
+
+### 25c. `UMWidth`, `UMHeight` & View Frame Extensions
+Convenience view modifiers and extensions providing expressive syntax for setting fixed, minimum, maximum, rectangle, and square sizing on SwiftUI views.
+
+#### Modifiers & Extensions
+
+##### `UMWidth` & `UMHeight` Modifiers
+- **`UMWidth(width: CGFloat)`**: Applies a fixed frame width with non-negative validation (`max(width, 0)`).
+- **`UMHeight(height: CGFloat)`**: Applies a fixed frame height with non-negative validation (`max(height, 0)`).
+
+##### `.width()` Extensions
+```swift
+func width(_ w: CGFloat?) -> some View
+func width(min width: CGFloat) -> some View
+func width(max width: CGFloat) -> some View
+```
+
+##### `.height()` Extensions
+```swift
+func height(_ height: CGFloat?) -> some View
+func height(min height: CGFloat) -> some View
+func height(max height: CGFloat) -> some View
+func height(min: CGFloat, max: CGFloat) -> some View
+```
+
+##### `.rect()` & `.side()` Extensions
+```swift
+func rect(_ w: CGFloat, _ h: CGFloat) -> some View
+func rect(_ w: CGFloat, min h: CGFloat) -> some View
+func rect(_ w: CGFloat, max h: CGFloat) -> some View
+func rect(min width: CGFloat, _ height: CGFloat) -> some View
+func rect(min width: CGFloat, min height: CGFloat) -> some View
+func rect(size: CGSize?) -> some View
+func side(_ s: CGFloat) -> some View
+```
+
+#### Usage Example
+```swift
+// Fixed width and height
+Text("Hello")
+    .width(200)
+    .height(40)
+
+// Minimum and maximum constraints
+Text("Dynamic Card")
+    .width(min: 150)
+    .height(min: 50, max: 200)
+
+// Explicit rect and square side dimensions
+Rectangle()
+    .rect(300, 150)
+
+Circle()
+    .side(48)
 ```
 
 ---
