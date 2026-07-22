@@ -147,3 +147,67 @@ public extension View {
 		self.rect(s, s)
 	}
 }
+
+@available(macOS 11.0, iOS 13.0, *)
+public extension View {
+	/// Forces dark mode / dark color scheme rendering on the view hierarchy.
+	func umDark() -> some View {
+		self
+			.preferredColorScheme(.dark)
+			.environment(\.colorScheme, .dark)
+	}
+	
+	/// Applies rect sizing, padding, and forces dark mode.
+	@ViewBuilder
+	func umDarkRect(_ w: CGFloat, _ h: CGFloat? = nil) -> some View {
+		Group {
+			if let h = h {
+				self
+					.rect(w, h)
+					.padding()
+					.umDark()
+			} else {
+				self
+					.width(w)
+					.padding()
+					.umDark()
+			}
+		}
+	}
+	
+	/// Applies minimum width rect sizing, padding, and forces dark mode.
+	@ViewBuilder
+	func umDarkRect(minWidth w: CGFloat, _ h: CGFloat? = nil) -> some View {
+		Group {
+			if let h = h {
+				self
+					.rect(min: w, h)
+					.padding()
+					.umDark()
+			} else {
+				self
+					.frame(minWidth: w)
+					.padding()
+					.umDark()
+			}
+		}
+	}
+	
+	/// Applies width and minimum height rect sizing, padding, and forces dark mode.
+	func umDarkRect(_ w: CGFloat? = nil, minHeight h: CGFloat) -> some View {
+		self
+			.width(w)
+			.height(min: h)
+			.padding()
+			.umDark()
+	}
+	
+	/// Applies minimum width and minimum height rect sizing, padding, and forces dark mode.
+	func umDarkRect(minWidth w: CGFloat, minHeight h: CGFloat) -> some View {
+		self
+			.frame(minWidth: w, minHeight: h)
+			.padding()
+			.umDark()
+	}
+}
+

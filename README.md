@@ -878,6 +878,15 @@ func rect(size: CGSize?) -> some View
 func side(_ s: CGFloat) -> some View
 ```
 
+##### `.umDark()` & `.umDarkRect()` Extensions
+```swift
+func umDark() -> some View
+func umDarkRect(_ w: CGFloat, _ h: CGFloat? = nil) -> some View
+func umDarkRect(minWidth w: CGFloat, _ h: CGFloat? = nil) -> some View
+func umDarkRect(_ w: CGFloat? = nil, minHeight h: CGFloat) -> some View
+func umDarkRect(minWidth w: CGFloat, minHeight h: CGFloat) -> some View
+```
+
 #### Usage Example
 ```swift
 // Fixed width and height
@@ -896,6 +905,14 @@ Rectangle()
 
 Circle()
     .side(48)
+
+// Force Dark Mode on a view hierarchy
+CustomView()
+    .umDark()
+
+// Convenient dark card rectangle with padding
+Text("Dark Card")
+    .umDarkRect(200, 100)
 ```
 
 ---
