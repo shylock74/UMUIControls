@@ -46,6 +46,7 @@ To maintain a clean modular architecture, components are structured into dedicat
    - [UMUILeftObjectView & Alignment Modifiers](#23-umleftobjectview--alignment-modifiers)
    - [UMUIZInset](#24-umzinset)
    - [UMUIProgressView](#25-umuiprogressview)
+   - [UMUIProgressBarView](#25a-umuiprogressbarview)
    - [UMUISettingsGlobalView & UMUISettingPaneView](#25b-umuisettingsglobalview--umuisettingpaneview)
    - [UMWidth, UMHeight & View Frame Extensions](#25c-umwidth-umheight--view-frame-extensions)
 3. [Helper Extensions](#26-helper-extensions)
@@ -740,6 +741,65 @@ UMUIProgressView()
 // Progress view with a custom accent/tint color and compact size
 UMUIProgressView(style: UMUIProgressViewStyle(tintColor: .orange))
     .frame(width: 20, height: 20)
+```
+
+---
+
+### 25a. `UMUIProgressBarView`
+A horizontal, deterministic progress bar featuring a sleek 4px height, rounded corner radii (`2px`), and an optional jitter-free percentage indicator on the right.
+
+#### Signatures & Initializers
+```swift
+// 1. Primary Initializer
+public init(
+    value: Double,
+    showPercentage: Bool = true,
+    showDecimals: Bool = false,
+    style: UMUIProgressBarViewStyle = UMUIProgressBarViewStyle()
+)
+
+// 2. Convenience Initializer with direct tintColor
+public init(
+    value: Double,
+    showPercentage: Bool = true,
+    showDecimals: Bool = false,
+    tintColor: Color? = nil
+)
+
+// 3. Style Initializer
+public init(tintColor: Color? = nil)
+```
+
+#### Parameters
+##### `UMUIProgressBarView`
+| Parameter | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `value` | `Double` | *Required* | Normalized progress value ranging from `0.0` to `1.0`. Automatically clamped. |
+| `showPercentage` | `Bool` | `true` | Controls whether the percentage text indicator is displayed to the right of the bar. |
+| `showDecimals` | `Bool` | `false` | When `true`, displays 1 decimal place (e.g., `75.5%`). When `false`, displays integer percentage (e.g., `75%`). |
+| `style` | `UMUIProgressBarViewStyle` | `UMUIProgressBarViewStyle()` | Visual style configuration for the progress bar. |
+| `tintColor` | `Color?` | `nil` | Optional custom fill color for convenience initialization. Defaults to `.accentColor` if nil. |
+
+##### `UMUIProgressBarViewStyle`
+| Parameter | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `tintColor` | `Color?` | `nil` | The primary fill color of the progress bar track. |
+
+#### Design & Interactive Behavior
+- **Sleek 4px Height:** Designed with a 4.0pt height and 2.0pt corner radius (`Capsule`/`RoundedRectangle`).
+- **Jitter-Free Indicator:** Percentage labels use monospaced digit formatting with a fixed layout frame width (`38pt` for integer, `48pt` for decimals) to prevent horizontal layout shift or flickering during updates.
+- **Normalized Value:** Accepts values from `0.0` (0%) to `1.0` (100%).
+
+#### Usage Examples
+```swift
+// Standard progress bar with default percentage label (e.g. 75%)
+UMUIProgressBarView(value: 0.75)
+
+// Progress bar displaying 1 decimal place (e.g. 75.5%)
+UMUIProgressBarView(value: 0.755, showPercentage: true, showDecimals: true)
+
+// Progress bar with custom tint color and no percentage text
+UMUIProgressBarView(value: 0.40, showPercentage: false, tintColor: .orange)
 ```
 
 ---
