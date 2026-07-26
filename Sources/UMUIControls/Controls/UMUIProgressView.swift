@@ -92,6 +92,7 @@ public struct UMUIProgressView : View {
 				y : geometry.size.height / 2
 			)
 		}
+		.frame (maxWidth : .infinity, maxHeight : .infinity)
 		.onAppear {
 			// Initiates a continuous, linear rotation animation that bypasses UI thread blockages
 			withAnimation (
