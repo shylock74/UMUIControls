@@ -11,27 +11,27 @@ import SwiftUI
 @available(macOS 11.0, *)
 public extension View {
 	/// Left-aligns this view inside its parent container.
-	func left (_ width : CGFloat? = nil) -> some View {
+	func umLeft (_ width : CGFloat? = nil) -> some View {
 		self.modifier (UMUILeftObjectView (width: width))
 	}
 	
 	/// Horizontally centers this view inside its parent container.
-	func centered () -> some View {
+	func umCentered () -> some View {
 		self.modifier (UMUICenterObjectView ())
 	}
 	
 	/// Horizontally centers this view inside its parent container.
-	func hCentered () -> some View {
+	func umHCentered () -> some View {
 		self.modifier (UMUICenterObjectView ())
 	}
 	
 	/// Vertically centers this view inside its parent container.
-	func zCentered () -> some View {
+	func umZCentered () -> some View {
 		self.modifier (UMUIZCenterObjectView ())
 	}
 	
 	/// Vertically centers this view inside its parent container.
-	func vCentered () -> some View {
+	func umVCentered () -> some View {
 		self.modifier (UMUIZCenterObjectView ())
 	}
 }

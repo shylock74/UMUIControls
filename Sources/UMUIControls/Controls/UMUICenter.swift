@@ -50,7 +50,7 @@ public struct UMUICenter : ViewModifier {
 @available(macOS 11.0, *)
 public extension View {
 	/// Center a view horizontally, vertically, or in both directions.
-	func center (_ direction : UMUICenter.Direction = .horizontally) -> some View {
+	func umCenter (_ direction : UMUICenter.Direction = .horizontally) -> some View {
 		self.modifier (UMUICenter (direction: direction))
 	}
 }

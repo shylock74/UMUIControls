@@ -43,8 +43,9 @@ public struct UMHeight: ViewModifier {
 @available(macOS 10.15, iOS 13.0, *)
 public extension View {
 	/// Sets an explicit width on the view if non-nil.
+	@_disfavoredOverload
 	@ViewBuilder
-	func width(_ w: CGFloat?) -> some View {
+	func umWidth(_ w: CGFloat?) -> some View {
 		if let w = w {
 			self.modifier(UMWidth(width: w))
 		} else {
@@ -53,12 +54,14 @@ public extension View {
 	}
 	
 	/// Sets a maximum width on the view.
-	func width(max width: CGFloat) -> some View {
+	@_disfavoredOverload
+	func umWidth(max width: CGFloat) -> some View {
 		self.frame(maxWidth: width)
 	}
 	
 	/// Sets a minimum width on the view.
-	func width(min width: CGFloat) -> some View {
+	@_disfavoredOverload
+	func umWidth(min width: CGFloat) -> some View {
 		self.frame(minWidth: width)
 	}
 }
@@ -66,8 +69,9 @@ public extension View {
 @available(macOS 10.15, iOS 13.0, *)
 public extension View {
 	/// Sets an explicit height on the view if non-nil.
+	@_disfavoredOverload
 	@ViewBuilder
-	func height(_ height: CGFloat?) -> some View {
+	func umHeight(_ height: CGFloat?) -> some View {
 		if let height = height {
 			self.modifier(UMHeight(height: height))
 		} else {
@@ -76,17 +80,20 @@ public extension View {
 	}
 	
 	/// Sets a maximum height on the view.
-	func height(max height: CGFloat) -> some View {
+	@_disfavoredOverload
+	func umHeight(max height: CGFloat) -> some View {
 		self.frame(maxHeight: height)
 	}
 	
 	/// Sets a minimum height on the view.
-	func height(min height: CGFloat) -> some View {
+	@_disfavoredOverload
+	func umHeight(min height: CGFloat) -> some View {
 		self.frame(minHeight: height)
 	}
 	
 	/// Sets both minimum and maximum heights on the view.
-	func height(min: CGFloat, max: CGFloat) -> some View {
+	@_disfavoredOverload
+	func umHeight(min: CGFloat, max: CGFloat) -> some View {
 		self.frame(minHeight: min, maxHeight: max)
 	}
 }
@@ -94,45 +101,51 @@ public extension View {
 @available(macOS 10.15, iOS 13.0, *)
 public extension View {
 	/// Sets explicit width and height dimensions with validation.
-	func rect(_ w: CGFloat, _ h: CGFloat) -> some View {
+	@_disfavoredOverload
+	func umRect(_ w: CGFloat, _ h: CGFloat) -> some View {
 		let width: CGFloat = (w < 1 || w.isNaN) ? 1 : w
 		let height: CGFloat = (h < 1 || h.isNaN) ? 1 : h
 		return self.frame(width: width, height: height)
 	}
 	
 	/// Sets fixed width and minimum height with validation.
-	func rect(_ w: CGFloat, min h: CGFloat) -> some View {
+	@_disfavoredOverload
+	func umRect(_ w: CGFloat, min h: CGFloat) -> some View {
 		let width: CGFloat = (w < 1 || w.isNaN) ? 1 : w
 		let height: CGFloat = (h < 1 || h.isNaN) ? 1 : h
 		return self
-			.width(width)
+			.umWidth(width)
 			.frame(minHeight: height)
 	}
 	
 	/// Sets fixed width and maximum height with validation.
-	func rect(_ w: CGFloat, max h: CGFloat) -> some View {
+	@_disfavoredOverload
+	func umRect(_ w: CGFloat, max h: CGFloat) -> some View {
 		let width: CGFloat = (w < 1 || w.isNaN) ? 1 : w
 		let height: CGFloat = (h < 1 || h.isNaN) ? 1 : h
 		return self
-			.width(width)
+			.umWidth(width)
 			.frame(maxHeight: height)
 	}
 	
 	/// Sets minimum width and fixed height with validation.
-	func rect(min width: CGFloat, _ height: CGFloat) -> some View {
+	@_disfavoredOverload
+	func umRect(min width: CGFloat, _ height: CGFloat) -> some View {
 		self
 			.frame(minWidth: width)
-			.height(height)
+			.umHeight(height)
 	}
 	
 	/// Sets minimum width and minimum height.
-	func rect(min width: CGFloat, min height: CGFloat) -> some View {
+	@_disfavoredOverload
+	func umRect(min width: CGFloat, min height: CGFloat) -> some View {
 		self.frame(minWidth: width, minHeight: height)
 	}
 	
 	/// Sets explicit size dimensions using CGSize if non-nil.
+	@_disfavoredOverload
 	@ViewBuilder
-	func rect(size: CGSize?) -> some View {
+	func umRect(size: CGSize?) -> some View {
 		Group {
 			if let size = size {
 				self.frame(width: size.width, height: size.height)
@@ -143,14 +156,16 @@ public extension View {
 	}
 	
 	/// Sets equal width and height (square layout).
-	func side(_ s: CGFloat) -> some View {
-		self.rect(s, s)
+	@_disfavoredOverload
+	func umSide(_ s: CGFloat) -> some View {
+		self.umRect(s, s)
 	}
 }
 
 @available(macOS 11.0, iOS 13.0, *)
 public extension View {
 	/// Forces dark mode / dark color scheme rendering on the view hierarchy.
+	@_disfavoredOverload
 	func umDark() -> some View {
 		self
 			.preferredColorScheme(.dark)
@@ -158,17 +173,18 @@ public extension View {
 	}
 	
 	/// Applies rect sizing, padding, and forces dark mode.
+	@_disfavoredOverload
 	@ViewBuilder
 	func umDarkRect(_ w: CGFloat, _ h: CGFloat? = nil) -> some View {
 		Group {
 			if let h = h {
 				self
-					.rect(w, h)
+					.umRect(w, h)
 					.padding()
 					.umDark()
 			} else {
 				self
-					.width(w)
+					.umWidth(w)
 					.padding()
 					.umDark()
 			}
@@ -176,12 +192,13 @@ public extension View {
 	}
 	
 	/// Applies minimum width rect sizing, padding, and forces dark mode.
+	@_disfavoredOverload
 	@ViewBuilder
 	func umDarkRect(minWidth w: CGFloat, _ h: CGFloat? = nil) -> some View {
 		Group {
 			if let h = h {
 				self
-					.rect(min: w, h)
+					.umRect(min: w, h)
 					.padding()
 					.umDark()
 			} else {
@@ -194,15 +211,17 @@ public extension View {
 	}
 	
 	/// Applies width and minimum height rect sizing, padding, and forces dark mode.
+	@_disfavoredOverload
 	func umDarkRect(_ w: CGFloat? = nil, minHeight h: CGFloat) -> some View {
 		self
-			.width(w)
-			.height(min: h)
+			.umWidth(w)
+			.umHeight(min: h)
 			.padding()
 			.umDark()
 	}
 	
 	/// Applies minimum width and minimum height rect sizing, padding, and forces dark mode.
+	@_disfavoredOverload
 	func umDarkRect(minWidth w: CGFloat, minHeight h: CGFloat) -> some View {
 		self
 			.frame(minWidth: w, minHeight: h)

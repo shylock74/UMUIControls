@@ -226,7 +226,7 @@ struct CapsuleButtonStyle: ButtonStyle {
     }
     
     private func resolveForegroundColor(backgroundColor: Color) -> Color {
-        return backgroundColor.contrastingTextColor(in: environment)
+        return backgroundColor.umContrastingTextColor(in: environment)
     }
 }
 
@@ -235,7 +235,7 @@ struct CapsuleButtonStyle: ButtonStyle {
 @available(macOS 11.0, *)
 public extension Color {
     /// Returns either `.black` or `.white` depending on which provides better contrast against this color.
-    func contrastingTextColor(in environment: EnvironmentValues) -> Color {
+    func umContrastingTextColor(in environment: EnvironmentValues) -> Color {
         #if os(macOS)
         let nsColor = NSColor(self)
         guard let rgbColor = nsColor.usingColorSpace(.deviceRGB) else {

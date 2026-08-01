@@ -690,9 +690,9 @@ A layout ViewModifier utility that centers any target view horizontally, vertica
 
 ### 23. `UMUILeftObjectView` & Alignment Modifiers
 A rich collection of layout positioning ViewModifiers that position elements within dynamic frames:
-- **`.left(width: CGFloat?)`**: Left-aligns a view (optionally restricting its width).
-- **`.centered()` / `.hCentered()`**: Centers a view horizontally.
-- **`.zCentered()` / `.vCentered()`**: Centers a view vertically.
+- **`.umLeft(width: CGFloat?)`**: Left-aligns a view (optionally restricting its width).
+- **`.umCentered()` / `.umHCentered()`**: Centers a view horizontally.
+- **`.umZCentered()` / `.umVCentered()`**: Centers a view vertically.
 
 ---
 
@@ -912,30 +912,30 @@ Convenience view modifiers and extensions providing expressive syntax for settin
 - **`UMWidth(width: CGFloat)`**: Applies a fixed frame width with non-negative validation (`max(width, 0)`).
 - **`UMHeight(height: CGFloat)`**: Applies a fixed frame height with non-negative validation (`max(height, 0)`).
 
-##### `.width()` Extensions
+##### `.umWidth()` Extensions
 ```swift
-func width(_ w: CGFloat?) -> some View
-func width(min width: CGFloat) -> some View
-func width(max width: CGFloat) -> some View
+func umWidth(_ w: CGFloat?) -> some View
+func umWidth(min width: CGFloat) -> some View
+func umWidth(max width: CGFloat) -> some View
 ```
 
-##### `.height()` Extensions
+##### `.umHeight()` Extensions
 ```swift
-func height(_ height: CGFloat?) -> some View
-func height(min height: CGFloat) -> some View
-func height(max height: CGFloat) -> some View
-func height(min: CGFloat, max: CGFloat) -> some View
+func umHeight(_ height: CGFloat?) -> some View
+func umHeight(min height: CGFloat) -> some View
+func umHeight(max height: CGFloat) -> some View
+func umHeight(min: CGFloat, max: CGFloat) -> some View
 ```
 
-##### `.rect()` & `.side()` Extensions
+##### `.umRect()` & `.umSide()` Extensions
 ```swift
-func rect(_ w: CGFloat, _ h: CGFloat) -> some View
-func rect(_ w: CGFloat, min h: CGFloat) -> some View
-func rect(_ w: CGFloat, max h: CGFloat) -> some View
-func rect(min width: CGFloat, _ height: CGFloat) -> some View
-func rect(min width: CGFloat, min height: CGFloat) -> some View
-func rect(size: CGSize?) -> some View
-func side(_ s: CGFloat) -> some View
+func umRect(_ w: CGFloat, _ h: CGFloat) -> some View
+func umRect(_ w: CGFloat, min h: CGFloat) -> some View
+func umRect(_ w: CGFloat, max h: CGFloat) -> some View
+func umRect(min width: CGFloat, _ height: CGFloat) -> some View
+func umRect(min width: CGFloat, min height: CGFloat) -> some View
+func umRect(size: CGSize?) -> some View
+func umSide(_ s: CGFloat) -> some View
 ```
 
 ##### `.umDark()` & `.umDarkRect()` Extensions
@@ -951,20 +951,20 @@ func umDarkRect(minWidth w: CGFloat, minHeight h: CGFloat) -> some View
 ```swift
 // Fixed width and height
 Text("Hello")
-    .width(200)
-    .height(40)
+    .umWidth(200)
+    .umHeight(40)
 
 // Minimum and maximum constraints
 Text("Dynamic Card")
-    .width(min: 150)
-    .height(min: 50, max: 200)
+    .umWidth(min: 150)
+    .umHeight(min: 50, max: 200)
 
 // Explicit rect and square side dimensions
 Rectangle()
-    .rect(300, 150)
+    .umRect(300, 150)
 
 Circle()
-    .side(48)
+    .umSide(48)
 
 // Force Dark Mode on a view hierarchy
 CustomView()

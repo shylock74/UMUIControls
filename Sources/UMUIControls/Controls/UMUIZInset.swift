@@ -83,12 +83,12 @@ public struct UMUIZInset : ViewModifier {
 @available(macOS 11.0, *)
 public extension View {
 	/// Insets this view toward the specified corner of its container.
-	func zInset (corner : UMUIZInset.Corner = .upperLeft) -> some View {
+	func umZInset (corner : UMUIZInset.Corner = .upperLeft) -> some View {
 		self.modifier (UMUIZInset (corner: corner))
 	}
 	
 	/// Insets this view toward the specified corner of its container.
-	func zInset (_ corner : UMUIZInset.Corner = .upperLeft) -> some View {
+	func umZInset (_ corner : UMUIZInset.Corner = .upperLeft) -> some View {
 		self.modifier (UMUIZInset (corner: corner))
 	}
 }
