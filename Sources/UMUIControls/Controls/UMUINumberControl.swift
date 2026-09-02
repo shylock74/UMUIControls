@@ -92,6 +92,15 @@ public struct UMUINumberControl: View {
         self.labelWidth = labelWidth
         self.fieldWidth = fieldWidth
         self.unitWidth = unitWidth
+        // Seed the field here rather than in onAppear alone: inside a disclosure group or
+        // a tab the control can render before onAppear runs, and it would show an empty
+        // field next to a slider that already sits at its value.
+        let shown = isPercentage ? value.wrappedValue * 100 : value.wrappedValue
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.minimumFractionDigits = decimals
+        formatter.maximumFractionDigits = decimals
+        _textValue = State(initialValue: formatter.string(from: NSNumber(value: shown)) ?? "")
     }
     
     /// Local text value representing the input field value to bypass SwiftUI formatter bugs.
