@@ -57,6 +57,9 @@ public struct UMUICapsuleButton<Label: View>: View {
     /// The size option for the button (.large, .normal, or .small).
     public let size: UMUICapsuleButtonSize
     
+    /// Whether the button carries a soft, slowly pulsing halo in its own colour.
+    public let glow: Bool
+    
     /// The action to perform when tapped.
     public let action: () -> Void
     
@@ -69,16 +72,19 @@ public struct UMUICapsuleButton<Label: View>: View {
     /// - Parameters:
     ///   - style: The style (gray, accent, or custom).
     ///   - size: The size option (.large, .normal, or .small).
+    ///   - glow: Adds a pulsing halo so the button reads as the primary action.
     ///   - action: The action to perform when tapped.
     ///   - label: The content inside the button.
     public init(
         style: UMUICapsuleButtonStyle = .gray,
         size: UMUICapsuleButtonSize = .small,
+        glow: Bool = false,
         action: @escaping () -> Void,
         @ViewBuilder label: () -> Label
     ) {
         self.style = style
         self.size = size
+        self.glow = glow
         self.action = action
         self.label = label()
     }
@@ -87,7 +93,7 @@ public struct UMUICapsuleButton<Label: View>: View {
         Button(action: action) {
             label
         }
-        .buttonStyle(CapsuleButtonStyle(style: style, size: size, isHovered: isHovered))
+        .buttonStyle(CapsuleButtonStyle(style: style, size: size, glow: glow, isHovered: isHovered))
         .onHover { hovering in
             isHovered = hovering
         }
@@ -106,9 +112,10 @@ public extension UMUICapsuleButton where Label == Text {
         _ title: String,
         style: UMUICapsuleButtonStyle = .gray,
         size: UMUICapsuleButtonSize = .small,
+        glow: Bool = false,
         action: @escaping () -> Void
     ) {
-        self.init(style: style, size: size, action: action) {
+        self.init(style: style, size: size, glow: glow, action: action) {
             Text(title)
         }
     }
@@ -128,9 +135,10 @@ public extension UMUICapsuleButton where Label == SwiftUI.Label<Text, Image> {
         systemImage: String,
         style: UMUICapsuleButtonStyle = .gray,
         size: UMUICapsuleButtonSize = .small,
+        glow: Bool = false,
         action: @escaping () -> Void
     ) {
-        self.init(style: style, size: size, action: action) {
+        self.init(style: style, size: size, glow: glow, action: action) {
             SwiftUI.Label(title, systemImage: systemImage)
         }
     }
@@ -142,6 +150,7 @@ public extension UMUICapsuleButton where Label == SwiftUI.Label<Text, Image> {
 struct CapsuleButtonStyle: ButtonStyle {
     let style: UMUICapsuleButtonStyle
     let size: UMUICapsuleButtonSize
+    let glow: Bool
     let isHovered: Bool
     
     @Environment(\.colorScheme) private var colorScheme
@@ -167,6 +176,10 @@ struct CapsuleButtonStyle: ButtonStyle {
                     .fill(baseColor)
                     .overlay(
                         Capsule()
+                            .strokeBorder(Color.white.opacity(glow ? 0.35 : 0.0), lineWidth: 1)
+                    )
+                    .overlay(
+                        Capsule()
                             .fill(LinearGradient(
                                 colors: [Color.white.opacity(0.12), Color.clear, Color.black.opacity(0.12)],
                                 startPoint: .top,
@@ -174,6 +187,10 @@ struct CapsuleButtonStyle: ButtonStyle {
                             ))
                     )
                     .brightness(brightnessChange)
+            )
+            .background(
+                UMUICapsuleGlow(color: baseColor, isHovered: isHovered, isPressed: isPressed)
+                    .opacity(glow ? 1 : 0)
             )
             .scaleEffect(scale)
             .shadow(color: Color.black.opacity(shadowOpacity), radius: 4, x: 0, y: isHovered ? 2 : 0)
@@ -227,6 +244,33 @@ struct CapsuleButtonStyle: ButtonStyle {
     
     private func resolveForegroundColor(backgroundColor: Color) -> Color {
         return backgroundColor.umContrastingTextColor(in: environment)
+    }
+}
+
+// MARK: - Glow Halo
+
+/// The soft, slowly breathing halo drawn behind a glowing capsule button.
+/// It is purely decorative and never takes hits, so the button below stays clickable.
+@available(macOS 11.0, *)
+struct UMUICapsuleGlow: View {
+    let color: Color
+    let isHovered: Bool
+    let isPressed: Bool
+    
+    @State private var breathing = false
+    
+    var body: some View {
+        // Pressing dims the halo so the button still reads as pushed in.
+        let intensity: Double = isPressed ? 0.30 : (isHovered ? 0.85 : 0.55)
+        
+        Capsule()
+            .fill(color)
+            .blur(radius: isHovered ? 16 : 12)
+            .opacity(intensity * (breathing ? 1.0 : 0.55))
+            .scaleEffect(breathing ? 1.10 : 1.0)
+            .animation(.easeInOut(duration: 1.8).repeatForever(autoreverses: true), value: breathing)
+            .allowsHitTesting(false)
+            .onAppear { breathing = true }
     }
 }
 
