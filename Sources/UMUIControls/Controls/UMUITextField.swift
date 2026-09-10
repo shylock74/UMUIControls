@@ -43,6 +43,11 @@ public struct UMUITextField: View {
     /// Whether the text field acts as a secure password field with visibility toggle.
     public let isSecure: Bool
     
+    /// Whether a clear button appears at the trailing edge while the field has
+    /// text. Off by default: on a field that is normally full — a name, a value
+    /// being edited — the button is one more thing to miss the target of.
+    public let isClearable: Bool
+    
     /// The width allocated for the leading label.
     public let labelWidth: CGFloat
     
@@ -53,6 +58,7 @@ public struct UMUITextField: View {
         value: Binding<String>,
         size: UMUITextFieldSize = .small,
         isSecure: Bool = false,
+        isClearable: Bool = false,
         labelWidth: CGFloat = 80
     ) {
         self.label = label
@@ -60,6 +66,7 @@ public struct UMUITextField: View {
         self._value = value
         self.size = size
         self.isSecure = isSecure
+        self.isClearable = isClearable
         self.labelWidth = labelWidth
     }
     
@@ -71,6 +78,7 @@ public struct UMUITextField: View {
                 value: $value,
                 size: size,
                 isSecure: isSecure,
+                isClearable: isClearable,
                 labelWidth: labelWidth
             )
         } else {
@@ -80,6 +88,7 @@ public struct UMUITextField: View {
                 value: $value,
                 size: size,
                 isSecure: isSecure,
+                isClearable: isClearable,
                 labelWidth: labelWidth
             )
         }
@@ -94,6 +103,7 @@ struct UMUITextFieldModern: View {
     @Binding public var value: String
     public let size: UMUITextFieldSize
     public let isSecure: Bool
+    public let isClearable: Bool
     public let labelWidth: CGFloat
     
     @State private var localText: String = ""
@@ -107,6 +117,7 @@ struct UMUITextFieldModern: View {
         value: Binding<String>,
         size: UMUITextFieldSize,
         isSecure: Bool,
+        isClearable: Bool,
         labelWidth: CGFloat
     ) {
         self.label = label
@@ -114,6 +125,7 @@ struct UMUITextFieldModern: View {
         self._value = value
         self.size = size
         self.isSecure = isSecure
+        self.isClearable = isClearable
         self.labelWidth = labelWidth
     }
     
@@ -143,6 +155,21 @@ struct UMUITextFieldModern: View {
                         .textFieldStyle(.plain)
                         .font(fieldFont)
                         .onSubmit { commitChanges() }
+                }
+                
+                if isClearable && !localText.isEmpty {
+                    Button {
+                        localText = ""
+                        commitChanges()
+                        isFocused = true
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(size == .small ? .caption2 : .body)
+                            .foregroundColor(.secondary)
+                    }
+                    .buttonStyle(.plain)
+                    .focusable(false)
+                    .help("Clear")
                 }
                 
                 if isSecure {
@@ -238,6 +265,7 @@ struct UMUITextFieldLegacy: View {
     @Binding public var value: String
     public let size: UMUITextFieldSize
     public let isSecure: Bool
+    public let isClearable: Bool
     public let labelWidth: CGFloat
     
     @State private var localText: String = ""
@@ -251,6 +279,7 @@ struct UMUITextFieldLegacy: View {
         value: Binding<String>,
         size: UMUITextFieldSize,
         isSecure: Bool,
+        isClearable: Bool,
         labelWidth: CGFloat
     ) {
         self.label = label
@@ -258,6 +287,7 @@ struct UMUITextFieldLegacy: View {
         self._value = value
         self.size = size
         self.isSecure = isSecure
+        self.isClearable = isClearable
         self.labelWidth = labelWidth
     }
     
@@ -287,6 +317,20 @@ struct UMUITextFieldLegacy: View {
                     })
                     .textFieldStyle(.plain)
                     .font(fieldFont)
+                }
+                
+                if isClearable && !localText.isEmpty {
+                    Button {
+                        localText = ""
+                        commitChanges()
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(size == .small ? .caption2 : .body)
+                            .foregroundColor(.secondary)
+                    }
+                    .buttonStyle(.plain)
+                    .focusable(false)
+                    .help("Clear")
                 }
                 
                 if isSecure {

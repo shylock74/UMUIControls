@@ -195,6 +195,7 @@ public init(
     value: Binding<String>,
     size: UMUITextFieldSize = .small,
     isSecure: Bool = false,
+    isClearable: Bool = false,
     labelWidth: CGFloat = 80
 )
 ```
@@ -207,12 +208,14 @@ public init(
 | `value` | `Binding<String>` | *Required* | Parent binding updated via debounce/commit. |
 | `size` | `UMUITextFieldSize` | `.small` | Size configuration: `.normal` or `.small` (caption-sized). |
 | `isSecure` | `Bool` | `false` | Enables password hide/reveal mode (bullets vs characters). |
+| `isClearable` | `Bool` | `false` | Shows a trailing clear button while the field has text. |
 | `labelWidth` | `CGFloat` | `80` | Horizontal width allocated for the leading label. |
 
 #### Timing & Focus Logic
 - **0.3s Debounce:** Local keystrokes update local state instantly for latency-free typing. Synchronization to `value` is debounced by `300ms` completely in a background queue (`DispatchQueue.global(qos: .userInteractive)`), leaving the MainActor entirely unencumbered.
 - **Instant Sync:** Synchronizes immediately (bypassing debounce) on **Enter/Return**, **blur (losing focus)**, or **disappear (`onDisappear`)**.
 - **Eye Toggle:** Retains keyboard focus on the field programmatically so typing is never interrupted when toggling password visibility.
+- **Clear Button:** Appears only while the field has text, empties it, and syncs `value` immediately without waiting for the debounce. Focus stays on the field, so you can keep typing.
 
 ---
 
