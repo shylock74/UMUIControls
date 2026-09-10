@@ -22,8 +22,11 @@ public struct UMUIProgressView : View {
 	/// The visual configuration style containing color preferences.
 	public var style : UMUIProgressViewStyle
 	
-	/// The current rotation angle driven by the animation timer.
-	@State private var rotationAngle : Angle = .degrees (0)
+	/// The current rotation angle for the outer wheel.
+	@State private var outerRotationAngle : Angle = .degrees (0)
+	
+	/// The current rotation angle for the inner wheel.
+	@State private var innerRotationAngle : Angle = .degrees (0)
 	
 	/// Public initializer to create the progress wheel with a specific style.
 	/// - Parameter style: The style configuration, defaults to a standard instance.
@@ -65,7 +68,7 @@ public struct UMUIProgressView : View {
 							lineCap : .round
 						)
 					)
-					.rotationEffect (rotationAngle)
+					.rotationEffect (outerRotationAngle)
 				
 				// Inner Wheel active rotating segment (rotating in opposite direction)
 				Circle ()
@@ -81,7 +84,7 @@ public struct UMUIProgressView : View {
 						)
 					)
 					.padding (size * 0.25)
-					.rotationEffect (-rotationAngle * 1.5)
+					.rotationEffect (innerRotationAngle)
 			}
 			.frame (
 				width : size,
@@ -94,12 +97,21 @@ public struct UMUIProgressView : View {
 		}
 		.frame (maxWidth : .infinity, maxHeight : .infinity)
 		.onAppear {
-			// Initiates a continuous, linear rotation animation that bypasses UI thread blockages
+			// Outer circle animation: 1 full rotation every 2 seconds
 			withAnimation (
 				.linear (duration : 2.0)
 				.repeatForever (autoreverses : false)
 			) {
-				rotationAngle = .degrees (360)
+				outerRotationAngle = .degrees (360)
+			}
+			
+			// Inner circle animation: 1 full rotation in the opposite direction every 1.33 seconds
+			// (Questo mantiene il rapporto di velocità di circa 1.5x rispetto a quello esterno)
+			withAnimation (
+				.linear (duration : 1.33)
+				.repeatForever (autoreverses : false)
+			) {
+				innerRotationAngle = .degrees (-360)
 			}
 		}
 	}
