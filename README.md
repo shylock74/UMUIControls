@@ -23,6 +23,7 @@ To maintain a clean modular architecture, components are structured into dedicat
    - [UMUICapsuleButton](#1-umuicapsulebutton)
    - [UMUIMiniButton](#1b-umuiminibutton)
    - [UMUITextField](#2-umuitextfield)
+   - [UMUICurrencyField](#2b-umuicurrencyfield)
    - [UMUIKnobControl](#3-umuiknobcontrol)
    - [UMUIColorPalettePicker](#4-umuicolorpalettepicker)
    - [UMUISlider](#5-umuislider)
@@ -216,6 +217,50 @@ public init(
 - **Instant Sync:** Synchronizes immediately (bypassing debounce) on **Enter/Return**, **blur (losing focus)**, or **disappear (`onDisappear`)**.
 - **Eye Toggle:** Retains keyboard focus on the field programmatically so typing is never interrupted when toggling password visibility.
 - **Clear Button:** Appears only while the field has text, empties it, and syncs `value` immediately without waiting for the debounce. Focus stays on the field, so you can keep typing.
+
+---
+
+### 2b. `UMUICurrencyField`
+A currency amount field with an optional leading label, a fixed trailing currency symbol, and the same rounded-rect look and focus glow as `UMUITextField`. Unlike `TextField(value:formatter:)`, it never writes the binding while you type: the parent does not re-render on every keystroke, so the field keeps focus.
+
+*Fully backward-compatible with macOS 11 (uses legacy bindings when `@FocusState` is unavailable).*
+
+#### Signature & Initializer
+```swift
+public init(
+    label: String? = nil,
+    value: Binding<Double>,
+    currency: String = "€",
+    decimals: Int = 2,
+    size: UMUICurrencyFieldSize = .small,
+    labelWidth: CGFloat = 80,
+    fieldWidth: CGFloat = 80
+)
+```
+
+#### Parameters
+| Parameter | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `label` | `String?` | `nil` | Optional label displayed horizontally on the left of the field. |
+| `value` | `Binding<Double>` | *Required* | Amount, written only on commit and rounded to `decimals` places. |
+| `currency` | `String` | `"€"` | Symbol shown after the amount, outside the editable text. An empty string hides it. |
+| `decimals` | `Int` | `2` | Fraction digits shown in the field and kept on commit. |
+| `size` | `UMUICurrencyFieldSize` | `.small` | Size configuration: `.normal` or `.small` (caption-sized). |
+| `labelWidth` | `CGFloat` | `80` | Horizontal width allocated for the leading label. |
+| `fieldWidth` | `CGFloat` | `80` | Width of the bordered field, currency symbol included. |
+
+#### Commit Logic
+- **Commit Only:** Keystrokes edit a local copy of the text. `value` is written on **Enter/Return**, **blur (losing focus)**, or **disappear (`onDisappear`)**, and only if the text was actually changed.
+- **Esc Reverts:** The system Cancel command (`onExitCommand`, Esc) discards the edit in progress and restores the last committed amount without touching `value`.
+- **Invalid Input:** Empty or unparsable text reverts to the last committed amount.
+- **Locale-Tolerant Parsing:** Accepts both `,` and `.` as decimal separator (`7,49`, `7.49`, `1.234,56`, `1,234.56`); spaces and the currency symbol are ignored. The committed amount is reformatted with the current locale.
+- **Outside Changes Win:** If `value` changes from outside while editing (e.g. another record gets selected), the field shows the new amount and drops the half-typed text, so it is never committed into the wrong record.
+
+#### Usage Example
+```swift
+@State private var fullPrice = 14.99
+UMUICurrencyField(label: "Full Price:", value: $fullPrice, size: .normal, labelWidth: 72, fieldWidth: 72)
+```
 
 ---
 
