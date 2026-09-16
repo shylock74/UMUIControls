@@ -70,6 +70,27 @@ public struct UMUITextField: View {
         self.labelWidth = labelWidth
     }
     
+    /// Backward-compatible initializer for callers linked against older versions of UMUIControls.
+    @_disfavoredOverload
+    public init(
+        label: String? = nil,
+        placeholder: String = "",
+        value: Binding<String>,
+        size: UMUITextFieldSize = .small,
+        isSecure: Bool = false,
+        labelWidth: CGFloat = 80
+    ) {
+        self.init(
+            label: label,
+            placeholder: placeholder,
+            value: value,
+            size: size,
+            isSecure: isSecure,
+            isClearable: false,
+            labelWidth: labelWidth
+        )
+    }
+    
     public var body: some View {
         if #available(macOS 12.0, *) {
             UMUITextFieldModern(
