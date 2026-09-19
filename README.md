@@ -50,6 +50,15 @@ To maintain a clean modular architecture, components are structured into dedicat
    - [UMUIProgressBarView](#25a-umuiprogressbarview)
    - [UMUISettingsGlobalView & UMUISettingPaneView](#25b-umuisettingsglobalview--umuisettingpaneview)
    - [UMWidth, UMHeight & View Frame Extensions](#25c-umwidth-umheight--view-frame-extensions)
+   - [UMUITextEditor](#25d-umuitexteditor)
+   - [UMUIChatBubble](#25e-umuichatbubble)
+   - [UMUIStatusPill](#25f-umuistatuspill)
+   - [UMUIListRow](#25g-umuilistrow)
+   - [UMUIKeyValueEditor](#25h-umuikeyvalueeditor)
+   - [UMUIInspectorRow](#25i-umuiinspectorrow)
+   - [UMUIThreeColumnSplitView](#25j-umuithreecolumnsplitview)
+   - [UMUIHexColorField & Hex Helpers](#25k-umuihexcolorfield--hex-helpers)
+   - [UMUIEmptyStateView](#25l-umuiemptystateview)
 3. [Helper Extensions](#26-helper-extensions)
 4. [Theming & Integration](#theming--integration)
 
@@ -1021,6 +1030,172 @@ CustomView()
 // Convenient dark card rectangle with padding
 Text("Dark Card")
     .umDarkRect(200, 100)
+```
+
+---
+
+### 25d. `UMUITextEditor`
+A multi-line editor with the same rounded-rect border and focus glow as `UMUITextField`, an optional label above, a placeholder, and the same 0.3 s debounced binding. Requires macOS 13.
+
+```swift
+public init(
+    label: String? = nil,
+    placeholder: String = "",
+    value: Binding<String>,
+    size: UMUITextEditorSize = .small,   // .normal / .small
+    minHeight: CGFloat = 60,
+    maxHeight: CGFloat? = nil,
+    isMonospaced: Bool = false,
+    debounceInterval: TimeInterval = 0.3,   // 0 = write on every keystroke
+    onSubmit: (() -> Void)? = nil
+)
+```
+
+- **Sync:** keystrokes edit a local copy; `value` is written 0.3 s after the last keystroke, on blur, on disappear, and right before `onSubmit`.
+- **⌘↩ Submit:** when `onSubmit` is set, ⌘↩ commits the text and calls it (macOS 14+, via `onKeyPress`). Plain ↩ inserts a newline.
+
+```swift
+UMUITextEditor(placeholder: "Type your answer…", value: $answer, minHeight: 44) { send() }
+```
+
+---
+
+### 25e. `UMUIChatBubble`
+A chat bubble for turn-by-turn threads. Requires macOS 12.
+
+```swift
+public init(
+    _ text: String,
+    role: UMUIChatBubbleRole,        // .outgoing, .incoming, .system
+    header: String? = nil,           // caption above (author)
+    footer: String? = nil,           // caption below (time)
+    systemImage: String? = nil,
+    maxBubbleWidth: CGFloat = 460
+)
+```
+
+- `.outgoing`: right-aligned, accent background, black/white text by luminance.
+- `.incoming`: left-aligned neutral card with a hairline border.
+- `.system`: centered muted note, no card.
+- Text is selectable.
+
+---
+
+### 25f. `UMUIStatusPill`
+A tinted capsule badge for states, with an optional breathing dot for work in progress.
+
+```swift
+public init(
+    _ title: String,
+    systemImage: String? = nil,
+    style: UMUIStatusPillStyle = .neutral,  // .neutral, .accent, .success, .warning, .danger, .custom(Color)
+    isPulsing: Bool = false
+)
+```
+
+```swift
+UMUIStatusPill("Clarification in Progress", style: .warning, isPulsing: true)
+UMUIStatusPill("Ready to Generate", systemImage: "checkmark.seal.fill", style: .success)
+```
+
+---
+
+### 25g. `UMUIListRow`
+A selectable sidebar/master-list row: leading symbol, title, optional subtitle, trailing accessory, hover and accent selection states.
+
+```swift
+// Trailing detail text
+public init(title: String, subtitle: String? = nil, systemImage: String? = nil,
+            detail: String? = nil, isSelected: Bool, action: @escaping () -> Void)
+
+// Custom trailing accessory
+public init(title: String, subtitle: String? = nil, systemImage: String? = nil,
+            isSelected: Bool, action: @escaping () -> Void,
+            @ViewBuilder trailing: () -> Trailing)
+```
+
+---
+
+### 25h. `UMUIKeyValueEditor`
+An editable key/value table built from debounced `UMUITextField` pairs, with remove buttons and an add button. Requires macOS 12.
+
+```swift
+public struct UMUIKeyValuePair: Identifiable, Equatable, Hashable, Sendable {
+    public var id: UUID
+    public var key: String
+    public var value: String
+}
+
+public init(
+    pairs: Binding<[UMUIKeyValuePair]>,
+    keyPlaceholder: String = "Key",
+    valuePlaceholder: String = "Value",
+    addTitle: String = "Add",
+    keyWidth: CGFloat = 110
+)
+```
+
+---
+
+### 25i. `UMUIInspectorRow`
+A read-only label/value line for inspectors. Long values truncate in the middle; the full value is in the tooltip and in the **Copy** context menu.
+
+```swift
+public init(_ label: String, value: String, isMonospaced: Bool = false, labelWidth: CGFloat = 80)
+public init(_ label: String, value: String, isMonospaced: Bool = false, labelWidth: CGFloat = 80,
+            @ViewBuilder accessory: () -> Accessory)
+```
+
+```swift
+UMUIInspectorRow("SHA-256", value: hash, isMonospaced: true) {
+    UMUIStatusPill("Verified", systemImage: "checkmark.seal.fill", style: .success)
+}
+```
+
+---
+
+### 25j. `UMUIThreeColumnSplitView`
+Sidebar / content / inspector layout on native resizable dividers (`HSplitView`). Side columns collapse when their binding turns `false`; the content column keeps `contentMinWidth`.
+
+```swift
+public init(
+    showSidebar: Binding<Bool> = .constant(true),
+    showInspector: Binding<Bool> = .constant(true),
+    sidebarWidth: UMUIColumnWidth = .sidebar,       // 220 / 280 / 400
+    inspectorWidth: UMUIColumnWidth = .inspector,   // 260 / 340 / 520
+    contentMinWidth: CGFloat = 420,
+    @ViewBuilder sidebar: () -> Sidebar,
+    @ViewBuilder content: () -> Content,
+    @ViewBuilder inspector: () -> Inspector
+)
+```
+
+---
+
+### 25k. `UMUIHexColorField` & Hex Helpers
+A color token editor bound to a `#RRGGBB` string: system color-panel swatch plus an editable hex field. Invalid text never reaches the binding. Requires macOS 12.
+
+```swift
+public init(label: String? = nil, hex: Binding<String>, labelWidth: CGFloat = 80)
+
+// Helpers
+Color(umHex: "#1D3557")   // Color? — accepts #RGB, #RRGGBB, #RRGGBBAA
+color.umHexString         // String? — "#RRGGBB" in sRGB
+```
+
+---
+
+### 25l. `UMUIEmptyStateView`
+A centered placeholder for empty lists, unselected panes and locked stages.
+
+```swift
+public init(
+    systemImage: String,
+    title: String,
+    message: String? = nil,
+    actionTitle: String? = nil,
+    action: (() -> Void)? = nil
+)
 ```
 
 ---
