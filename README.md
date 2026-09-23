@@ -59,6 +59,7 @@ To maintain a clean modular architecture, components are structured into dedicat
    - [UMUIThreeColumnSplitView](#25j-umuithreecolumnsplitview)
    - [UMUIHexColorField & Hex Helpers](#25k-umuihexcolorfield--hex-helpers)
    - [UMUIEmptyStateView](#25l-umuiemptystateview)
+   - [UMUIPopoverInfo](#25m-umuipopoverinfo)
 3. [Helper Extensions](#26-helper-extensions)
 4. [Theming & Integration](#theming--integration)
 
@@ -1196,6 +1197,19 @@ public init(
     actionTitle: String? = nil,
     action: (() -> Void)? = nil
 )
+```
+
+---
+
+### 25m. `UMUIPopoverInfo`
+A plain `info.circle` button that opens a popover with a longer explanation, so a paragraph of help text does not have to sit in the layout permanently. Requires macOS 12.
+
+```swift
+public init(_ text: String, title: String? = nil, icon: String? = nil, width: CGFloat = 260)
+```
+
+```swift
+UMUIPopoverInfo("Rate is how often a frame is examined; a card lasts as long as the clip that should have been there, so 2 fps finds anything an editor would have noticed missing.")
 ```
 
 ---
