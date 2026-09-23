@@ -90,10 +90,14 @@ public struct UMUIProgressView : View {
 			)
 			let baseColor = style.tintColor ?? Color.gray
 			
-			// Dynamically adjust stroke width based on the allocated view size
-			let outerStroke = size > 24 ? 3.0 : 1.5
-			let innerStroke = size > 24 ? 2.0 : 1.0
-			
+			// Dynamically adjust stroke width based on the allocated view size.
+			// When there is room, the strokes grow with the view and the inner wheel moves closer to the outer one,
+			// leaving the middle free (e.g. for a percentage label laid over it).
+			let isRoomy = size >= 48
+			let outerStroke = isRoomy ? min (size * 0.07, 8.0) : (size > 24 ? 3.0 : 1.5)
+			let innerStroke = isRoomy ? outerStroke * 2.0 / 3.0 : (size > 24 ? 2.0 : 1.0)
+			let innerInset = size * (isRoomy ? 0.15 : 0.25)
+
 			ZStack {
 				// Outer Wheel background shadow ring
 				Circle ()
@@ -130,7 +134,7 @@ public struct UMUIProgressView : View {
 							lineCap : .round
 						)
 					)
-					.padding (size * 0.25)
+					.padding (innerInset)
 					.rotationEffect (innerAngle)
 			}
 			.frame (
