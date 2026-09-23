@@ -16,10 +16,23 @@ public enum UMUISegmentedBarSize: Sendable, Equatable {
     case small
 }
 
+/// Display modes for `UMUISegmentedBar`.
+@available(macOS 11.0, *)
+public enum UMUISegmentedBarMode: Sendable, Equatable {
+    /// Automatically transforms into a picker when space is constrained and any title would truncate.
+    case auto
+    /// Always forces the segmented bar layout.
+    case segmented
+    /// Always forces the picker layout.
+    case picker
+}
+
 /// A premium visual segmented bar for single selection of String options.
 ///
 /// Features a sliding pill backdrop that glides smoothly behind selected options
 /// using hardware-accelerated spring animations (`matchedGeometryEffect`).
+/// Automatically collapses into a compact `UMUIPicker` if horizontal space is constrained
+/// to prevent title truncation.
 ///
 /// Usage:
 /// ```swift
@@ -42,6 +55,9 @@ public struct UMUISegmentedBar: View {
     /// The width allocated for the optional leading label.
     public let labelWidth: CGFloat
     
+    /// Mode controlling whether the bar transforms into a picker automatically.
+    public let mode: UMUISegmentedBarMode
+    
     @Namespace private var animationNamespace
     @State private var hoveredOption: String? = nil
     
@@ -52,18 +68,21 @@ public struct UMUISegmentedBar: View {
     ///   - selection: Binding to the active selection.
     ///   - size: Sizing mode (default is `.normal`).
     ///   - labelWidth: Horizontal width reserved for label (default is `80`).
+    ///   - mode: Display mode (default is `.auto`).
     public init(
         label: String? = nil,
         options: [String],
         selection: Binding<String>,
         size: UMUISegmentedBarSize = .small,
-        labelWidth: CGFloat = 80
+        labelWidth: CGFloat = 80,
+        mode: UMUISegmentedBarMode = .auto
     ) {
         self.label = label
         self.options = options
         self._selection = selection
         self.size = size
         self.labelWidth = labelWidth
+        self.mode = mode
     }
     
     private var optionFont: Font {
@@ -92,60 +111,125 @@ public struct UMUISegmentedBar: View {
                 .frame(width: labelWidth)
             }
             
-            // Segment Deck Container
-            HStack(spacing: 2) {
-                ForEach(options, id: \.self) { option in
-                    Button {
-                        // Spring glide transition
-                        withAnimation(.spring(response: 0.26, dampingFraction: 0.8)) {
-                            selection = option
-                        }
-                    } label: {
-                        Text(option)
-                            .font(optionFont)
-                            .lineLimit(1)
-                            .foregroundColor(selection == option ? Color.accentColor : Color.secondary)
-                            .padding(.horizontal, horizontalPadding)
-                            .padding(.vertical, verticalPadding)
-                            .frame(minWidth: size == .normal ? 55 : 45)
+            // Segment Deck or Picker Deck
+            deckContent
+        }
+    }
+    
+    @ViewBuilder
+    private var deckContent: some View {
+        switch mode {
+        case .segmented:
+            segmentedDeck
+        case .picker:
+            pickerDeck
+        case .auto:
+            if #available(macOS 13.0, *) {
+                ViewThatFits(in: .horizontal) {
+                    segmentedDeck
+                        .fixedSize(horizontal: true, vertical: false)
+                    pickerDeck
+                }
+            } else {
+                segmentedDeck
+            }
+        }
+    }
+    
+    private var pickerDeck: some View {
+        UMUIPicker(
+            options: options,
+            selection: $selection,
+            size: size == .normal ? .normal : .small
+        )
+    }
+    
+    private var segmentedDeck: some View {
+        HStack(spacing: 2) {
+            ForEach(options, id: \.self) { option in
+                Button {
+                    // Spring glide transition
+                    withAnimation(.spring(response: 0.26, dampingFraction: 0.8)) {
+                        selection = option
                     }
-                    .buttonStyle(.plain)
-                    .contentShape(Rectangle())
-                    .background(
-                        // Sliding Capsule Backdrop
-                        Group {
-                            if selection == option {
-                                RoundedRectangle(cornerRadius: 4)
-                                    .fill(Color( .controlBackgroundColor))
-                                    .shadow(color: .black.opacity(0.12), radius: 1.5, y: 1)
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: 4)
-                                            .stroke(Color.secondary.opacity(0.1), lineWidth: 0.5)
-                                    )
-                                    .matchedGeometryEffect(id: "activeSegment", in: animationNamespace)
-                            }
+                } label: {
+                    Text(option)
+                        .font(optionFont)
+                        .lineLimit(1)
+                        .foregroundColor(selection == option ? Color.accentColor : Color.secondary)
+                        .padding(.horizontal, horizontalPadding)
+                        .padding(.vertical, verticalPadding)
+                        .frame(minWidth: size == .normal ? 55 : 45)
+                }
+                .buttonStyle(.plain)
+                .contentShape(Rectangle())
+                .background(
+                    // Sliding Capsule Backdrop
+                    Group {
+                        if selection == option {
+                            RoundedRectangle(cornerRadius: 4)
+                                .fill(Color(.controlBackgroundColor))
+                                .shadow(color: .black.opacity(0.12), radius: 1.5, y: 1)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 4)
+                                        .stroke(Color.secondary.opacity(0.1), lineWidth: 0.5)
+                                )
+                                .matchedGeometryEffect(id: "activeSegment", in: animationNamespace)
                         }
-                    )
-                    // Subtle hover overlay
-                    .background(
-                        RoundedRectangle(cornerRadius: 4)
-                            .fill(hoveredOption == option && selection != option ? Color.primary.opacity(0.04) : Color.clear)
-                    )
-                    .onHover { hovering in
-                        hoveredOption = hovering ? option : nil
                     }
+                )
+                // Subtle hover overlay
+                .background(
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(hoveredOption == option && selection != option ? Color.primary.opacity(0.04) : Color.clear)
+                )
+                .onHover { hovering in
+                    hoveredOption = hovering ? option : nil
                 }
             }
-            .padding(2)
-            .background(
-                RoundedRectangle(cornerRadius: 6)
-                    .fill(Color.secondary.opacity(0.08))
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 6)
-                    .stroke(Color.secondary.opacity(0.15), lineWidth: 0.5)
-            )
         }
+        .padding(2)
+        .background(
+            RoundedRectangle(cornerRadius: 6)
+                .fill(Color.secondary.opacity(0.08))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 6)
+                .stroke(Color.secondary.opacity(0.15), lineWidth: 0.5)
+        )
+    }
+}
+
+// MARK: - Generic Enum Extension
+
+@available(macOS 11.0, *)
+extension UMUISegmentedBar {
+    /// Creates a segmented bar bound to any `Hashable & CaseIterable` enum or collection.
+    public init<T: Hashable & CaseIterable>(
+        label: String? = nil,
+        selection: Binding<T>,
+        titleProvider: @escaping (T) -> String = { "\($0)" },
+        size: UMUISegmentedBarSize = .small,
+        labelWidth: CGFloat = 80,
+        mode: UMUISegmentedBarMode = .auto
+    ) {
+        let stringOptions = Array(T.allCases).map { titleProvider($0) }
+        let binding = Binding<String>(
+            get: { titleProvider(selection.wrappedValue) },
+            set: { newTitle in
+                if let match = Array(T.allCases).first(where: { titleProvider($0) == newTitle }) {
+                    selection.wrappedValue = match
+                }
+            }
+        )
+        self.init(
+            label: label,
+            options: stringOptions,
+            selection: binding,
+            size: size,
+            labelWidth: labelWidth,
+            mode: mode
+        )
     }
 }
 
