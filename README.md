@@ -1202,14 +1202,15 @@ public init(
 ---
 
 ### 25m. `UMUIPopoverInfo`
-A plain `info.circle` button that opens a popover with a longer explanation, so a paragraph of help text does not have to sit in the layout permanently. Requires macOS 12.
+A plain `info.circle` button that opens a styled popover with a longer explanation, so a paragraph of help text does not have to sit in the layout permanently: a bold centered title, an accent-tinted icon below it, then the text broken one sentence per line (via locale-aware sentence boundaries, so a decimal like `29.97` never causes a false break). Requires macOS 12.
 
 ```swift
-public init(_ text: String, title: String? = nil, icon: String? = nil, width: CGFloat = 260)
+public init(_ title: String, icon: String, text: String, width: CGFloat = 280)
 ```
 
 ```swift
-UMUIPopoverInfo("Rate is how often a frame is examined; a card lasts as long as the clip that should have been there, so 2 fps finds anything an editor would have noticed missing.")
+UMUIPopoverInfo("Frame Rate", icon: "gauge.with.needle",
+    text: "Rate is how often a frame is examined; a card lasts as long as the clip that should have been there, so 2 fps finds anything an editor would have noticed missing.")
 ```
 
 ---

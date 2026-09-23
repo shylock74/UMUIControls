@@ -8,32 +8,35 @@
 
 import SwiftUI
 
-/// A plain `info.circle` button that opens a popover with explanatory text.
+/// A plain `info.circle` button that opens a styled popover: a bold title,
+/// a tinted icon centered below it, and the explanation broken one sentence
+/// per line so a long paragraph reads as a short list rather than a block.
 ///
 /// Usage:
 /// ```swift
-/// UMUIPopoverInfo("Rate is how often a frame is examined; a card lasts as long as the clip that should have been there, so 2 fps finds anything an editor would have noticed missing.")
+/// UMUIPopoverInfo("Frame Rate", icon: "gauge.with.needle",
+///     text: "Rate is how often a frame is examined; a card lasts as long as the clip that should have been there, so 2 fps finds anything an editor would have noticed missing.")
 /// ```
 @available(macOS 12.0, *)
 public struct UMUIPopoverInfo: View {
-    /// The explanation shown inside the popover.
+    /// The popover's heading, shown large and centered above the icon.
+    public let title: String
+
+    /// The SF Symbol centered between the title and the text.
+    public let icon: String
+
+    /// The explanation, broken onto one line per sentence for readability.
     public let text: String
 
-    /// An optional heading shown above the text.
-    public let title: String?
-
-    /// An optional SF Symbol shown beside the text, for a warning or a pointer to what the text is about.
-    public let icon: String?
-
-    /// Maximum width of the popover's text column, so a long paragraph wraps instead of stretching the popover across the screen.
+    /// Width of the popover, so a long paragraph wraps instead of stretching across the screen.
     public let width: CGFloat
 
     @State private var isPresented = false
 
-    public init(_ text: String, title: String? = nil, icon: String? = nil, width: CGFloat = 260) {
-        self.text = text
+    public init(_ title: String, icon: String, text: String, width: CGFloat = 280) {
         self.title = title
         self.icon = icon
+        self.text = text
         self.width = width
     }
 
@@ -47,27 +50,39 @@ public struct UMUIPopoverInfo: View {
         }
         .buttonStyle(.plain)
         .popover(isPresented: $isPresented, arrowEdge: .top) {
-            HStack(alignment: .top, spacing: 8) {
-                if let icon {
-                    Image(systemName: icon)
-                        .font(.system(size: 12))
-                        .foregroundStyle(.secondary)
-                }
+            VStack(spacing: 12) {
+                Text(title)
+                    .font(.system(size: 15, weight: .semibold))
+                    .multilineTextAlignment(.center)
 
-                VStack(alignment: .leading, spacing: 4) {
-                    if let title {
-                        Text(title)
-                            .font(.system(size: 11, weight: .medium))
+                Image(systemName: icon)
+                    .font(.system(size: 26))
+                    .foregroundStyle(Color.accentColor)
+
+                VStack(alignment: .leading, spacing: 6) {
+                    ForEach(Array(sentences.enumerated()), id: \.offset) { _, sentence in
+                        Text(sentence)
+                            .font(.system(size: 11))
+                            .foregroundStyle(.secondary)
                     }
-
-                    Text(text)
-                        .font(.system(size: 11))
-                        .foregroundStyle(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
                 }
+                .fixedSize(horizontal: false, vertical: true)
             }
-            .frame(width: width, alignment: .leading)
-            .padding(12)
+            .frame(width: width)
+            .padding(16)
         }
+    }
+
+    /// `text` broken along locale-aware sentence boundaries — robust against a period inside a
+    /// number or an abbreviation, which a naive split on `". "` is not.
+    private var sentences: [String] {
+        var result: [String] = []
+        text.enumerateSubstrings(in: text.startIndex..<text.endIndex, options: [.bySentences]) { substring, _, _, _ in
+            let trimmed = substring?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+            if !trimmed.isEmpty {
+                result.append(trimmed)
+            }
+        }
+        return result.isEmpty ? [text] : result
     }
 }
