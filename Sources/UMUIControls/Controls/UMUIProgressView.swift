@@ -22,11 +22,18 @@ public struct UMUIProgressView : View {
 	/// The visual configuration style containing color preferences.
 	public var style : UMUIProgressViewStyle
 	
-	/// The current rotation angle for the outer wheel.
+	/// The current rotation angle for the outer wheel. Only used on macOS 11, see body.
 	@State private var outerRotationAngle : Angle = .degrees (0)
 	
-	/// The current rotation angle for the inner wheel.
+	/// The current rotation angle for the inner wheel. Only used on macOS 11, see body.
 	@State private var innerRotationAngle : Angle = .degrees (0)
+	
+	/// Seconds for one full turn of the outer wheel.
+	private static let outerPeriod : Double = 2.0
+	
+	/// Seconds for one full turn of the inner wheel, in the opposite direction
+	/// (Questo mantiene il rapporto di velocità di circa 1.5x rispetto a quello esterno)
+	private static let innerPeriod : Double = 1.33
 	
 	/// Public initializer to create the progress wheel with a specific style.
 	/// - Parameter style: The style configuration, defaults to a standard instance.
@@ -35,7 +42,47 @@ public struct UMUIProgressView : View {
 	}
 	
 	/// The body definition of the SwiftUI View.
+	///
+	/// The angles are read off the clock rather than animated. A repeatForever animation started from
+	/// onAppear becomes the transaction of that whole update, so whatever else changes layout in the same
+	/// pass — a sheet resizing to fit this view, a sibling appearing — is animated by it too, and keeps
+	/// repeating long after this view is gone. A TimelineView has no transaction to lend.
 	public var body : some View {
+		if #available (macOS 12.0, *) {
+			TimelineView (.animation) { context in
+				let seconds = context.date.timeIntervalSinceReferenceDate
+				wheels (
+					outerAngle : .degrees (seconds.truncatingRemainder (dividingBy : Self.outerPeriod) / Self.outerPeriod * 360),
+					innerAngle : .degrees (-seconds.truncatingRemainder (dividingBy : Self.innerPeriod) / Self.innerPeriod * 360)
+				)
+			}
+		} else {
+			wheels (
+				outerAngle : outerRotationAngle,
+				innerAngle : innerRotationAngle
+			)
+			.onAppear {
+				// Outer circle animation: 1 full rotation every 2 seconds
+				withAnimation (
+					.linear (duration : Self.outerPeriod)
+					.repeatForever (autoreverses : false)
+				) {
+					outerRotationAngle = .degrees (360)
+				}
+				
+				// Inner circle animation: 1 full rotation in the opposite direction every 1.33 seconds
+				withAnimation (
+					.linear (duration : Self.innerPeriod)
+					.repeatForever (autoreverses : false)
+				) {
+					innerRotationAngle = .degrees (-360)
+				}
+			}
+		}
+	}
+	
+	/// The two concentric wheels at the given angles, sized to the space offered.
+	private func wheels (outerAngle : Angle, innerAngle : Angle) -> some View {
 		GeometryReader { geometry in
 			let size = min (
 				geometry.size.width,
@@ -68,7 +115,7 @@ public struct UMUIProgressView : View {
 							lineCap : .round
 						)
 					)
-					.rotationEffect (outerRotationAngle)
+					.rotationEffect (outerAngle)
 				
 				// Inner Wheel active rotating segment (rotating in opposite direction)
 				Circle ()
@@ -84,7 +131,7 @@ public struct UMUIProgressView : View {
 						)
 					)
 					.padding (size * 0.25)
-					.rotationEffect (innerRotationAngle)
+					.rotationEffect (innerAngle)
 			}
 			.frame (
 				width : size,
@@ -96,23 +143,5 @@ public struct UMUIProgressView : View {
 			)
 		}
 		.frame (maxWidth : .infinity, maxHeight : .infinity)
-		.onAppear {
-			// Outer circle animation: 1 full rotation every 2 seconds
-			withAnimation (
-				.linear (duration : 2.0)
-				.repeatForever (autoreverses : false)
-			) {
-				outerRotationAngle = .degrees (360)
-			}
-			
-			// Inner circle animation: 1 full rotation in the opposite direction every 1.33 seconds
-			// (Questo mantiene il rapporto di velocità di circa 1.5x rispetto a quello esterno)
-			withAnimation (
-				.linear (duration : 1.33)
-				.repeatForever (autoreverses : false)
-			) {
-				innerRotationAngle = .degrees (-360)
-			}
-		}
 	}
 }
