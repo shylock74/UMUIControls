@@ -58,6 +58,12 @@ public struct UMUITagBar: View {
         return size == .normal ? 4 : 2
     }
     
+    @Environment(\.umAccentColor) private var envAccentColor
+    
+    private var resolvedAccentColor: Color {
+        envAccentColor ?? .accentColor
+    }
+
     public var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: size == .normal ? 8 : 6) {
@@ -73,8 +79,8 @@ public struct UMUITagBar: View {
                             .font(tagFont)
                             .padding(.horizontal, horizontalPadding)
                             .padding(.vertical, verticalPadding)
-                            .background(selectedTags.contains(tag) ? Color.accentColor : Color.gray.opacity(0.3))
-                            .foregroundColor(selectedTags.contains(tag) ? .white : .primary)
+                            .background(selectedTags.contains(tag) ? resolvedAccentColor : Color.gray.opacity(0.3))
+                            .foregroundColor(selectedTags.contains(tag) ? resolvedAccentColor.umContrastingTextColor : .primary)
                             .clipShape(Capsule())
                     }
                     .buttonStyle(.plain)

@@ -882,12 +882,14 @@ public init<Content: View>(
 // 1. Automatic Key-Based Persistence Initializer
 public init(
     storageKey: String = "UMUIControls.Settings.selectedPane",
+    accentColor: Color? = nil,
     @UMUISettingPaneViewBuilder panes: () -> [UMUISettingPaneView]
 )
 
 // 2. External State Binding Initializer
 public init(
     selectedPane: Binding<String>,
+    accentColor: Color? = nil,
     @UMUISettingPaneViewBuilder panes: () -> [UMUISettingPaneView]
 )
 ```
@@ -907,11 +909,12 @@ public init(
 | :--- | :--- | :--- | :--- |
 | `storageKey` | `String` | `"UMUIControls.Settings.selectedPane"` | The key string to automatically persist the selected pane index inside `UserDefaults`. |
 | `selectedPane` | `Binding<String>` | *Required* | An external binding to control the selected pane programmatically or bind to standard state. |
+| `accentColor` | `Color?` | `nil` | Optional accent color override (defaults to the environment or system accent color). |
 | `panes` | `() -> [UMUISettingPaneView]` | *Required* | A `@ViewBuilder` result builder gathering settings pane views. |
 
 #### Design & Interactive Behavior
 - **Dual-Pane Layout:** Designed as a split-pane interface with a left sidebar (180px fixed width) containing scrollable item categories and a main settings frame on the right.
-- **Selection Visuals:** The active category button is highlighted in the standard system `.accentColor` or `.tint` with white text/icons. Unselected buttons render with subtle outlines and respond to mouse hover events.
+- **Selection Visuals:** The active category button is highlighted in the accent color (or custom `accentColor`). The text and icon automatically calculate contrast: for light backgrounds (like yellow), they adapt to `.darkGray` with a matching subtle container box, ensuring optimal legibility.
 - **State Persistence:** Automatically remembers and retrieves the last open pane across app launches, using either the default/custom `storageKey` key under the hood or an external binding.
 - **Backwards Compatibility:** Includes a typealias alias `UMUISettingsGloablView` to support accidental typos.
 

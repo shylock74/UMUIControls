@@ -123,7 +123,7 @@ public struct UMUIPositionButton: View {
                     RoundedRectangle(cornerRadius: 4)
                         .fill(current == position ? Color.accentColor : Color.secondary.opacity(0.15))
                 )
-                .foregroundColor(current == position ? Color.white : Color.primary)
+                .foregroundColor(current == position ? Color.accentColor.umContrastingTextColor : Color.primary)
                 .controlSize(size == .normal ? .small : .mini)
         }
     }

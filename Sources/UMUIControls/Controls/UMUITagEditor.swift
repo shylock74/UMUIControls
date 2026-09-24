@@ -106,6 +106,12 @@ public struct UMUITagEditor: View {
         }
     }
     
+    @Environment(\.umAccentColor) private var envAccentColor
+    
+    private var resolvedAccentColor: Color {
+        envAccentColor ?? .accentColor
+    }
+
     private var popoverContent: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Popular Tags")
@@ -122,8 +128,8 @@ public struct UMUITagEditor: View {
                             .lineLimit(1)
                             .padding(.horizontal, 8)
                             .padding(.vertical, 4)
-                            .background(tags.contains(tag) ? Color.accentColor : Color.secondary.opacity(0.1))
-                            .foregroundColor(tags.contains(tag) ? Color.white : Color.primary)
+                            .background(tags.contains(tag) ? resolvedAccentColor : Color.secondary.opacity(0.1))
+                            .foregroundColor(tags.contains(tag) ? resolvedAccentColor.umContrastingTextColor : Color.primary)
                             .cornerRadius(8)
                     }
                     .buttonStyle(.plain)

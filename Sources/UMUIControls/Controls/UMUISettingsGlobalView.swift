@@ -69,6 +69,7 @@ public struct UMUISettingPaneViewBuilder {
 @available(macOS 11.0, *)
 public struct UMUISettingsGlobalView: View {
     public let panes: [UMUISettingPaneView]
+    public let accentColor: Color?
     
     // Internal state wrapper for AppStorage persistence
     @AppStorage
@@ -78,16 +79,25 @@ public struct UMUISettingsGlobalView: View {
     private let selectedPaneBinding: Binding<String>?
     private let defaultPaneId: String
     
+    @Environment(\.umAccentColor) private var envAccentColor
+    
+    private var resolvedAccentColor: Color {
+        accentColor ?? envAccentColor ?? .accentColor
+    }
+    
     /// Initializes the settings view with a custom binding to control and persist the selection externally.
     /// - Parameters:
     ///   - selectedPane: A binding to the currently selected pane ID.
+    ///   - accentColor: An optional custom accent color. Defaults to the system or environment accent color.
     ///   - panes: A `@ViewBuilder` returning a list of `UMUISettingPaneView` objects.
     public init(
         selectedPane: Binding<String>,
+        accentColor: Color? = nil,
         @UMUISettingPaneViewBuilder panes: () -> [UMUISettingPaneView]
     ) {
         let resolvedPanes = panes()
         self.panes = resolvedPanes
+        self.accentColor = accentColor
         self.selectedPaneBinding = selectedPane
         self.defaultPaneId = resolvedPanes.first?.id ?? ""
         self._selectedPaneState = AppStorage(wrappedValue: "", "UMUISettingsGlobalView.unusedKey")
@@ -96,13 +106,16 @@ public struct UMUISettingsGlobalView: View {
     /// Initializes the settings view with automatic internal persistence.
     /// - Parameters:
     ///   - storageKey: The UserDefaults key name to store the selected pane state. Defaults to `"UMUIControls.Settings.selectedPane"`.
+    ///   - accentColor: An optional custom accent color. Defaults to the system or environment accent color.
     ///   - panes: A `@ViewBuilder` returning a list of `UMUISettingPaneView` objects.
     public init(
         storageKey: String = "UMUIControls.Settings.selectedPane",
+        accentColor: Color? = nil,
         @UMUISettingPaneViewBuilder panes: () -> [UMUISettingPaneView]
     ) {
         let resolvedPanes = panes()
         self.panes = resolvedPanes
+        self.accentColor = accentColor
         self.selectedPaneBinding = nil
         let firstId = resolvedPanes.first?.id ?? ""
         self.defaultPaneId = firstId
@@ -134,6 +147,7 @@ public struct UMUISettingsGlobalView: View {
                             SidebarButton(
                                 pane: pane,
                                 isSelected: currentSelection == pane.id,
+                                accentColor: resolvedAccentColor,
                                 action: { selectPane(pane.id) }
                             )
                         }
@@ -191,9 +205,18 @@ public struct UMUISettingsGlobalView: View {
 private struct SidebarButton: View {
     let pane: UMUISettingPaneView
     let isSelected: Bool
+    let accentColor: Color
     let action: () -> Void
     
     @State private var isHovering = false
+    
+    private var isLightAccent: Bool {
+        accentColor.umIsLight
+    }
+    
+    private var selectedForeground: Color {
+        accentColor.umContrastingTextColor
+    }
     
     var body: some View {
         Button(action: action) {
@@ -204,14 +227,14 @@ private struct SidebarButton: View {
                     .frame(width: 22, height: 22)
                     .background(
                         RoundedRectangle(cornerRadius: 6)
-                            .fill(isSelected ? Color.white.opacity(0.2) : Color.secondary.opacity(0.15))
+                            .fill(isSelected ? (isLightAccent ? Color.darkGray.opacity(0.12) : Color.white.opacity(0.2)) : Color.secondary.opacity(0.15))
                     )
-                    .foregroundColor(isSelected ? .white : .primary)
+                    .foregroundColor(isSelected ? selectedForeground : .primary)
                 
                 Text(pane.name)
                     .font(.body)
                     .fontWeight(isSelected ? .medium : .regular)
-                    .foregroundColor(isSelected ? .white : .primary)
+                    .foregroundColor(isSelected ? selectedForeground : .primary)
                 
                 Spacer()
             }
@@ -224,7 +247,7 @@ private struct SidebarButton: View {
             RoundedRectangle(cornerRadius: 8)
                 .fill(
                     isSelected
-                    ? Color.accentColor
+                    ? accentColor
                     : (isHovering ? Color.secondary.opacity(0.1) : Color.clear)
                 )
         )
@@ -232,7 +255,7 @@ private struct SidebarButton: View {
             RoundedRectangle(cornerRadius: 8)
                 .stroke(
                     isSelected
-                    ? Color.accentColor.opacity(0.8)
+                    ? accentColor.opacity(0.8)
                     : Color.secondary.opacity(0.2),
                     lineWidth: 1
                 )

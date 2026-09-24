@@ -236,7 +236,7 @@ struct CapsuleButtonStyle: ButtonStyle {
         case .gray:
             return colorScheme == .dark ? Color(white: 0.22) : Color(white: 0.90)
         case .accent:
-            return .accentColor
+            return environment.umAccentColor ?? .accentColor
         case .custom(let color):
             return color
         }
@@ -271,28 +271,6 @@ struct UMUICapsuleGlow: View {
             .animation(.easeInOut(duration: 1.8).repeatForever(autoreverses: true), value: breathing)
             .allowsHitTesting(false)
             .onAppear { breathing = true }
-    }
-}
-
-// MARK: - Color Extension for Relative Luminance
-
-@available(macOS 11.0, *)
-public extension Color {
-    /// Returns either `.black` or `.white` depending on which provides better contrast against this color.
-    func umContrastingTextColor(in environment: EnvironmentValues) -> Color {
-        #if os(macOS)
-        let nsColor = NSColor(self)
-        guard let rgbColor = nsColor.usingColorSpace(.deviceRGB) else {
-            return .white
-        }
-        let r = Double(rgbColor.redComponent)
-        let g = Double(rgbColor.greenComponent)
-        let b = Double(rgbColor.blueComponent)
-        let luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b
-        return luminance > 0.5 ? .black : .white
-        #else
-        return .white
-        #endif
     }
 }
 

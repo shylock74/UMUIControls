@@ -136,12 +136,16 @@ public struct UMUIChatBubble: View {
         }
     }
 
+    private var resolvedAccentColor: Color {
+        environment.umAccentColor ?? .accentColor
+    }
+
     private var bubbleColor: Color {
-        role == .outgoing ? Color.accentColor : Color(.controlBackgroundColor)
+        role == .outgoing ? resolvedAccentColor : Color(.controlBackgroundColor)
     }
 
     private var textColor: Color {
-        role == .outgoing ? Color.accentColor.umContrastingTextColor(in: environment) : Color.primary
+        role == .outgoing ? resolvedAccentColor.umContrastingTextColor(in: environment) : Color.primary
     }
 }
 

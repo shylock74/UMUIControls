@@ -61,6 +61,16 @@ public struct UMUIListRow<Trailing: View>: View {
         self.trailing = trailing()
     }
 
+    @Environment(\.umAccentColor) private var envAccentColor
+    
+    private var resolvedAccentColor: Color {
+        envAccentColor ?? .accentColor
+    }
+    
+    private var selectedForeground: Color {
+        resolvedAccentColor.umContrastingTextColor
+    }
+
     public var body: some View {
         Button(action: action) {
             HStack(spacing: 8) {
@@ -68,7 +78,7 @@ public struct UMUIListRow<Trailing: View>: View {
                     Image(systemName: systemImage)
                         .font(.system(size: 12))
                         .frame(width: 16)
-                        .foregroundColor(isSelected ? .white : .accentColor)
+                        .foregroundColor(isSelected ? selectedForeground : resolvedAccentColor)
                 }
 
                 VStack(alignment: .leading, spacing: 1) {
@@ -76,19 +86,19 @@ public struct UMUIListRow<Trailing: View>: View {
                         .font(.system(size: 12, weight: isSelected ? .semibold : .regular))
                         .lineLimit(1)
                         .truncationMode(.tail)
-                        .foregroundColor(isSelected ? .white : .primary)
+                        .foregroundColor(isSelected ? selectedForeground : .primary)
                     if let subtitle = subtitle, !subtitle.isEmpty {
                         Text(subtitle)
                             .font(.system(size: 10))
                             .lineLimit(1)
-                            .foregroundColor(isSelected ? .white.opacity(0.8) : .secondary)
+                            .foregroundColor(isSelected ? selectedForeground.opacity(0.8) : .secondary)
                     }
                 }
 
                 Spacer(minLength: 4)
 
                 trailing
-                    .foregroundColor(isSelected ? .white.opacity(0.9) : .secondary)
+                    .foregroundColor(isSelected ? selectedForeground.opacity(0.9) : .secondary)
             }
             .padding(.horizontal, 8)
             .padding(.vertical, 5)
@@ -108,7 +118,7 @@ public struct UMUIListRow<Trailing: View>: View {
 
     private var backgroundColor: Color {
         if isSelected {
-            return .accentColor
+            return resolvedAccentColor
         }
         return isHovered ? Color.secondary.opacity(0.12) : Color.clear
     }
