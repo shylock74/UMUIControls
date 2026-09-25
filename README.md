@@ -60,6 +60,7 @@ To maintain a clean modular architecture, components are structured into dedicat
    - [UMUIHexColorField & Hex Helpers](#25k-umuihexcolorfield--hex-helpers)
    - [UMUIEmptyStateView](#25l-umuiemptystateview)
    - [UMUIPopoverInfo](#25m-umuipopoverinfo)
+   - [UMUICopyableURLText & UMUICopyableLink](#25n-umuicopyableurltext--umuicopyablelink)
 3. [Helper Extensions](#26-helper-extensions)
 4. [Theming & Integration](#theming--integration)
 
@@ -1214,6 +1215,32 @@ public init(_ title: String, icon: String, text: String, width: CGFloat = 280)
 ```swift
 UMUIPopoverInfo("Frame Rate", icon: "gauge.with.needle",
     text: "Rate is how often a frame is examined; a card lasts as long as the clip that should have been there, so 2 fps finds anything an editor would have noticed missing.")
+```
+
+---
+
+### 25n. `UMUICopyableURLText` & `UMUICopyableLink`
+A clickable URL / path text view that copies its string to the system pasteboard. On hover, text turns white with a hand pointer. On click, it turns accent color and displays a floating popover badge ("copied in the pasteboard") that stays for 1 second, then smoothly fades out over 1 second back to the base or hover color.
+
+```swift
+public init(
+    _ url: String,
+    displayText: String? = nil,
+    isEnabled: Bool = true,
+    font: Font = .system(size: 11),
+    popoverText: String = "copied in the pasteboard",
+    baseColor: Color = .secondary,
+    hoverColor: Color = .white,
+    accentColor: Color? = nil,
+    lineLimit: Int? = 1,
+    truncationMode: Text.TruncationMode = .middle,
+    onCopy: ((String) -> Void)? = nil
+)
+```
+
+```swift
+UMUICopyableURLText("https://github.com/shylock74/UMUIControls")
+UMUICopyableURLText(package.urlOrPath, isEnabled: !package.isLocal)
 ```
 
 ---
