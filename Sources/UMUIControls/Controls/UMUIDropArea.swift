@@ -21,7 +21,8 @@ import SwiftUI
 /// - Professional typography using small, bold labels.
 ///
 /// Parameters:
-/// - title: The primary label for the drop area.
+/// - title: The primary label for the drop area. Pass an empty string when the surrounding layout
+///   already labels the area: with no title and no count the label row is left out entirely.
 /// - count: An optional integer to show the number of items already loaded.
 /// - subtitle: An optional string to display the current selection or a prompt.
 /// - icon: The SF Symbol name to represent the area.
@@ -57,18 +58,20 @@ public struct UMUIDropArea: View {
     public var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             // Label and Badge
-            HStack(spacing: 4) {
-                Text(title)
-                    .font(.system(size: 9, weight: .black))
-                    .foregroundColor(.secondary)
-                
-                if let count = count {
-                    Text("\(count)")
-                        .font(.system(size: 8, weight: .bold, design: .monospaced))
-                        .padding(.horizontal, 4)
-                        .padding(.vertical, 1)
-                        .background(Color.accentColor.opacity(0.1))
-                        .clipShape(RoundedRectangle(cornerRadius: 3))
+            if !title.isEmpty || count != nil {
+                HStack(spacing: 4) {
+                    Text(title)
+                        .font(.system(size: 9, weight: .black))
+                        .foregroundColor(.secondary)
+                    
+                    if let count = count {
+                        Text("\(count)")
+                            .font(.system(size: 8, weight: .bold, design: .monospaced))
+                            .padding(.horizontal, 4)
+                            .padding(.vertical, 1)
+                            .background(Color.accentColor.opacity(0.1))
+                            .clipShape(RoundedRectangle(cornerRadius: 3))
+                    }
                 }
             }
             
@@ -83,6 +86,9 @@ public struct UMUIDropArea: View {
                 Text(subtitle ?? "Drop items here")
                     .font(.system(size: 9, weight: .bold))
                     .lineLimit(1)
+                    // The subtitle is usually a file name or path, whose start and extension both matter.
+                    .truncationMode(.middle)
+                    .padding(.horizontal, 8)
                     .foregroundColor(subtitle != nil ? Color.primary : Color.secondary.opacity(0.5))
             }
             .frame(maxWidth: .infinity)
