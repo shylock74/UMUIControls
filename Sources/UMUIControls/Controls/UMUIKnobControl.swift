@@ -63,7 +63,7 @@ public struct UMUIKnobControl: View {
     ///   - defaultValue: Optional value to reset to on double-click (default is `nil`).
     ///   - size: Sizing mode (default is `.normal`).
     ///   - customDiameter: Optional custom diameter in points (overrides standard sizing mode).
-    ///   - labelWidth: Width reserved for the label (default is `80`).
+    ///   - labelWidth: Minimum width of the label column; a longer label widens it rather than being truncated (default is `80`).
     public init(
         label: String? = nil,
         value: Binding<Double>,
@@ -114,7 +114,7 @@ public struct UMUIKnobControl: View {
                         .foregroundColor(.primary)
                     Spacer(minLength: 0)
                 }
-                .frame(width: labelWidth)
+                .umLabelColumn(labelWidth)
             }
             
             // Interactive Knob Component

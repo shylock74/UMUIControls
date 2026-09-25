@@ -160,7 +160,7 @@ struct UMUITextFieldModern: View {
                         .foregroundColor(.primary)
                     Spacer(minLength: 0)
                 }
-                .frame(width: labelWidth)
+                .umLabelColumn(labelWidth)
             }
             
             HStack(spacing: 4) {
@@ -322,7 +322,7 @@ struct UMUITextFieldLegacy: View {
                         .foregroundColor(.primary)
                     Spacer(minLength: 0)
                 }
-                .frame(width: labelWidth)
+                .umLabelColumn(labelWidth)
             }
             
             HStack(spacing: 4) {

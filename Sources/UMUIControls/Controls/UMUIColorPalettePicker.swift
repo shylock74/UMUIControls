@@ -59,7 +59,7 @@ public struct UMUIColorPalettePicker: View {
     ///   - selection: Binding to the selected Color.
     ///   - palette: Predefined color swatch palette (defaults to a high-quality HSL-shaded list).
     ///   - size: Sizing mode (default is `.normal`).
-    ///   - labelWidth: Width reserved for the label (default is `80`).
+    ///   - labelWidth: Minimum width of the label column; a longer label widens it rather than being truncated (default is `80`).
     public init(
         label: String? = nil,
         selection: Binding<Color>,
@@ -101,7 +101,7 @@ public struct UMUIColorPalettePicker: View {
                         .foregroundColor(.primary)
                     Spacer(minLength: 0)
                 }
-                .frame(width: labelWidth)
+                .umLabelColumn(labelWidth)
             }
             
             // Swatch Flow Container

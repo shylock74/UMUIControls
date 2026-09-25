@@ -53,7 +53,7 @@ public struct UMUISlider: View {
     ///   - value: Binding to the double value.
     ///   - range: Active bounds for the value (default is `0...1`).
     ///   - size: Sizing mode (default is `.normal`).
-    ///   - labelWidth: Horizontal width reserved for label (default is `80`).
+    ///   - labelWidth: Minimum width of the label column; a longer label widens it rather than being truncated (default is `80`).
     public init(
         label: String? = nil,
         value: Binding<Double>,
@@ -93,7 +93,7 @@ public struct UMUISlider: View {
                         .foregroundColor(.primary)
                     Spacer(minLength: 0)
                 }
-                .frame(width: labelWidth)
+                .umLabelColumn(labelWidth)
             }
             
             // Slider Component View

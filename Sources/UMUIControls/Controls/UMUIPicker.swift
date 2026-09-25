@@ -80,7 +80,7 @@ public struct UMUIPicker: View {
                         .foregroundColor(.primary)
                     Spacer(minLength: 0)
                 }
-                .frame(width: labelWidth)
+                .umLabelColumn(labelWidth)
             }
             
             // Styled Dropdown Menu Button

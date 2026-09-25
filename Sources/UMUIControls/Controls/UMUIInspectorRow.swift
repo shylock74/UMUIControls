@@ -57,7 +57,7 @@ public struct UMUIInspectorRow<Accessory: View>: View {
                 .font(.caption)
                 .foregroundColor(.secondary)
                 .lineLimit(1)
-                .frame(width: labelWidth, alignment: .leading)
+                .umLabelColumn(labelWidth)
 
             Text(value.isEmpty ? "—" : value)
                 .font(isMonospaced ? .system(.caption, design: .monospaced) : .caption)

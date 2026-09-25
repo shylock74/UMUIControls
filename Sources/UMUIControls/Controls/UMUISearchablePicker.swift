@@ -130,7 +130,7 @@ public struct UMUISearchablePicker: View {
                         .lineLimit(1)
                     Spacer(minLength: 0)
                 }
-                .frame(width: labelWidth)
+                .umLabelColumn(labelWidth ?? 0)
             }
 
             closedControl

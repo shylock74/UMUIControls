@@ -41,7 +41,7 @@ public struct UMUIHexColorField: View {
                 Text(label)
                     .font(.caption)
                     .lineLimit(1)
-                    .frame(width: labelWidth, alignment: .leading)
+                    .umLabelColumn(labelWidth)
             }
 
             ColorPicker("", selection: colorBinding, supportsOpacity: false)

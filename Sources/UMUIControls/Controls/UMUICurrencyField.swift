@@ -346,7 +346,7 @@ private struct UMUICurrencyFieldLabel: View {
                 .foregroundColor(.primary)
             Spacer(minLength: 0)
         }
-        .frame(width: width)
+        .umLabelColumn(width)
     }
 }
 

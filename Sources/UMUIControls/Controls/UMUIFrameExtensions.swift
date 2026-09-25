@@ -230,3 +230,19 @@ public extension View {
 	}
 }
 
+
+// Structure:  u m label column
+@available(macOS 10.15, iOS 13.0, *)
+public extension View {
+
+	/// Lays a leading label out in a column at least `width` wide.
+	///
+	/// Rows that share a `width` keep their controls lined up, as a fixed frame
+	/// would; but a label longer than the column widens it instead of being
+	/// truncated, so a label is always read in full.
+	func umLabelColumn(_ width: CGFloat, alignment: Alignment = .leading) -> some View {
+		self
+			.frame(minWidth: max(width, 0), alignment: alignment)
+			.fixedSize(horizontal: true, vertical: false)
+	}
+}

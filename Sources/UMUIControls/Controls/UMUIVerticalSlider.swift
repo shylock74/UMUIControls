@@ -61,7 +61,7 @@ public struct UMUIVerticalSlider: View {
     ///   - height: The vertical height override of the fader (default is `nil` to automatically match size).
     ///   - size: Sizing mode (default is `.normal`).
     ///   - inverted: If `true`, the value increases downwards (default is `false`).
-    ///   - labelWidth: Horizontal width reserved for label (default is `80`).
+    ///   - labelWidth: Minimum width of the label column; a longer label widens it rather than being truncated (default is `80`).
     public init(
         label: String? = nil,
         value: Binding<Double>,
@@ -116,7 +116,7 @@ public struct UMUIVerticalSlider: View {
                         .foregroundColor(.primary)
                     Spacer(minLength: 0)
                 }
-                .frame(width: labelWidth)
+                .umLabelColumn(labelWidth)
             }
             
             // Fader Deck Assembly

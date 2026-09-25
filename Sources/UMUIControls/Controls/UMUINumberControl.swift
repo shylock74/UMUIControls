@@ -66,7 +66,7 @@ public struct UMUINumberControl: View {
     ///   - unit: Optional unit string.
     ///   - decimals: Number of decimal places (default 0).
     ///   - size: Sizing mode (default is `.normal`).
-    ///   - labelWidth: Width of the label area (default 50).
+    ///   - labelWidth: Minimum width of the label column; a longer label widens it rather than being truncated (default 50).
     ///   - fieldWidth: Width of the text field (default 60).
     public init (
         title: String,
@@ -153,7 +153,7 @@ public struct UMUINumberControl: View {
                     .lineLimit(1)
                 Spacer(minLength: 0)
             }
-            .frame(width: labelWidth)
+            .umLabelColumn(labelWidth)
             
             // Slider
             if let step = step {

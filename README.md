@@ -70,6 +70,7 @@ To maintain a clean modular architecture, components are structured into dedicat
 - **Accent-Color Aware:** Controls dynamically adapt to system or parent-level `.tint(_:)` / `.accentColor(_:)` styling without hardcoded values.
 - **Dynamic Color Contrast:** High-contrast text color selector calculated via W3C relative luminance.
 - **Unified Sizing Sweep:** All controls support `.normal` and `.small` sizing modes, defaulting to `.small` for premium visual density.
+- **Labels Never Truncate:** `labelWidth` is the minimum width of a leading label column (`umLabelColumn(_:)`). Rows sharing it stay aligned; a longer label widens its column instead of being cut to "Launc…".
 - **Zero Third-Party Dependencies:** 100% native SwiftUI.
 
 ---
@@ -220,7 +221,7 @@ public init(
 | `size` | `UMUITextFieldSize` | `.small` | Size configuration: `.normal` or `.small` (caption-sized). |
 | `isSecure` | `Bool` | `false` | Enables password hide/reveal mode (bullets vs characters). |
 | `isClearable` | `Bool` | `false` | Shows a trailing clear button while the field has text. |
-| `labelWidth` | `CGFloat` | `80` | Horizontal width allocated for the leading label. |
+| `labelWidth` | `CGFloat` | `80` | Minimum width of the leading label column. A longer label widens it instead of being truncated. |
 
 #### Timing & Focus Logic
 - **0.3s Debounce:** Local keystrokes update local state instantly for latency-free typing. Synchronization to `value` is debounced by `300ms` completely in a background queue (`DispatchQueue.global(qos: .userInteractive)`), leaving the MainActor entirely unencumbered.
@@ -256,7 +257,7 @@ public init(
 | `currency` | `String` | `"€"` | Symbol shown after the amount, outside the editable text. An empty string hides it. |
 | `decimals` | `Int` | `2` | Fraction digits shown in the field and kept on commit. |
 | `size` | `UMUICurrencyFieldSize` | `.small` | Size configuration: `.normal` or `.small` (caption-sized). |
-| `labelWidth` | `CGFloat` | `80` | Horizontal width allocated for the leading label. |
+| `labelWidth` | `CGFloat` | `80` | Minimum width of the leading label column. A longer label widens it instead of being truncated. |
 | `fieldWidth` | `CGFloat` | `80` | Width of the bordered field, currency symbol included. |
 
 #### Commit Logic
@@ -299,7 +300,7 @@ public init(
 | `defaultValue`| `Double?` | `nil` | Optional default value reset on double-click. |
 | `size` | `UMUIKnobControlSize` | `.small` | Sizing configuration: `.normal` (40pt diameter) or `.small` (26pt diameter). |
 | `customDiameter`| `CGFloat?` | `nil` | Optional custom diameter override in points. |
-| `labelWidth` | `CGFloat` | `80` | Horizontal width reserved for label. |
+| `labelWidth` | `CGFloat` | `80` | Minimum width of the leading label column. A longer label widens it instead of being truncated. |
 
 #### Premium Features
 - **Vertical Drag Gestures:** Dragging vertically up increases value, dragging down decreases it. Bypasses standard circular tracking to guarantee industry-grade control precision.
@@ -329,7 +330,7 @@ public init(
 | `selection` | `Binding<Color>` | *Required* | Bound selected Color. |
 | `palette` | `[Color]` | `defaultPalette`| Preset swatches (HSL-harmonized list). |
 | `size` | `UMUIColorPalettePickerSize`| `.small` | Sizing configuration: `.normal` or `.small`. |
-| `labelWidth` | `CGFloat` | `80` | Horizontal space reserved for label. |
+| `labelWidth` | `CGFloat` | `80` | Minimum width of the leading label column. A longer label widens it instead of being truncated. |
 
 #### Thread Safety & Custom Colors
 - **Thread Safety:** Integrates macOS native `NSColorSampler` for system color picking. The system callback executes on a background thread; the control explicitly dispatches back to `DispatchQueue.main` for binding writes to prevent background thread warnings.
@@ -358,7 +359,7 @@ public init(
 | `value` | `Binding<Double>` | *Required* | Bound numeric value. |
 | `range` | `ClosedRange<Double>`| `0...1` | Dynamic limits for the fader. |
 | `size` | `UMUISliderSize` | `.small` | Sizing configuration: `.normal` (12pt track, 16pt thumb) or `.small` (8pt track, 12pt thumb). |
-| `labelWidth` | `CGFloat` | `80` | Horizontal space reserved for label. |
+| `labelWidth` | `CGFloat` | `80` | Minimum width of the leading label column. A longer label widens it instead of being truncated. |
 
 #### Micro-Interactions
 - **Zero-Distance Click-to-Snap:** Clicking anywhere along the path immediately snaps the slider value to that horizontal coordinate.
@@ -391,7 +392,7 @@ public init(
 | `height` | `CGFloat?` | `nil` | Dynamic vertical height. Defaults to 150px in `.normal` and 110px in `.small`. |
 | `size` | `UMUIVerticalSliderSize`| `.small` | Sizing configuration: `.normal` or `.small`. |
 | `inverted` | `Bool` | `false` | If true, max value is at the bottom (increases downward). |
-| `labelWidth` | `CGFloat` | `80` | Label frame width. |
+| `labelWidth` | `CGFloat` | `80` | Minimum width of the leading label column. A longer label widens it instead of being truncated. |
 
 #### Graduation & Thumb Style
 - **Graduation Ticks:** Draws a structural ticks panel with precise step markers at `0%`, `25%`, `50%`, `75%`, and `100%`.
@@ -430,7 +431,7 @@ public init(
 | `options` | `[String]` | *Required* | Set of text string items. |
 | `selection` | `Binding` | *Required* | Bound selection (a `String` or a `Set<String>`). |
 | `size` | `UMUISegmentedBarSize`| `.small` | Sizing configuration: `.normal` or `.small`. |
-| `labelWidth` | `CGFloat` | `80` | Horizontal width reserved for label. |
+| `labelWidth` | `CGFloat` | `80` | Minimum width of the leading label column. A longer label widens it instead of being truncated. |
 
 #### Gliding Mechanisms
 - **Gliding Pill (Single-Selection):** Employs SwiftUI's `@Namespace` and hardware-accelerated `matchedGeometryEffect` to perform buttery-smooth gliding animations from one segment to the next.
@@ -466,7 +467,7 @@ public init(
 | `unit` | `String?` | `nil` | Appended text unit (e.g. "px", "s"). |
 | `decimals` | `Int` | `0` | Fraction precision of text box. |
 | `size` | `UMUINumberControlSize`| `.small` | Sizing configuration: `.normal` or `.small`. |
-| `labelWidth` | `CGFloat` | `50` | Horizontal space reserved for label. |
+| `labelWidth` | `CGFloat` | `50` | Minimum width of the leading label column. A longer label widens it instead of being truncated. |
 | `fieldWidth` | `CGFloat` | `60` | Horizontal space reserved for input. |
 
 ---

@@ -67,7 +67,7 @@ public struct UMUISegmentedBar: View {
     ///   - options: Array of text choices.
     ///   - selection: Binding to the active selection.
     ///   - size: Sizing mode (default is `.normal`).
-    ///   - labelWidth: Horizontal width reserved for label (default is `80`).
+    ///   - labelWidth: Minimum width of the label column; a longer label widens it rather than being truncated (default is `80`).
     ///   - mode: Display mode (default is `.auto`).
     public init(
         label: String? = nil,
@@ -108,7 +108,7 @@ public struct UMUISegmentedBar: View {
                         .foregroundColor(.primary)
                     Spacer(minLength: 0)
                 }
-                .frame(width: labelWidth)
+                .umLabelColumn(labelWidth)
             }
             
             // Segment Deck or Picker Deck
@@ -268,7 +268,7 @@ public struct UMUIMultiSegmentedBar: View {
     ///   - options: Array of text choices.
     ///   - selection: Binding to the active Set of selections.
     ///   - size: Sizing mode (default is `.normal`).
-    ///   - labelWidth: Horizontal width reserved for label (default is `80`).
+    ///   - labelWidth: Minimum width of the label column; a longer label widens it rather than being truncated (default is `80`).
     public init(
         label: String? = nil,
         options: [String],
@@ -306,7 +306,7 @@ public struct UMUIMultiSegmentedBar: View {
                         .foregroundColor(.primary)
                     Spacer(minLength: 0)
                 }
-                .frame(width: labelWidth)
+                .umLabelColumn(labelWidth)
             }
             
             // Segment Deck Container
