@@ -2,7 +2,7 @@
 //  UMUIMiniButton.swift
 //  UMUIControls
 //
-//  A compact capsule-outlined button for dense/restricted user interfaces.
+//  A compact capsule soft-pill button for dense/restricted user interfaces.
 //
 
 import SwiftUI
@@ -10,23 +10,23 @@ import SwiftUI
 /// The styling options for `UMUIMiniButton`.
 @available(macOS 11.0, *)
 public enum UMUIMiniButtonStyle: Sendable, Equatable {
-    /// A neutral gray outline.
+    /// A neutral gray soft-pill.
     case gray
     
-    /// The application's accent color outline.
+    /// The application's accent color soft-pill.
     case accent
     
-    /// A custom outline color.
+    /// A custom color soft-pill.
     case custom(Color)
 }
 
-/// A compact capsule-shaped outline button with responsive interactive hover and click states.
+/// A compact capsule-shaped button with a soft pill styling and responsive interactive hover and click states.
 ///
 /// Features:
-/// - Outline design with a 1.0pt stroke width.
-/// - Fixed 11pt regular font (non-bold).
-/// - 6pt horizontal and 2pt vertical padding.
-/// - Sfondo semitrasparente: 10% opacity on hover, 20% opacity on press.
+/// - Soft pill styling with subtle, non-intrusive hairline border.
+/// - Highly legible 11pt medium-weight typography.
+/// - 8pt horizontal and 3pt vertical padding with 5pt icon-text spacing.
+/// - Semitransparent background fill with interactive hover and click states.
 /// - Supports custom views, text-only, and text + SF Symbol initializers.
 ///
 /// Usage:
@@ -94,7 +94,7 @@ public extension UMUIMiniButton where Label == Text {
 
 @available(macOS 11.0, *)
 public extension UMUIMiniButton where Label == HStack<TupleView<(Image, Text)>> {
-    /// Creates a mini button with an icon and a text title (spaced at 4pt).
+    /// Creates a mini button with an icon and a text title (spaced at 5pt).
     /// - Parameters:
     ///   - title: The label text of the button.
     ///   - systemImage: The name of the SF Symbol.
@@ -107,7 +107,7 @@ public extension UMUIMiniButton where Label == HStack<TupleView<(Image, Text)>> 
         action: @escaping () -> Void
     ) {
         self.init(style: style, action: action) {
-            HStack(spacing: 4) {
+            HStack(spacing: 5) {
                 Image(systemName: systemImage)
                 Text(title)
             }
@@ -124,40 +124,82 @@ struct MiniButtonStyle: ButtonStyle {
     
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.isEnabled) private var isEnabled
+    @Environment(\.umAccentColor) private var envAccentColor
     
     func makeBody(configuration: Configuration) -> some View {
         let isPressed = configuration.isPressed
-        let baseColor = resolveColor()
-        
-        // Transparent by default, 10% opacity on hover, 20% opacity on press
-        let bgOpacity: Double = isPressed ? 0.2 : (isHovered && isEnabled ? 0.1 : 0.0)
-        let strokeColor = baseColor.opacity(isEnabled ? 1.0 : 0.4)
+        let fgColor = resolveForegroundColor()
+        let bgColor = resolveBackgroundColor(isPressed: isPressed)
+        let strokeColor = resolveStrokeColor()
         
         return configuration.label
-            .font(.system(size: 11, weight: .regular))
-            .foregroundColor(strokeColor)
-            .padding(.horizontal, 6)
-            .padding(.vertical, 2)
+            .font(.system(size: 11, weight: .medium))
+            .foregroundColor(fgColor)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 3)
             .background(
                 Capsule()
-                    .fill(baseColor.opacity(bgOpacity))
+                    .fill(bgColor)
             )
             .overlay(
                 Capsule()
-                    .strokeBorder(strokeColor, lineWidth: 1.0)
+                    .strokeBorder(strokeColor, lineWidth: 0.75)
             )
+            .opacity(isEnabled ? 1.0 : 0.4)
             .animation(.easeOut(duration: 0.15), value: isPressed)
             .animation(.easeOut(duration: 0.15), value: isHovered)
     }
     
-    private func resolveColor() -> Color {
+    private func resolveForegroundColor() -> Color {
         switch style {
         case .gray:
-            return colorScheme == .dark ? Color(white: 0.65) : Color(white: 0.4)
+            return colorScheme == .dark ? Color(white: 0.78) : Color(white: 0.28)
         case .accent:
-            return .accentColor
+            return envAccentColor ?? .accentColor
         case .custom(let color):
             return color
+        }
+    }
+    
+    private func resolveBackgroundColor(isPressed: Bool) -> Color {
+        switch style {
+        case .gray:
+            if isPressed {
+                return colorScheme == .dark ? Color.white.opacity(0.20) : Color.black.opacity(0.15)
+            } else if isHovered && isEnabled {
+                return colorScheme == .dark ? Color.white.opacity(0.14) : Color.black.opacity(0.09)
+            } else {
+                return colorScheme == .dark ? Color.white.opacity(0.08) : Color.black.opacity(0.05)
+            }
+        case .accent:
+            let base = envAccentColor ?? .accentColor
+            if isPressed {
+                return base.opacity(0.28)
+            } else if isHovered && isEnabled {
+                return base.opacity(0.20)
+            } else {
+                return base.opacity(0.12)
+            }
+        case .custom(let color):
+            if isPressed {
+                return color.opacity(0.28)
+            } else if isHovered && isEnabled {
+                return color.opacity(0.20)
+            } else {
+                return color.opacity(0.12)
+            }
+        }
+    }
+    
+    private func resolveStrokeColor() -> Color {
+        switch style {
+        case .gray:
+            return colorScheme == .dark ? Color.white.opacity(0.12) : Color.black.opacity(0.08)
+        case .accent:
+            let base = envAccentColor ?? .accentColor
+            return base.opacity(0.22)
+        case .custom(let color):
+            return color.opacity(0.22)
         }
     }
 }
@@ -187,6 +229,10 @@ struct UMUIMiniButton_Previews: PreviewProvider {
             }
             
             HStack(spacing: 10) {
+                UMUIMiniButton("Actions", systemImage: "slider.horizontal.3", style: .gray) {
+                    print("Actions clicked")
+                }
+                
                 UMUIMiniButton("Play", systemImage: "play.fill", style: .accent) {
                     print("Play clicked")
                 }
@@ -205,7 +251,7 @@ struct UMUIMiniButton_Previews: PreviewProvider {
             }
         }
         .padding()
-        .frame(width: 350, height: 250)
+        .frame(width: 400, height: 260)
     }
 }
 #endif

@@ -141,7 +141,7 @@ public enum UMUICapsuleButtonSize: Sendable, Equatable {
 ---
 
 ### 1b. `UMUIMiniButton`
-A compact capsule-outlined button designed to be used in place of `UMBorderlessSmallButton` or whenever space is very limited and the UI needs to be kept extremely compact.
+A compact capsule soft-pill button designed to be used in place of `UMBorderlessSmallButton` or whenever space is very limited and the UI needs to be kept extremely compact yet clear and readable.
 
 #### Signatures & Initializers
 ```swift
@@ -159,7 +159,7 @@ public init(
     action: @escaping () -> Void
 ) where Label == Text
 
-// 3. Convenience Icon & Text (spaced at 4pt)
+// 3. Convenience Icon & Text (spaced at 5pt)
 public init(
     _ title: String,
     systemImage: String,
@@ -171,26 +171,25 @@ public init(
 #### Parameters
 | Parameter | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
-| `style` | `UMUIMiniButtonStyle` | `.gray` | The outline color theme: `.gray`, `.accent`, or `.custom(Color)`. |
+| `style` | `UMUIMiniButtonStyle` | `.gray` | The soft-pill color theme: `.gray`, `.accent`, or `.custom(Color)`. |
 | `action` | `() -> Void` | *Required* | Closure invoked when the button is clicked. |
-| `label` | `View` | *Required* | SwiftUI content layout wrapped inside the outline capsule. |
+| `label` | `View` | *Required* | SwiftUI content layout wrapped inside the soft-pill capsule. |
 
 #### Color Enum
 ```swift
 public enum UMUIMiniButtonStyle: Sendable, Equatable {
-    case gray                // Gray outline
-    case accent              // System accent outline
-    case custom(Color)       // Custom color outline
+    case gray                // Neutral gray soft-pill
+    case accent              // System accent soft-pill
+    case custom(Color)       // Custom color soft-pill
 }
 ```
 
 #### Design & Interactive Behavior
-- **Typography:** Fixed `11pt` size with regular weight (non-bold).
-- **Border:** Capsule-shaped outline with a thin `1.0pt` stroke width.
-- **Padding:** Compact `6pt` horizontal and `2pt` vertical padding.
-- **Hover:** Fills the background with `10%` opacity of the border color.
-- **Press:** Fills the background with `20%` opacity of the border color.
-- **Disabled State:** Opacity is automatically reduced to `40%` for both text and border.
+- **Typography:** Fixed `11pt` size with medium weight (`.medium`) for high legibility on dark and light backgrounds.
+- **Border:** Subtle hairline outline with a non-intrusive `0.75pt` stroke width.
+- **Padding:** Comfortable `8pt` horizontal and `3pt` vertical padding with `5pt` spacing between icon and text.
+- **Background:** Soft translucent fill (e.g. `8%` resting opacity) with responsive tactile brightening on hover (`14%`) and press (`20%`).
+- **Disabled State:** Opacity is automatically reduced to `40%`.
 
 ---
 
