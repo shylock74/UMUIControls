@@ -107,6 +107,7 @@ public struct UMUITagEditor: View {
     }
     
     @Environment(\.umAccentColor) private var envAccentColor
+    @Environment(\.self) private var environment
     
     private var resolvedAccentColor: Color {
         envAccentColor ?? .accentColor
@@ -129,7 +130,7 @@ public struct UMUITagEditor: View {
                             .padding(.horizontal, 8)
                             .padding(.vertical, 4)
                             .background(tags.contains(tag) ? resolvedAccentColor : Color.secondary.opacity(0.1))
-                            .foregroundColor(tags.contains(tag) ? resolvedAccentColor.umContrastingTextColor : Color.primary)
+                            .foregroundColor(tags.contains(tag) ? resolvedAccentColor.umContrastingTextColor(in: environment) : Color.primary)
                             .cornerRadius(8)
                     }
                     .buttonStyle(.plain)

@@ -59,6 +59,7 @@ public struct UMUITagBar: View {
     }
     
     @Environment(\.umAccentColor) private var envAccentColor
+    @Environment(\.self) private var environment
     
     private var resolvedAccentColor: Color {
         envAccentColor ?? .accentColor
@@ -80,7 +81,7 @@ public struct UMUITagBar: View {
                             .padding(.horizontal, horizontalPadding)
                             .padding(.vertical, verticalPadding)
                             .background(selectedTags.contains(tag) ? resolvedAccentColor : Color.gray.opacity(0.3))
-                            .foregroundColor(selectedTags.contains(tag) ? resolvedAccentColor.umContrastingTextColor : .primary)
+                            .foregroundColor(selectedTags.contains(tag) ? resolvedAccentColor.umContrastingTextColor(in: environment) : .primary)
                             .clipShape(Capsule())
                     }
                     .buttonStyle(.plain)

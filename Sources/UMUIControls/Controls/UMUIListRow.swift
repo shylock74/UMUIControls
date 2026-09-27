@@ -62,13 +62,14 @@ public struct UMUIListRow<Trailing: View>: View {
     }
 
     @Environment(\.umAccentColor) private var envAccentColor
+    @Environment(\.self) private var environment
     
     private var resolvedAccentColor: Color {
         envAccentColor ?? .accentColor
     }
     
     private var selectedForeground: Color {
-        resolvedAccentColor.umContrastingTextColor
+        resolvedAccentColor.umContrastingTextColor(in: environment)
     }
 
     public var body: some View {

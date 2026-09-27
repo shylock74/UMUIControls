@@ -209,13 +209,14 @@ private struct SidebarButton: View {
     let action: () -> Void
     
     @State private var isHovering = false
+    @Environment(\.self) private var environment
     
     private var isLightAccent: Bool {
-        accentColor.umIsLight
+        accentColor.umIsLight(in: environment)
     }
     
     private var selectedForeground: Color {
-        accentColor.umContrastingTextColor
+        accentColor.umContrastingTextColor(in: environment)
     }
     
     var body: some View {
@@ -266,6 +267,44 @@ private struct SidebarButton: View {
     }
 }
 
+@available(macOS 11.0, *)
+public extension UMUISettingsGlobalView {
+    /// Sets the accent color for this settings view and its sidebar navigation buttons.
+    func accentColor(_ color: Color) -> some View {
+        self.umAccentColor(color)
+    }
+}
+
 // Supporting typo class definition requested in instructions for safety/compatibility.
 @available(macOS 11.0, *)
 public typealias UMUISettingsGloablView = UMUISettingsGlobalView
+
+// MARK: - Previews
+
+#if DEBUG
+@available(macOS 11.0, *)
+struct UMUISettingsGlobalView_Previews: PreviewProvider {
+    static var previews: some View {
+        UMUISettingsGlobalView(storageKey: "previewSelectedPane") {
+            UMUISettingPaneView(id: "transcription", icon: "waveform", name: "Transcription") {
+                Text("Transcription Content")
+            }
+            UMUISettingPaneView(id: "ai", icon: "wand.and.sparkles", name: "AI & Translation") {
+                Text("AI & Translation Content")
+            }
+            UMUISettingPaneView(id: "export", icon: "square.and.arrow.up", name: "Export & Subtitles") {
+                Text("Export Content")
+            }
+            UMUISettingPaneView(id: "editor", icon: "slider.horizontal.3", name: "Editor & Player") {
+                Text("Editor Content")
+            }
+            UMUISettingPaneView(id: "advanced", icon: "gearshape", name: "Advanced & System") {
+                Text("Advanced Content")
+            }
+        }
+        .accentColor(.cyan)
+        .frame(width: 550, height: 360)
+        .preferredColorScheme(.dark)
+    }
+}
+#endif
