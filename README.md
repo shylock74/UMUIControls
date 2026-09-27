@@ -70,6 +70,7 @@ To maintain a clean modular architecture, components are structured into dedicat
    - [UMUIFileDropArea](#25u-umuifiledroparea)
    - [UMUIWindow](#25v-umuiwindow)
    - [Binding Helpers](#25w-binding-helpers)
+   - [UMUILayoutConfig](#25x-umuilayoutconfig)
 3. [Helper Extensions](#26-helper-extensions)
 4. [Theming & Integration](#theming--integration)
 
@@ -1420,6 +1421,48 @@ UMUIWindow.close(id: "app.dictionaries")
 $settings.maxLines.umDouble          // Binding<Int> → Binding<Double>, rounded on write
 $margins.leftP.umDefault(0.05)        // Binding<T?> → Binding<T>, reading a default for nil
 ```
+
+---
+
+### 25x. `UMUILayoutConfig`
+Layout metrics (label widths, window sizes, ...) read at run time from a **UM User Interface Configurator** project — the `.umuic` JSON file bundled with the app. While the Configurator edits the project it broadcasts every change over `DistributedNotificationCenter`; an observing `UMUILayoutConfig` republishes, so a Debug build can be retuned live. A dependency-free port of UMSwiftUI's `UMConfig`: same file, same broadcast (`ulti.media.umuic.broadcast.<bundle id without dots>`), same group / key names.
+
+```swift
+public static let shared: UMUILayoutConfig        // UMConfigurator.umuic in the main bundle
+
+public init(configFileName: String = "UMConfigurator", bundle: Bundle = .main, observesConfigurator: Bool = true)
+
+public func double(_ group: String, _ key: String, def: Double? = nil) -> Double
+public func double(_ group: String, _ key: String, min: Double) -> Double
+public func int(_ group: String, _ key: String, def: Int? = nil) -> Int
+public func int(_ group: String, _ key: String, min: Int) -> Int
+public func string(_ group: String, _ key: String, def: String = "") -> String
+public func bool(_ group: String, _ key: String, def: Bool? = nil) -> Bool
+public func pointSize(_ group: String, _ key: String, def: CGPoint = .zero) -> CGPoint
+```
+
+Declare the metrics in an extension — the project in Debug, the baked value in Release — and observe the shared instance:
+
+```swift
+extension UMUILayoutConfig {
+    var settingsWindow_labelW: Double {
+    #if DEBUG
+        double("settingsWindow", "labelW")
+    #else
+        132.0
+    #endif
+    }
+}
+
+struct SettingsRow: View {
+    @ObservedObject private var layout = UMUILayoutConfig.shared
+    var body: some View {
+        UMUITextField(label: "Name", value: $name, labelWidth: layout.settingsWindow_labelW)
+    }
+}
+```
+
+Group and key follow the Configurator's identifier rule: leading digits dropped, first letter lowercased, spaces removed with the next letter capitalized ("Settings Window" → `settingsWindow`).
 
 ---
 
