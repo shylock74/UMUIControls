@@ -27,6 +27,7 @@ import SwiftUI
 /// - subtitle: An optional string to display the current selection or a prompt.
 /// - icon: The SF Symbol name to represent the area.
 /// - isTargeted: A boolean state tracking if an item is being dragged over.
+/// - placeholder: The text shown while `subtitle` is `nil`.
 /// - onSelect: A closure triggered when the user taps the area manually.
 @available(macOS 11.0, *)
 public struct UMUIDropArea: View {
@@ -35,6 +36,7 @@ public struct UMUIDropArea: View {
     public var subtitle: String? = nil
     public let icon: String
     public let isTargeted: Bool
+    public var placeholder: String = "Drop items here"
     public let onSelect: () -> Void
     
     @State private var isHovered = false
@@ -45,6 +47,7 @@ public struct UMUIDropArea: View {
         subtitle: String? = nil,
         icon: String,
         isTargeted: Bool,
+        placeholder: String = "Drop items here",
         onSelect: @escaping () -> Void
     ) {
         self.title = title
@@ -52,6 +55,7 @@ public struct UMUIDropArea: View {
         self.subtitle = subtitle
         self.icon = icon
         self.isTargeted = isTargeted
+        self.placeholder = placeholder
         self.onSelect = onSelect
     }
     
@@ -83,7 +87,7 @@ public struct UMUIDropArea: View {
                         .foregroundColor(isTargeted ? Color.accentColor : .secondary)
                 }
                 
-                Text(subtitle ?? "Drop items here")
+                Text(subtitle ?? placeholder)
                     .font(.system(size: 9, weight: .bold))
                     .lineLimit(1)
                     // The subtitle is usually a file name or path, whose start and extension both matter.

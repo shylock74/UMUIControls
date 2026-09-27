@@ -15,6 +15,11 @@ public extension View {
 		self.modifier (UMUILeftObjectView (width: width))
 	}
 	
+	/// Right-aligns this view inside its parent container.
+	func umRight (_ width : CGFloat? = nil) -> some View {
+		self.modifier (UMUIRightObjectView (width: width))
+	}
+
 	/// Horizontally centers this view inside its parent container.
 	func umCentered () -> some View {
 		self.modifier (UMUICenterObjectView ())

@@ -61,6 +61,15 @@ To maintain a clean modular architecture, components are structured into dedicat
    - [UMUIEmptyStateView](#25l-umuiemptystateview)
    - [UMUIPopoverInfo](#25m-umuipopoverinfo)
    - [UMUICopyableURLText & UMUICopyableLink](#25n-umuicopyableurltext--umuicopyablelink)
+   - [UMUILabeledRow](#25o-umuilabeledrow)
+   - [UMUIColorWell](#25p-umuicolorwell)
+   - [UMUINumberField](#25q-umuinumberfield)
+   - [UMUIFontSelector & UMUIFontCatalog](#25r-umuifontselector--umuifontcatalog)
+   - [UMUIToggleTextField](#25s-umuitoggletextfield)
+   - [UMUISheetButton & UMUISheetContainer](#25t-umuisheetbutton--umuisheetcontainer)
+   - [UMUIFileDropArea](#25u-umuifiledroparea)
+   - [UMUIWindow](#25v-umuiwindow)
+   - [Binding Helpers](#25w-binding-helpers)
 3. [Helper Extensions](#26-helper-extensions)
 4. [Theming & Integration](#theming--integration)
 
@@ -750,6 +759,7 @@ A layout ViewModifier utility that centers any target view horizontally, vertica
 ### 23. `UMUILeftObjectView` & Alignment Modifiers
 A rich collection of layout positioning ViewModifiers that position elements within dynamic frames:
 - **`.umLeft(width: CGFloat?)`**: Left-aligns a view (optionally restricting its width).
+- **`.umRight(width: CGFloat?)`**: Right-aligns a view (optionally restricting its width).
 - **`.umCentered()` / `.umHCentered()`**: Centers a view horizontally.
 - **`.umZCentered()` / `.umVCentered()`**: Centers a view vertically.
 
@@ -1241,6 +1251,174 @@ public init(
 ```swift
 UMUICopyableURLText("https://github.com/shylock74/UMUIControls")
 UMUICopyableURLText(package.urlOrPath, isEnabled: !package.isLocal)
+```
+
+---
+
+### 25o. `UMUILabeledRow`
+The label column of the UMUIControls widgets, followed by any control and a trailing spacer. Use it for a control with no label of its own (a searchable picker, a drop area, a pair of fields) so it lines up with the rows around it.
+
+```swift
+public init(
+    _ label: String,
+    size: UMUILabeledRowSize = .small,      // .normal / .small
+    labelWidth: CGFloat = 80,
+    alignment: VerticalAlignment = .center,
+    @ViewBuilder content: () -> Content
+)
+```
+
+```swift
+UMUILabeledRow("Codec", labelWidth: 80) {
+    UMUISearchablePicker(items: codecs, selection: $codec)
+}
+```
+
+---
+
+### 25p. `UMUIColorWell`
+The plain "pick any color" row of a settings form: optional label, the system color well, and the picked color written as `#RRGGBB` (plus its opacity when `supportsOpacity` is on). Bound to a SwiftUI `Color`; bridge other color types at the call site.
+
+```swift
+public init(
+    label: String? = nil,
+    color: Binding<Color>,
+    supportsOpacity: Bool = false,
+    showsValue: Bool = true,
+    size: UMUIColorWellSize = .small,       // .normal / .small
+    labelWidth: CGFloat = 80
+)
+```
+
+```swift
+UMUIColorWell(label: "Background", color: $background, supportsOpacity: true)
+```
+
+---
+
+### 25q. `UMUINumberField`
+A numeric field without a slider, for values with no natural slider range (a frame width, a custom frame rate). Same rounded-rect border and focus glow as `UMUITextField`, optional trailing unit. Requires macOS 12.
+
+```swift
+// Double
+public init(label: String? = nil, value: Binding<Double>, range: ClosedRange<Double> = ...,
+            decimals: Int = 0, unit: String? = nil, size: UMUINumberFieldSize = .small,
+            labelWidth: CGFloat = 80, fieldWidth: CGFloat = 64)
+
+// Int
+public init(label: String? = nil, value: Binding<Int>, range: ClosedRange<Int> = ...,
+            unit: String? = nil, size: UMUINumberFieldSize = .small,
+            labelWidth: CGFloat = 80, fieldWidth: CGFloat = 64)
+```
+
+- **Commit Only:** `value` is written on **Enter/Return**, **blur** and **disappear**, clamped to `range` and rounded to `decimals`.
+- **Invalid Input:** unparsable text reverts to the last committed value. Both `,` and `.` are accepted as decimal separator.
+- **Outside Changes:** a new `value` from outside replaces the text, but never while the field has focus.
+
+---
+
+### 25r. `UMUIFontSelector` & `UMUIFontCatalog`
+A font chooser: searchable family list, then the family's faces and a size control when their bindings are passed. Changing the family moves the face to the new family's first face whenever the old one does not exist there. Requires macOS 12.
+
+```swift
+public init(
+    label: String = "Font",
+    family: Binding<String>,
+    face: Binding<String>? = nil,           // nil hides the face row
+    size: Binding<Double>? = nil,           // nil hides the size row
+    sizeRange: ClosedRange<Double> = 8...200,
+    labelWidth: CGFloat = 80
+)
+```
+
+```swift
+UMUIFontSelector(family: $font.family, face: $font.face, size: $font.size.umDouble, sizeRange: 10...200)
+```
+
+`UMUIFontCatalog.families` lists the installed families; `UMUIFontCatalog.faces(of:)` returns a family's faces (cached).
+
+---
+
+### 25s. `UMUIToggleTextField`
+A `UMUISmallSwitch` in the label column followed, while on, by a `UMUITextField` — an optional piece of text such as a file-name prefix.
+
+```swift
+public init(
+    _ title: String,
+    isOn: Binding<Bool>,
+    text: Binding<String>,
+    placeholder: String = "",
+    labelWidth: CGFloat = 80,
+    fieldWidth: CGFloat? = nil              // nil takes the remaining space
+)
+```
+
+---
+
+### 25t. `UMUISheetButton` & `UMUISheetContainer`
+A button that presents its content in a sheet with a header (title and close glyph) and a footer with an accent **Close** button. Esc and Return close it.
+
+```swift
+public enum UMUISheetButtonKind {
+    case mini(UMUIMiniButtonStyle)                                   // UMUIMiniButton
+    case capsule(UMUICapsuleButtonStyle, UMUICapsuleButtonSize)      // UMUICapsuleButton
+}
+
+public init(
+    _ title: String,
+    systemImage: String? = nil,
+    sheetTitle: String? = nil,              // defaults to the button title
+    kind: UMUISheetButtonKind = .mini(.gray),
+    closeTitle: String = "Close",
+    onClose: (() -> Void)? = nil,
+    @ViewBuilder content: @escaping () -> SheetContent
+)
+```
+
+`UMUISheetContainer(title:closeTitle:isPresented:content:)` is the same chrome, for a sheet presented by other means.
+
+---
+
+### 25u. `UMUIFileDropArea`
+A `UMUIDropArea` that handles the drop itself, bound to an optional `URL`. It accepts one file (optionally restricted to some extensions) or one folder, opens an `NSOpenPanel` on click, shows the chosen item's name and offers a clear button. Requires macOS 12.
+
+```swift
+public enum UMUIFileDropKind {
+    case file(extensions: [String])         // [] accepts any file
+    case folder
+}
+
+public init(
+    url: Binding<URL?>,
+    kind: UMUIFileDropKind = .file(extensions: []),
+    prompt: String = "Drop here or click to choose",
+    title: String = "",
+    icon: String? = nil,                    // defaults to a document or a folder symbol
+    isClearable: Bool = true
+)
+```
+
+`UMUIDropArea` gained a `placeholder` parameter (default `"Drop items here"`), the text shown while `subtitle` is `nil`.
+
+---
+
+### 25v. `UMUIWindow`
+Opens a SwiftUI view in a standalone window, one window per id: showing an id that is already open brings that window to the front.
+
+```swift
+UMUIWindow.show(id: "app.dictionaries", title: "Dictionaries", resizable: true) {
+    DictionaryManagerView()
+}
+UMUIWindow.close(id: "app.dictionaries")
+```
+
+---
+
+### 25w. Binding Helpers
+
+```swift
+$settings.maxLines.umDouble          // Binding<Int> → Binding<Double>, rounded on write
+$margins.leftP.umDefault(0.05)        // Binding<T?> → Binding<T>, reading a default for nil
 ```
 
 ---
