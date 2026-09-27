@@ -29,7 +29,7 @@ public struct UMUISwitchExpansionDisclosureGroup <Content : View> : View {
 		self.smallFont = smallFont
 		self._expanded = expanded
 		self.content = content
-		self.backgroundColor = backgroundColor ?? Color.gray.opacity (0.1)
+		self.backgroundColor = backgroundColor
 	}
 	
 	public init (label : String,

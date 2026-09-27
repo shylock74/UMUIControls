@@ -25,13 +25,15 @@ public struct UMUIRoundedBoxModifier : ViewModifier {
 	
 	public func body (content : Content) -> some View {
 		// Draws the glassy bounding grouping card.
+		// A barely-there fill and the same hairline as UMUISection: the box reads as a
+		// sub-group inside a section instead of a solid slab on top of it.
 		content
 			.padding (8)
-			.background (backgroundColor ?? Color.secondary.opacity (0.1))
+			.background (backgroundColor ?? Color.primary.opacity (0.03))
 			.cornerRadius (6)
 			.overlay (RoundedRectangle (cornerRadius: 6)
 				.stroke (borderColor ?? Color.secondary.opacity (0.2),
-						 lineWidth: 0.5))
+						 lineWidth: 1))
 	}
 }
 
