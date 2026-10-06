@@ -89,7 +89,7 @@ To maintain a clean modular architecture, components are structured into dedicat
 ## Component Index & Reference
 
 ### 1. `UMUICapsuleButton`
-A capsule-shaped button styled with responsive tactile micro-interactions and dynamic high-contrast text color detection.
+A capsule-shaped button with a soft **tinted fill** (no border, no gradient), text in the same color as the fill, and subtle hover/press states. `.gray` is neutral; `.accent` and `.custom(Color)` tint both fill and text.
 
 #### Signatures & Initializers
 ```swift
@@ -152,7 +152,7 @@ public enum UMUICapsuleButtonSize: Sendable, Equatable {
 ---
 
 ### 1b. `UMUIMiniButton`
-A compact capsule soft-pill button designed to be used in place of `UMBorderlessSmallButton` or whenever space is very limited and the UI needs to be kept extremely compact yet clear and readable.
+A compact capsule soft-pill button (tinted fill, borderless) designed to be used in place of `UMBorderlessSmallButton` or whenever space is very limited and the UI needs to be kept extremely compact yet clear and readable.
 
 #### Signatures & Initializers
 ```swift

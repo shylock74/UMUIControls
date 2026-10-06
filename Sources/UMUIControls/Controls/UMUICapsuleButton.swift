@@ -2,7 +2,7 @@
 //  UMUICapsuleButton.swift
 //  UMUIControls
 //
-//  A customizable capsule-shaped button featuring dynamic text color contrast,
+//  A customizable capsule-shaped button with a soft tinted fill, matching text color,
 //  hover and press animations, and support for accent, gray, and custom colors.
 //
 
@@ -154,48 +154,34 @@ struct CapsuleButtonStyle: ButtonStyle {
     let isHovered: Bool
     
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.isEnabled) private var isEnabled
     @Environment(\.self) private var environment
     
     func makeBody(configuration: Configuration) -> some View {
         let isPressed = configuration.isPressed
-        let baseColor = resolveBackgroundColor()
-        let foregroundColor = resolveForegroundColor(backgroundColor: baseColor)
+        let tint = resolveTintColor()
+        let foregroundColor = resolveForegroundColor(tint: tint)
+        let fillColor = resolveFillColor(tint: tint, isPressed: isPressed)
         
-        // Interactive tactile micro-animations
-        let scale: CGFloat = isPressed ? 0.96 : (isHovered ? 1.02 : 1.0)
-        let brightnessChange: Double = isPressed ? -0.08 : (isHovered ? 0.04 : 0.0)
-        let shadowOpacity: Double = isHovered && !isPressed ? 0.15 : 0.0
+        let scale: CGFloat = isPressed ? 0.98 : 1.0
         
         return configuration.label
-            .font(fontForSize.weight(.semibold))
+            .font(fontForSize.weight(.medium))
             .foregroundColor(foregroundColor)
             .padding(.horizontal, horizontalPadding)
             .padding(.vertical, verticalPadding)
             .background(
                 Capsule()
-                    .fill(baseColor)
-                    .overlay(
-                        Capsule()
-                            .strokeBorder(Color.white.opacity(glow ? 0.35 : 0.0), lineWidth: 1)
-                    )
-                    .overlay(
-                        Capsule()
-                            .fill(LinearGradient(
-                                colors: [Color.white.opacity(0.12), Color.clear, Color.black.opacity(0.12)],
-                                startPoint: .top,
-                                endPoint: .bottom
-                            ))
-                    )
-                    .brightness(brightnessChange)
+                    .fill(fillColor)
             )
             .background(
-                UMUICapsuleGlow(color: baseColor, isHovered: isHovered, isPressed: isPressed)
+                UMUICapsuleGlow(color: tint, isHovered: isHovered, isPressed: isPressed)
                     .opacity(glow ? 1 : 0)
             )
             .scaleEffect(scale)
-            .shadow(color: Color.black.opacity(shadowOpacity), radius: 4, x: 0, y: isHovered ? 2 : 0)
-            .animation(.spring(response: 0.2, dampingFraction: 0.7), value: isPressed)
-            .animation(.spring(response: 0.25, dampingFraction: 0.7), value: isHovered)
+            .opacity(isEnabled ? 1.0 : 0.4)
+            .animation(.easeOut(duration: 0.15), value: isPressed)
+            .animation(.easeOut(duration: 0.15), value: isHovered)
     }
     
     private var fontForSize: Font {
@@ -231,10 +217,11 @@ struct CapsuleButtonStyle: ButtonStyle {
         }
     }
     
-    private func resolveBackgroundColor() -> Color {
+    /// The base colour of the style (used for the tinted fill, text and glow).
+    private func resolveTintColor() -> Color {
         switch style {
         case .gray:
-            return colorScheme == .dark ? Color(white: 0.22) : Color(white: 0.90)
+            return colorScheme == .dark ? Color.white : Color.black
         case .accent:
             return environment.umAccentColor ?? .accentColor
         case .custom(let color):
@@ -242,8 +229,25 @@ struct CapsuleButtonStyle: ButtonStyle {
         }
     }
     
-    private func resolveForegroundColor(backgroundColor: Color) -> Color {
-        return backgroundColor.umContrastingTextColor(in: environment)
+    private func resolveFillColor(tint: Color, isPressed: Bool) -> Color {
+        let isGray = style == .gray
+        let base: Double = isGray ? 0.08 : 0.14
+        let step: Double = isGray ? 0.06 : 0.07
+        if isPressed {
+            return tint.opacity(base + step * 2)
+        } else if isHovered && isEnabled {
+            return tint.opacity(base + step)
+        }
+        return tint.opacity(base)
+    }
+    
+    private func resolveForegroundColor(tint: Color) -> Color {
+        switch style {
+        case .gray:
+            return colorScheme == .dark ? Color(white: 0.82) : Color(white: 0.25)
+        default:
+            return tint
+        }
     }
 }
 

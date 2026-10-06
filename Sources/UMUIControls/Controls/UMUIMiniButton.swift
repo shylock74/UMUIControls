@@ -23,7 +23,7 @@ public enum UMUIMiniButtonStyle: Sendable, Equatable {
 /// A compact capsule-shaped button with a soft pill styling and responsive interactive hover and click states.
 ///
 /// Features:
-/// - Soft pill styling with subtle, non-intrusive hairline border.
+/// - Soft pill styling with a gentle tinted fill and no border.
 /// - Highly legible 11pt medium-weight typography.
 /// - 8pt horizontal and 3pt vertical padding with 5pt icon-text spacing.
 /// - Semitransparent background fill with interactive hover and click states.
@@ -130,7 +130,6 @@ struct MiniButtonStyle: ButtonStyle {
         let isPressed = configuration.isPressed
         let fgColor = resolveForegroundColor()
         let bgColor = resolveBackgroundColor(isPressed: isPressed)
-        let strokeColor = resolveStrokeColor()
         
         return configuration.label
             .font(.system(size: 11, weight: .medium))
@@ -140,10 +139,6 @@ struct MiniButtonStyle: ButtonStyle {
             .background(
                 Capsule()
                     .fill(bgColor)
-            )
-            .overlay(
-                Capsule()
-                    .strokeBorder(strokeColor, lineWidth: 0.75)
             )
             .opacity(isEnabled ? 1.0 : 0.4)
             .animation(.easeOut(duration: 0.15), value: isPressed)
@@ -188,18 +183,6 @@ struct MiniButtonStyle: ButtonStyle {
             } else {
                 return color.opacity(0.12)
             }
-        }
-    }
-    
-    private func resolveStrokeColor() -> Color {
-        switch style {
-        case .gray:
-            return colorScheme == .dark ? Color.white.opacity(0.12) : Color.black.opacity(0.08)
-        case .accent:
-            let base = envAccentColor ?? .accentColor
-            return base.opacity(0.22)
-        case .custom(let color):
-            return color.opacity(0.22)
         }
     }
 }
