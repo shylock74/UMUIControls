@@ -142,6 +142,7 @@ public struct UMUISegmentedBar: View {
             selection: $selection,
             size: size == .normal ? .normal : .small
         )
+        .help(selection)
     }
     
     private var segmentedDeck: some View {

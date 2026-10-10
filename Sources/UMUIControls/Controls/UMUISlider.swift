@@ -42,6 +42,10 @@ public struct UMUISlider: View {
     /// The width allocated for the optional leading label.
     public let labelWidth: CGFloat
     
+    /// When `true` the thumb is always shown (smaller at rest, full size on hover/drag)
+    /// instead of appearing only on hover. Default is `false`.
+    public let thumbAlwaysVisible: Bool
+    
     // MARK: - Internal States
     
     @State private var isDragging: Bool = false
@@ -54,18 +58,21 @@ public struct UMUISlider: View {
     ///   - range: Active bounds for the value (default is `0...1`).
     ///   - size: Sizing mode (default is `.normal`).
     ///   - labelWidth: Minimum width of the label column; a longer label widens it rather than being truncated (default is `80`).
+    ///   - thumbAlwaysVisible: Keep the thumb visible when the pointer is not over the slider (default is `false`).
     public init(
         label: String? = nil,
         value: Binding<Double>,
         range: ClosedRange<Double> = 0...1,
         size: UMUISliderSize = .small,
-        labelWidth: CGFloat = 80
+        labelWidth: CGFloat = 80,
+        thumbAlwaysVisible: Bool = false
     ) {
         self.label = label
         self._value = value
         self.range = range
         self.size = size
         self.labelWidth = labelWidth
+        self.thumbAlwaysVisible = thumbAlwaysVisible
     }
     
     private var fraction: Double {
@@ -113,10 +120,13 @@ public struct UMUISlider: View {
                                 .stroke(Color.secondary.opacity(0.15), lineWidth: 0.5)
                         )
                     
-                    // Front active fill
-                    RoundedRectangle(cornerRadius: tHeight / 2)
+                    // Front active fill, clipped to the track shape so a short fill
+                    // never renders as a detached rounded blob.
+                    Rectangle()
                         .fill(Color.accentColor)
                         .frame(width: fillWidth, height: tHeight)
+                        .frame(width: width, height: tHeight, alignment: .leading)
+                        .clipShape(RoundedRectangle(cornerRadius: tHeight / 2))
                     
                     // Circular Grab Handle (Thumb) - scales up on hover/drag
                     Circle()
@@ -124,8 +134,8 @@ public struct UMUISlider: View {
                         .frame(width: tSize, height: tSize)
                         .shadow(color: .black.opacity(0.25), radius: 1.5, y: 1)
                         .offset(x: max(0, min(fillWidth - tSize / 2, width - tSize)))
-                        .scaleEffect(isHovered || isDragging ? 1.0 : 0.0)
-                        .opacity(isHovered || isDragging ? 1.0 : 0.0)
+                        .scaleEffect(isHovered || isDragging ? 1.0 : (thumbAlwaysVisible ? 0.75 : 0.0))
+                        .opacity(isHovered || isDragging || thumbAlwaysVisible ? 1.0 : 0.0)
                 }
                 .frame(height: tSize)
                 .contentShape(Rectangle())
