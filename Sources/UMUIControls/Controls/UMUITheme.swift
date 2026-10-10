@@ -91,7 +91,7 @@ public struct UMUITheme: Equatable, Sendable {
 
     // MARK: Presets
 
-    /// Neutral dark theme with a red accent (BeatMark Pro look).
+    /// Neutral dark theme with an orange accent (BeatMark Pro look).
     public static let proDark = UMUITheme(
         surfaceWindow:   Color(white: 0.10),
         surfacePanel:    Color(white: 0.12),
@@ -104,14 +104,14 @@ public struct UMUITheme: Equatable, Sendable {
         textSecondary:   Color.white.opacity(0.65),
         textTertiary:    Color.white.opacity(0.45),
         textDisabled:    Color.white.opacity(0.30),
-        accentFill:      Color(red: 0.85, green: 0.17, blue: 0.15),
-        accentText:      Color(red: 1.00, green: 0.35, blue: 0.31),
-        accentSubtle:    Color(red: 0.85, green: 0.17, blue: 0.15).opacity(0.20),
+        accentFill:      Color(red: 0.93, green: 0.42, blue: 0.10),
+        accentText:      Color(red: 1.00, green: 0.58, blue: 0.25),
+        accentSubtle:    Color(red: 0.93, green: 0.42, blue: 0.10).opacity(0.20),
         stateHero:       Color(red: 1.00, green: 0.80, blue: 0.20),
         stateForced:     Color(red: 0.30, green: 0.80, blue: 0.40),
         stateIgnored:    Color.white.opacity(0.45),
         stateCut:        Color(red: 0.25, green: 0.75, blue: 0.95),
-        stateWarning:    Color(red: 1.00, green: 0.60, blue: 0.20),
+        stateWarning:    Color(red: 1.00, green: 0.30, blue: 0.28),
         destructive:     Color(red: 1.00, green: 0.35, blue: 0.31),
         captionSize: 10, footnoteSize: 11, bodySize: 13, titleSize: 15, displaySize: 24,
         space1: 4, space2: 8, space3: 12, space4: 16, space6: 24, space8: 32,
