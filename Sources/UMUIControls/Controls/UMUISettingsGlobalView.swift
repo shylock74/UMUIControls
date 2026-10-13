@@ -14,7 +14,12 @@ public struct UMUISettingPaneView: Identifiable {
     public let id: String
     public let icon: String
     public let name: String
-    public let content: AnyView
+    private let makeContent: () -> AnyView
+    /// Shows a small accent dot next to the name in the sidebar.
+    public let badge: Bool
+
+    /// The pane's view. Built each time it is read, so only the selected pane is ever built.
+    public var content: AnyView { makeContent() }
     
     /// Creates a settings pane.
     /// - Parameters:
@@ -26,12 +31,14 @@ public struct UMUISettingPaneView: Identifiable {
         id: String? = nil,
         icon: String,
         name: String,
-        @ViewBuilder content: () -> Content
+        badge: Bool = false,
+        @ViewBuilder content: @escaping () -> Content
     ) {
         self.id = id ?? name
         self.icon = icon
         self.name = name
-        self.content = AnyView(content())
+        self.badge = badge
+        self.makeContent = { AnyView(content()) }
     }
 }
 
@@ -39,12 +46,42 @@ public struct UMUISettingPaneView: Identifiable {
 @available(macOS 11.0, *)
 @resultBuilder
 public struct UMUISettingPaneViewBuilder {
-    public static func buildBlock(_ components: UMUISettingPaneView...) -> [UMUISettingPaneView] {
-        components
+    public static func buildExpression(_ expression: UMUISettingPaneView) -> [UMUISettingPaneView] {
+        [expression]
     }
-    public static func buildBlock(_ components: [UMUISettingPaneView]) -> [UMUISettingPaneView] {
-        components
+
+    public static func buildExpression(_ expression: [UMUISettingPaneView]) -> [UMUISettingPaneView] {
+        expression
     }
+
+    public static func buildBlock(_ components: [UMUISettingPaneView]...) -> [UMUISettingPaneView] {
+        components.flatMap { $0 }
+    }
+
+    public static func buildOptional(_ component: [UMUISettingPaneView]?) -> [UMUISettingPaneView] {
+        component ?? []
+    }
+
+    public static func buildEither(first component: [UMUISettingPaneView]) -> [UMUISettingPaneView] {
+        component
+    }
+
+    public static func buildEither(second component: [UMUISettingPaneView]) -> [UMUISettingPaneView] {
+        component
+    }
+
+    public static func buildArray(_ components: [[UMUISettingPaneView]]) -> [UMUISettingPaneView] {
+        components.flatMap { $0 }
+    }
+}
+
+/// Look of the settings container.
+@available(macOS 11.0, *)
+public enum UMUISettingsChrome: Sendable {
+    /// Outer padding, rounded border and a boxed content area (the original look).
+    case bordered
+    /// No outer border or box: the container fills whatever hosts it (e.g. a sheet).
+    case plain
 }
 
 /// A macOS-styled settings view container featuring a left navigation sidebar and a right content container.
@@ -70,6 +107,12 @@ public struct UMUISettingPaneViewBuilder {
 public struct UMUISettingsGlobalView: View {
     public let panes: [UMUISettingPaneView]
     public let accentColor: Color?
+    /// Width of the sidebar (default 180).
+    public let sidebarWidth: CGFloat
+    /// `.plain` drops the outer border and the content box.
+    public let chrome: UMUISettingsChrome
+    /// Shows the selected pane's name above its content (default `true`).
+    public let showsPaneTitle: Bool
     
     // Internal state wrapper for AppStorage persistence
     @AppStorage
@@ -93,11 +136,17 @@ public struct UMUISettingsGlobalView: View {
     public init(
         selectedPane: Binding<String>,
         accentColor: Color? = nil,
+        sidebarWidth: CGFloat = 180,
+        chrome: UMUISettingsChrome = .bordered,
+        showsPaneTitle: Bool = true,
         @UMUISettingPaneViewBuilder panes: () -> [UMUISettingPaneView]
     ) {
         let resolvedPanes = panes()
         self.panes = resolvedPanes
         self.accentColor = accentColor
+        self.sidebarWidth = sidebarWidth
+        self.chrome = chrome
+        self.showsPaneTitle = showsPaneTitle
         self.selectedPaneBinding = selectedPane
         self.defaultPaneId = resolvedPanes.first?.id ?? ""
         self._selectedPaneState = AppStorage(wrappedValue: "", "UMUISettingsGlobalView.unusedKey")
@@ -111,11 +160,17 @@ public struct UMUISettingsGlobalView: View {
     public init(
         storageKey: String = "UMUIControls.Settings.selectedPane",
         accentColor: Color? = nil,
+        sidebarWidth: CGFloat = 180,
+        chrome: UMUISettingsChrome = .bordered,
+        showsPaneTitle: Bool = true,
         @UMUISettingPaneViewBuilder panes: () -> [UMUISettingPaneView]
     ) {
         let resolvedPanes = panes()
         self.panes = resolvedPanes
         self.accentColor = accentColor
+        self.sidebarWidth = sidebarWidth
+        self.chrome = chrome
+        self.showsPaneTitle = showsPaneTitle
         self.selectedPaneBinding = nil
         let firstId = resolvedPanes.first?.id ?? ""
         self.defaultPaneId = firstId
@@ -123,10 +178,14 @@ public struct UMUISettingsGlobalView: View {
     }
     
     private var currentSelection: String {
+        let raw: String
         if let binding = selectedPaneBinding {
-            return binding.wrappedValue
+            raw = binding.wrappedValue
+        } else {
+            raw = selectedPaneState.isEmpty ? defaultPaneId : selectedPaneState
         }
-        return selectedPaneState.isEmpty ? defaultPaneId : selectedPaneState
+        // A selection that points at a pane that is not there (e.g. hidden) falls back to the first.
+        return panes.contains(where: { $0.id == raw }) ? raw : (panes.first?.id ?? raw)
     }
     
     private func selectPane(_ id: String) {
@@ -138,7 +197,7 @@ public struct UMUISettingsGlobalView: View {
     }
     
     public var body: some View {
-        HStack(alignment: .top, spacing: 12) {
+        HStack(alignment: .top, spacing: chrome == .bordered ? 12 : 0) {
             // Sidebar: Left navigation area
             VStack(alignment: .leading, spacing: 6) {
                 ScrollView(.vertical, showsIndicators: false) {
@@ -155,29 +214,36 @@ public struct UMUISettingsGlobalView: View {
                     .padding(.vertical, 2)
                 }
             }
-            .frame(width: 180)
+            .frame(width: sidebarWidth)
             
             // Content Area: Right side pane content
             if let activePane = panes.first(where: { $0.id == currentSelection }) ?? panes.first {
                 VStack(alignment: .leading, spacing: 8) {
                     // Header displaying active category name
-                    Text(activePane.name)
-                        .font(.headline)
-                        .foregroundColor(.primary)
-                        .padding(.leading, 4)
+                    if showsPaneTitle {
+                        Text(activePane.name)
+                            .font(.headline)
+                            .foregroundColor(.primary)
+                            .padding(.leading, 4)
+                    }
                     
                     // Main content viewport with standard framing
-                    ZStack {
+                    if chrome == .bordered {
+                        ZStack {
+                            activePane.content
+                                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        }
+                        .padding(12)
+                        .background(
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(Color.secondary.opacity(0.2), lineWidth: 1)
+                                .background(Color.darkGray.opacity(0.3))
+                        )
+                        .cornerRadius(8)
+                    } else {
                         activePane.content
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
                     }
-                    .padding(12)
-                    .background(
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(Color.secondary.opacity(0.2), lineWidth: 1)
-                            .background(Color.darkGray.opacity(0.3))
-                    )
-                    .cornerRadius(8)
                 }
             } else {
                 VStack {
@@ -190,13 +256,27 @@ public struct UMUISettingsGlobalView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
-        .padding(12)
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(Color.secondary.opacity(0.3), lineWidth: 1)
-                .background(Color.darkGray.opacity(0.15))
-        )
-        .cornerRadius(12)
+        .modifier(UMUISettingsChromeModifier(chrome: chrome))
+    }
+}
+
+@available(macOS 11.0, *)
+private struct UMUISettingsChromeModifier: ViewModifier {
+    let chrome: UMUISettingsChrome
+
+    func body(content: Content) -> some View {
+        if chrome == .bordered {
+            content
+                .padding(12)
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(Color.secondary.opacity(0.3), lineWidth: 1)
+                        .background(Color.darkGray.opacity(0.15))
+                )
+                .cornerRadius(12)
+        } else {
+            content
+        }
     }
 }
 
