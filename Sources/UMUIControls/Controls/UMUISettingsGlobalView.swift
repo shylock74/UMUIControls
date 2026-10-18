@@ -166,6 +166,22 @@ public struct UMUISettingsGlobalView: View {
         self.defaultPaneId = resolvedPanes.first?.id ?? ""
         self._selectedPaneState = AppStorage(wrappedValue: "", "UMUISettingsGlobalView.unusedKey")
     }
+
+    /// Backward-compatibility initializer for clients built against earlier versions of UMUIControls.
+    public init(
+        selectedPane: Binding<String>,
+        accentColor: Color? = nil,
+        @UMUISettingPaneViewBuilder panes: () -> [UMUISettingPaneView]
+    ) {
+        self.init(
+            selectedPane: selectedPane,
+            accentColor: accentColor,
+            sidebarWidth: 180,
+            chrome: .bordered,
+            showsPaneTitle: true,
+            panes: panes
+        )
+    }
     
     /// Initializes the settings view with automatic internal persistence.
     /// - Parameters:
@@ -190,6 +206,22 @@ public struct UMUISettingsGlobalView: View {
         let firstId = resolvedPanes.first?.id ?? ""
         self.defaultPaneId = firstId
         self._selectedPaneState = AppStorage(wrappedValue: firstId, storageKey)
+    }
+
+    /// Backward-compatibility initializer for clients built against earlier versions of UMUIControls.
+    public init(
+        storageKey: String = "UMUIControls.Settings.selectedPane",
+        accentColor: Color? = nil,
+        @UMUISettingPaneViewBuilder panes: () -> [UMUISettingPaneView]
+    ) {
+        self.init(
+            storageKey: storageKey,
+            accentColor: accentColor,
+            sidebarWidth: 180,
+            chrome: .bordered,
+            showsPaneTitle: true,
+            panes: panes
+        )
     }
     
     private var currentSelection: String {
