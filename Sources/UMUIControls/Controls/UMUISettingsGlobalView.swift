@@ -40,6 +40,21 @@ public struct UMUISettingPaneView: Identifiable {
         self.badge = badge
         self.makeContent = { AnyView(content()) }
     }
+
+    /// Backward-compatibility initializer for clients built against earlier versions of UMUIControls.
+    public init<Content: View>(
+        id: String? = nil,
+        icon: String,
+        name: String,
+        @ViewBuilder content: () -> Content
+    ) {
+        let view = content()
+        self.id = id ?? name
+        self.icon = icon
+        self.name = name
+        self.badge = false
+        self.makeContent = { AnyView(view) }
+    }
 }
 
 /// A result builder to collect individual settings panes.
