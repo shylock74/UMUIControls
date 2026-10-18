@@ -73,6 +73,16 @@ public struct UMUISettingPaneViewBuilder {
         components.flatMap { $0 }
     }
 
+    /// Backward-compatibility buildBlock for clients built against earlier versions of UMUIControls.
+    public static func buildBlock(_ components: UMUISettingPaneView...) -> [UMUISettingPaneView] {
+        Array(components)
+    }
+
+    /// Backward-compatibility buildBlock for clients built against earlier versions of UMUIControls.
+    public static func buildBlock(_ components: [UMUISettingPaneView]) -> [UMUISettingPaneView] {
+        components
+    }
+
     public static func buildOptional(_ component: [UMUISettingPaneView]?) -> [UMUISettingPaneView] {
         component ?? []
     }
