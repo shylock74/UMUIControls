@@ -125,21 +125,19 @@ struct MiniButtonStyle: ButtonStyle {
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.isEnabled) private var isEnabled
     @Environment(\.umAccentColor) private var envAccentColor
+    @Environment(\.umSecondaryColor) private var envSecondaryColor
+    @Environment(\.self) private var environment
     
     func makeBody(configuration: Configuration) -> some View {
         let isPressed = configuration.isPressed
         let fgColor = resolveForegroundColor()
-        let bgColor = resolveBackgroundColor(isPressed: isPressed)
         
         return configuration.label
             .font(.system(size: 11, weight: .medium))
             .foregroundColor(fgColor)
             .padding(.horizontal, 8)
             .padding(.vertical, 3)
-            .background(
-                Capsule()
-                    .fill(bgColor)
-            )
+            .background(backgroundFill(isPressed: isPressed))
             .opacity(isEnabled ? 1.0 : 0.4)
             .animation(.easeOut(duration: 0.15), value: isPressed)
             .animation(.easeOut(duration: 0.15), value: isHovered)
@@ -150,9 +148,42 @@ struct MiniButtonStyle: ButtonStyle {
         case .gray:
             return colorScheme == .dark ? Color(white: 0.78) : Color(white: 0.28)
         case .accent:
-            return envAccentColor ?? .accentColor
+            let base = envAccentColor ?? .accentColor
+            if let secondary = envSecondaryColor {
+                return base.umContrastingTextColor(secondary: secondary, in: environment)
+            }
+            return base
         case .custom(let color):
             return color
+        }
+    }
+    
+    @ViewBuilder
+    private func backgroundFill(isPressed: Bool) -> some View {
+        if style == .accent, let secondary = envSecondaryColor {
+            let base = envAccentColor ?? .accentColor
+            let alpha = resolveAccentAlpha(isPressed: isPressed)
+            Capsule()
+                .fill(
+                    LinearGradient(
+                        gradient: Gradient(colors: [base.opacity(alpha), secondary.opacity(alpha)]),
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
+        } else {
+            Capsule()
+                .fill(resolveBackgroundColor(isPressed: isPressed))
+        }
+    }
+    
+    private func resolveAccentAlpha(isPressed: Bool) -> Double {
+        if isPressed {
+            return 0.28
+        } else if isHovered && isEnabled {
+            return 0.20
+        } else {
+            return 0.12
         }
     }
     
@@ -168,13 +199,8 @@ struct MiniButtonStyle: ButtonStyle {
             }
         case .accent:
             let base = envAccentColor ?? .accentColor
-            if isPressed {
-                return base.opacity(0.28)
-            } else if isHovered && isEnabled {
-                return base.opacity(0.20)
-            } else {
-                return base.opacity(0.12)
-            }
+            let alpha = resolveAccentAlpha(isPressed: isPressed)
+            return base.opacity(alpha)
         case .custom(let color):
             if isPressed {
                 return color.opacity(0.28)
@@ -226,6 +252,12 @@ struct UMUIMiniButton_Previews: PreviewProvider {
             }
             
             HStack(spacing: 10) {
+                UMUIMiniButton("Gradient Accent", style: .accent) { }
+                UMUIMiniButton("Gradient Play", systemImage: "play.fill", style: .accent) { }
+            }
+            .umAccentColor(.blue, secondary: .purple)
+            
+            HStack(spacing: 10) {
                 UMUIMiniButton("Disabled Gray", style: .gray) { }
                     .disabled(true)
                 
@@ -234,7 +266,7 @@ struct UMUIMiniButton_Previews: PreviewProvider {
             }
         }
         .padding()
-        .frame(width: 400, height: 260)
+        .frame(width: 400, height: 300)
     }
 }
 #endif

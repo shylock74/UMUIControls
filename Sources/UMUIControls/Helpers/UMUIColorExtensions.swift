@@ -31,29 +31,38 @@ public extension Color {
         }
     }
     
-    /// Returns true if this color has a relative luminance > 0.5, indicating dark foreground content should be used.
-    var umIsLight: Bool {
+    /// Returns the relative luminance (0.0 to 1.0) of this color.
+    var umLuminance: Double {
         #if os(macOS)
         let resolvedNSColor = resolveToNSColor()
         guard let rgbColor = resolvedNSColor.usingColorSpace(.deviceRGB) else {
-            return false
+            return 0.0
         }
         let r = Double(rgbColor.redComponent)
         let g = Double(rgbColor.greenComponent)
         let b = Double(rgbColor.blueComponent)
-        let luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b
-        return luminance > 0.5
+        return 0.2126 * r + 0.7152 * g + 0.0722 * b
         #else
-        return false
+        return 0.0
         #endif
+    }
+    
+    /// Returns the relative luminance of this color, taking environment overrides into account.
+    func umLuminance(in environment: EnvironmentValues? = nil) -> Double {
+        if self == .accentColor, let customAccent = environment?.umAccentColor {
+            return customAccent.umLuminance
+        }
+        return umLuminance
+    }
+
+    /// Returns true if this color has a relative luminance > 0.5, indicating dark foreground content should be used.
+    var umIsLight: Bool {
+        umLuminance > 0.5
     }
     
     /// Returns true if this color is light, optionally taking environment overrides into account.
     func umIsLight(in environment: EnvironmentValues? = nil) -> Bool {
-        if self == .accentColor, let customAccent = environment?.umAccentColor {
-            return customAccent.umIsLight
-        }
-        return umIsLight
+        umLuminance(in: environment) > 0.5
     }
     
     /// Returns either `Color.darkGray` or `Color.white` depending on which provides better contrast against this color.
@@ -67,6 +76,17 @@ public extension Color {
             return customAccent.umContrastingTextColor
         }
         return umContrastingTextColor
+    }
+    
+    /// Returns either `Color.darkGray` or `Color.white` depending on which provides better contrast against a gradient between this color and an optional secondary color.
+    func umContrastingTextColor(secondary: Color?, in environment: EnvironmentValues? = nil) -> Color {
+        guard let secondary = secondary else {
+            return umContrastingTextColor(in: environment)
+        }
+        let lum1 = self.umLuminance(in: environment)
+        let lum2 = secondary.umLuminance(in: environment)
+        let avgLum = (lum1 + lum2) / 2.0
+        return avgLum > 0.5 ? .darkGray : .white
     }
     
     #if os(macOS)
@@ -86,12 +106,22 @@ private struct UMAccentColorKey: EnvironmentKey {
     static let defaultValue: Color? = nil
 }
 
+private struct UMSecondaryColorKey: EnvironmentKey {
+    static let defaultValue: Color? = nil
+}
+
 @available(macOS 11.0, *)
 public extension EnvironmentValues {
     /// Custom accent color passed through the view hierarchy for UMUIControls.
     var umAccentColor: Color? {
         get { self[UMAccentColorKey.self] }
         set { self[UMAccentColorKey.self] = newValue }
+    }
+    
+    /// Custom secondary color passed through the view hierarchy for UMUIControls gradient buttons.
+    var umSecondaryColor: Color? {
+        get { self[UMSecondaryColorKey.self] }
+        set { self[UMSecondaryColorKey.self] = newValue }
     }
 }
 
@@ -101,5 +131,16 @@ public extension View {
     func umAccentColor(_ color: Color) -> some View {
         environment(\.umAccentColor, color)
             .accentColor(color)
+    }
+    
+    /// Sets the secondary color for UMUIControls components in this view hierarchy.
+    func umSecondaryColor(_ color: Color?) -> some View {
+        environment(\.umSecondaryColor, color)
+    }
+    
+    /// Sets both the accent and optional secondary color for UMUIControls components in this view hierarchy.
+    func umAccentColor(_ accent: Color, secondary: Color?) -> some View {
+        self.umAccentColor(accent)
+            .umSecondaryColor(secondary)
     }
 }

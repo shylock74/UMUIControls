@@ -78,7 +78,7 @@ To maintain a clean modular architecture, components are structured into dedicat
 
 ## Core Features
 - **macOS Oriented:** Designed strictly for macOS 11.0+ (`.macOS(.v11)`).
-- **Accent-Color Aware:** Controls dynamically adapt to system or parent-level `.tint(_:)` / `.accentColor(_:)` styling without hardcoded values.
+- **Accent-Color Aware:** Controls dynamically adapt to system or parent-level `.tint(_:)` / `.accentColor(_:)` styling without hardcoded values. Buttons also support dual-color gradients when a secondary color is defined via `.umSecondaryColor(_:)` or `.umAccentColor(_:secondary:)`.
 - **Dynamic Color Contrast:** High-contrast text color selector calculated via W3C relative luminance.
 - **Unified Sizing Sweep:** All controls support `.normal` and `.small` sizing modes, defaulting to `.small` for premium visual density.
 - **Labels Never Truncate:** `labelWidth` is the minimum width of a leading label column (`umLabelColumn(_:)`). Rows sharing it stay aligned; a longer label widens its column instead of being cut to "Launc…".
@@ -89,7 +89,7 @@ To maintain a clean modular architecture, components are structured into dedicat
 ## Component Index & Reference
 
 ### 1. `UMUICapsuleButton`
-A capsule-shaped button with a soft **tinted fill** (no border, no gradient), text in the same color as the fill, and subtle hover/press states. `.gray` is neutral; `.accent` and `.custom(Color)` tint both fill and text.
+A capsule-shaped button with a soft **tinted fill** (no border), text in the same color as the fill, and subtle hover/press states. `.gray` is neutral; `.accent` and `.custom(Color)` tint both fill and text. When a secondary color is defined via `.umSecondaryColor(_:)` or `.umAccentColor(_:secondary:)`, `.accent` buttons automatically render a vertical bicolored gradient with dynamically calculated high-contrast text.
 
 #### Signatures & Initializers
 ```swift

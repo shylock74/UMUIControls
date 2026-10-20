@@ -161,8 +161,6 @@ struct CapsuleButtonStyle: ButtonStyle {
         let isPressed = configuration.isPressed
         let tint = resolveTintColor()
         let foregroundColor = resolveForegroundColor(tint: tint)
-        let fillColor = resolveFillColor(tint: tint, isPressed: isPressed)
-        
         let scale: CGFloat = isPressed ? 0.98 : 1.0
         
         return configuration.label
@@ -171,12 +169,16 @@ struct CapsuleButtonStyle: ButtonStyle {
             .padding(.horizontal, horizontalPadding)
             .padding(.vertical, verticalPadding)
             .background(
-                Capsule()
-                    .fill(fillColor)
+                backgroundFill(tint: tint, isPressed: isPressed)
             )
             .background(
-                UMUICapsuleGlow(color: tint, isHovered: isHovered, isPressed: isPressed)
-                    .opacity(glow ? 1 : 0)
+                UMUICapsuleGlow(
+                    color: tint,
+                    secondaryColor: (style == .accent) ? environment.umSecondaryColor : nil,
+                    isHovered: isHovered,
+                    isPressed: isPressed
+                )
+                .opacity(glow ? 1 : 0)
             )
             .scaleEffect(scale)
             .opacity(isEnabled ? 1.0 : 0.4)
@@ -229,22 +231,50 @@ struct CapsuleButtonStyle: ButtonStyle {
         }
     }
     
-    private func resolveFillColor(tint: Color, isPressed: Bool) -> Color {
+    @ViewBuilder
+    private func backgroundFill(tint: Color, isPressed: Bool) -> some View {
+        if style == .accent, let secondary = environment.umSecondaryColor {
+            let alpha = resolveAlpha(isPressed: isPressed)
+            Capsule()
+                .fill(
+                    LinearGradient(
+                        gradient: Gradient(colors: [tint.opacity(alpha), secondary.opacity(alpha)]),
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
+        } else {
+            Capsule()
+                .fill(resolveFillColor(tint: tint, isPressed: isPressed))
+        }
+    }
+    
+    private func resolveAlpha(isPressed: Bool) -> Double {
         let isGray = style == .gray
         let base: Double = isGray ? 0.08 : 0.14
         let step: Double = isGray ? 0.06 : 0.07
         if isPressed {
-            return tint.opacity(base + step * 2)
+            return base + step * 2
         } else if isHovered && isEnabled {
-            return tint.opacity(base + step)
+            return base + step
         }
-        return tint.opacity(base)
+        return base
+    }
+    
+    private func resolveFillColor(tint: Color, isPressed: Bool) -> Color {
+        let alpha = resolveAlpha(isPressed: isPressed)
+        return tint.opacity(alpha)
     }
     
     private func resolveForegroundColor(tint: Color) -> Color {
         switch style {
         case .gray:
             return colorScheme == .dark ? Color(white: 0.82) : Color(white: 0.25)
+        case .accent:
+            if let secondary = environment.umSecondaryColor {
+                return tint.umContrastingTextColor(secondary: secondary, in: environment)
+            }
+            return tint
         default:
             return tint
         }
@@ -258,6 +288,7 @@ struct CapsuleButtonStyle: ButtonStyle {
 @available(macOS 11.0, *)
 struct UMUICapsuleGlow: View {
     let color: Color
+    var secondaryColor: Color? = nil
     let isHovered: Bool
     let isPressed: Bool
     
@@ -267,14 +298,27 @@ struct UMUICapsuleGlow: View {
         // Pressing dims the halo so the button still reads as pushed in.
         let intensity: Double = isPressed ? 0.30 : (isHovered ? 0.85 : 0.55)
         
-        Capsule()
-            .fill(color)
-            .blur(radius: isHovered ? 16 : 12)
-            .opacity(intensity * (breathing ? 1.0 : 0.55))
-            .scaleEffect(breathing ? 1.10 : 1.0)
-            .animation(.easeInOut(duration: 1.8).repeatForever(autoreverses: true), value: breathing)
-            .allowsHitTesting(false)
-            .onAppear { breathing = true }
+        Group {
+            if let secondary = secondaryColor {
+                Capsule()
+                    .fill(
+                        LinearGradient(
+                            gradient: Gradient(colors: [color, secondary]),
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
+            } else {
+                Capsule()
+                    .fill(color)
+            }
+        }
+        .blur(radius: isHovered ? 16 : 12)
+        .opacity(intensity * (breathing ? 1.0 : 0.55))
+        .scaleEffect(breathing ? 1.10 : 1.0)
+        .animation(.easeInOut(duration: 1.8).repeatForever(autoreverses: true), value: breathing)
+        .allowsHitTesting(false)
+        .onAppear { breathing = true }
     }
 }
 
@@ -359,10 +403,29 @@ struct UMUICapsuleButton_Previews: PreviewProvider {
                         }
                     }
                 }
+                
+                Divider()
+                
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("Gradient (Accent + Secondary)")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                    
+                    HStack(spacing: 15) {
+                        UMUICapsuleButton("Gradient Accent", style: .accent) {
+                            print("Gradient button clicked")
+                        }
+                        
+                        UMUICapsuleButton("Glowing Gradient", style: .accent, glow: true) {
+                            print("Glowing gradient clicked")
+                        }
+                    }
+                    .umAccentColor(.blue, secondary: .purple)
+                }
             }
             .padding(30)
         }
-        .frame(width: 550, height: 450)
+        .frame(width: 550, height: 500)
     }
 }
 #endif

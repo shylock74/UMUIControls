@@ -1,18 +1,18 @@
-# Task: stile tinted per UMUIMiniButton e UMUICapsuleButton
+# Task: gradiente (accentColor + secondary) per tutti i pulsanti UMUIControls
 
-- [✅] 1. Analisi
-  - [✅] Leggere UMUIMiniButton e UMUICapsuleButton
-  - [✅] Verificare stato git (main + origin, no WalkThrough.md)
-  - [✅] Chiarire le richieste con l'utente
-- [✅] 2. Implementazione
-  - [✅] UMUIMiniButton: rimuovere il bordo, solo fill tenue
-  - [✅] UMUICapsuleButton: stile tinted (fill tenue, testo colorato, no gradiente/ombra)
-  - [✅] Aggiornare doc comment e preview
-- [✅] 3. Build DEBUG
-- [✅] 4. Git
-  - [✅] Commit
-  - [✅] Push su main
-- [✅] 5. App sul Desktop (N/A: è un package)
-- [✅] 6. Documentazione
-  - [✅] README.md
-  - [✅] WalkThrough.md (non esiste: ignorato)
+- [✅] 1. Modifiche ai colori ed Environment
+  - [✅] Aggiungere `UMSecondaryColorKey`, `EnvironmentValues.umSecondaryColor`, `View.umSecondaryColor(_:)`, `View.umAccentColor(_:secondary:)` in `UMUIColorExtensions.swift`
+  - [✅] Aggiungere utility di calcolo contrasto per gradiente `Color.umContrastingTextColor(secondary:in:)`
+- [✅] 2. Implementazione pulsanti
+  - [✅] `UMUICapsuleButton`: sfondo a gradiente verticale per `.accent`, testo a contrasto, aggiornamento `UMUICapsuleGlow`
+  - [✅] `UMUIMiniButton`: sfondo a gradiente verticale per `.accent`, testo a contrasto
+  - [✅] `UMUIIconButton`: sfondo hover a gradiente se presente colore secondario
+  - [✅] `UMUIIconToggle`: sfondo attivo a gradiente se presente colore secondario, testo a contrasto
+- [✅] 3. Previews
+  - [✅] Aggiornare preview in `UMUICapsuleButton.swift` con demo gradiente
+  - [✅] Aggiornare preview in `UMUIMiniButton.swift` con demo gradiente
+  - [✅] Aggiornare preview in `UMUIIconButton.swift` con demo gradiente
+- [✅] 4. Build e validazione
+  - [✅] `swift build`
+- [✅] 5. Git
+  - [✅] Commit e push su origin/main
