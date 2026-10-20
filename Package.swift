@@ -15,6 +15,10 @@ let package = Package(
     targets: [
         .target(
             name: "UMUIControls"
+        ),
+        .testTarget(
+            name: "UMUIControlsTests",
+            dependencies: ["UMUIControls"]
         )
     ],
     swiftLanguageModes: [.v5]
