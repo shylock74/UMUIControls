@@ -46,6 +46,10 @@ public struct UMUINumberControl: View {
     
     /// The sizing mode of the number control.
     public let size: UMUINumberControlSize
+
+    /// When `true`, a value typed in the text field is not clamped to `range` (the slider still is).
+    /// Use it when the slider range is a convenience and larger values are legitimate.
+    public var allowsOutOfRangeInput: Bool
     
     /// The width of the label area.
     public var labelWidth: CGFloat
@@ -77,6 +81,7 @@ public struct UMUINumberControl: View {
         unit: String? = nil,
         decimals: Int = 0,
         size: UMUINumberControlSize = .small,
+        allowsOutOfRangeInput: Bool = false,
         labelWidth: CGFloat = 50,
         fieldWidth: CGFloat = 60,
         unitWidth: CGFloat = 45
@@ -89,6 +94,7 @@ public struct UMUINumberControl: View {
         self.unit = unit
         self.decimals = decimals
         self.size = size
+        self.allowsOutOfRangeInput = allowsOutOfRangeInput
         self.labelWidth = labelWidth
         self.fieldWidth = fieldWidth
         self.unitWidth = unitWidth
@@ -137,7 +143,7 @@ public struct UMUINumberControl: View {
     private func updateValue(from parsed: Double) {
         let actualVal = isPercentage ? parsed / 100 : parsed
         // Clamp to range
-        var clamped = min(max(actualVal, range.lowerBound), range.upperBound)
+        var clamped = allowsOutOfRangeInput ? actualVal : min(max(actualVal, range.lowerBound), range.upperBound)
         if let step = step {
             clamped = (clamped / step).rounded() * step
         }
@@ -173,7 +179,7 @@ public struct UMUINumberControl: View {
                 onEditingChanged: { isEditing in
                     if !isEditing {
                         DispatchQueue.main.async {
-                            if let parsed = parseDouble(textValue) {
+                            if let parsed = parseDouble(textValue), abs(parsed - displayValue) > 1e-9 {
                                 updateValue(from: parsed)
                             }
                             textValue = formatNumber(displayValue)
@@ -182,7 +188,7 @@ public struct UMUINumberControl: View {
                 },
                 onCommit: {
                     DispatchQueue.main.async {
-                        if let parsed = parseDouble(textValue) {
+                        if let parsed = parseDouble(textValue), abs(parsed - displayValue) > 1e-9 {
                             updateValue(from: parsed)
                         }
                         textValue = formatNumber(displayValue)

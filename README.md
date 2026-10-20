@@ -462,6 +462,7 @@ public init(
     unit: String? = nil,
     decimals: Int = 0,
     size: UMUINumberControlSize = .small,
+    allowsOutOfRangeInput: Bool = false,
     labelWidth: CGFloat = 50,
     fieldWidth: CGFloat = 60
 )
@@ -473,6 +474,7 @@ public init(
 | `title` | `String` | *Required* | Leading label. |
 | `value` | `Binding<Double>` | *Required* | Numeric binding value. |
 | `range` | `ClosedRange<Double>`| *Required* | Clamped bounds for slider. |
+| `allowsOutOfRangeInput` | `Bool` | `false` | When `true`, a typed value is not clamped to `range` (only the slider is). The field also writes only when the typed number differs from the current value, so focusing and leaving a field never rewrites it. |
 | `isPercentage`| `Bool` | `false` | If true, multiplies display value by 100 and sets unit to `%`. |
 | `unit` | `String?` | `nil` | Appended text unit (e.g. "px", "s"). |
 | `decimals` | `Int` | `0` | Fraction precision of text box. |
