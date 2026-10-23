@@ -1492,3 +1492,20 @@ ContentView()
     .tint(.purple)                 // Customizes accent colors
     .colorScheme(.dark)            // Forces dark mode adaptations
 ```
+
+---
+
+### `UMUIMasonryGrid`
+
+A gallery of equal-width columns (macOS 14+). Every item keeps its own proportions and goes into the shortest column, so the heights even out as items are added. The number of columns follows the available width; `columnWidth` is the width a column is meant to have, and the real one fills the row. Put it in a `ScrollView`; it sizes each tile itself (column width, height from the ratio), so `content` only draws.
+
+```swift
+ScrollView {
+    UMUIMasonryGrid(photos, columnWidth: 220, spacing: 8,
+                    aspectRatio: { CGFloat($0.width) / CGFloat($0.height) }) { photo in
+        PhotoView(photo)
+    }
+}
+```
+
+Ratios are limited to 0.4 ... 2.5 and an unknown one (`nil`) is square. The placement rules live in `UMUIMasonryLayout` (`columns`, `columnCount`, `columnWidth`, `clampedRatio`), apart from any view.
