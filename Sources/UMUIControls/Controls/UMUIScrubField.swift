@@ -52,6 +52,10 @@ public struct UMUIScrubField: View {
     /// What the field is, for VoiceOver and the tooltip.
     public let title: String?
 
+    /// The value stands for several things that don't agree: "---" is shown, and any value
+    /// written (even the one in `value`) is a change.
+    public let isMixed: Bool
+
     @State private var editing = false
     @State private var text = ""
     @State private var hovering = false
@@ -68,7 +72,8 @@ public struct UMUIScrubField: View {
         unit: String? = nil,
         prefix: String? = nil,
         unitsPerPoint: Double? = nil,
-        title: String? = nil
+        title: String? = nil,
+        isMixed: Bool = false
     ) {
         self._value = value
         self.range = range
@@ -78,6 +83,7 @@ public struct UMUIScrubField: View {
         self.prefix = prefix
         self.unitsPerPoint = unitsPerPoint
         self.title = title
+        self.isMixed = isMixed
     }
 
     /// Creates a field bound to an `Int`.
@@ -88,7 +94,8 @@ public struct UMUIScrubField: View {
         unit: String? = nil,
         prefix: String? = nil,
         unitsPerPoint: Double? = nil,
-        title: String? = nil
+        title: String? = nil,
+        isMixed: Bool = false
     ) {
         self.init(
             value: Binding<Double>(
@@ -101,7 +108,8 @@ public struct UMUIScrubField: View {
             unit: unit,
             prefix: prefix,
             unitsPerPoint: unitsPerPoint,
-            title: title
+            title: title,
+            isMixed: isMixed
         )
     }
 
@@ -143,11 +151,11 @@ public struct UMUIScrubField: View {
                     .foregroundStyle(.secondary)
             }
             Spacer(minLength: 0)
-            Text(Self.format(value, decimals: decimals))
+            Text(isMixed ? "---" : Self.format(value, decimals: decimals))
                 .font(.caption)
                 .monospacedDigit()
                 .lineLimit(1)
-            if let unit, !unit.isEmpty {
+            if let unit, !unit.isEmpty, !isMixed {
                 Text(unit)
                     .font(.caption2)
                     .foregroundStyle(.secondary)
@@ -171,7 +179,7 @@ public struct UMUIScrubField: View {
         .help(title.map { "\($0): drag to change, click to type" } ?? "Drag to change, click to type")
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(title ?? "Value")
-        .accessibilityValue(Self.format(value, decimals: decimals) + (unit.map { " " + $0 } ?? ""))
+        .accessibilityValue(isMixed ? "Multiple values" : Self.format(value, decimals: decimals) + (unit.map { " " + $0 } ?? ""))
         .accessibilityAdjustableAction { direction in
             let delta = step ?? Self.unitStep(decimals: decimals)
             switch direction {
@@ -239,7 +247,7 @@ public struct UMUIScrubField: View {
     }
 
     private func beginEditing() {
-        text = Self.format(value, decimals: decimals)
+        text = isMixed ? "" : Self.format(value, decimals: decimals)
         if hovering {
             hovering = false
             #if os(macOS)
@@ -282,7 +290,7 @@ public struct UMUIScrubField: View {
         v = clamped(v)
         let factor = pow(10, Double(max(decimals, step.map { Self.fractionDigits(of: $0) } ?? 0)))
         v = (v * factor).rounded() / factor
-        if v != value {
+        if v != value || isMixed {
             value = v
         }
     }

@@ -37,6 +37,10 @@ public struct UMUIPicker: View {
     
     /// Optional placeholder displayed when selection is empty.
     public let placeholder: String?
+
+    /// The selection stands for several things that don't agree: "---" is shown and no
+    /// option is checked.
+    public let isMixed: Bool
     
     @State private var isHovered: Bool = false
     
@@ -47,7 +51,8 @@ public struct UMUIPicker: View {
         selection: Binding<String>,
         size: UMUIPickerSize = .small,
         labelWidth: CGFloat = 80,
-        placeholder: String? = nil
+        placeholder: String? = nil,
+        isMixed: Bool = false
     ) {
         self.label = label
         self.options = options
@@ -55,6 +60,7 @@ public struct UMUIPicker: View {
         self.size = size
         self.labelWidth = labelWidth
         self.placeholder = placeholder
+        self.isMixed = isMixed
     }
     
     private var optionFont: Font {
@@ -91,7 +97,7 @@ public struct UMUIPicker: View {
                     } label: {
                         HStack {
                             Text(option)
-                            if selection == option {
+                            if selection == option, !isMixed {
                                 Image(systemName: "checkmark")
                             }
                         }
@@ -99,7 +105,7 @@ public struct UMUIPicker: View {
                 }
             } label: {
                 HStack(spacing: 6) {
-                    Text(selection.isEmpty ? (placeholder ?? "Select…") : selection)
+                    Text(isMixed ? "---" : (selection.isEmpty ? (placeholder ?? "Select…") : selection))
                         .font(optionFont)
                         .foregroundColor(.primary)
                         .lineLimit(1)
@@ -139,7 +145,8 @@ extension UMUIPicker {
         titleProvider: @escaping (T) -> String = { "\($0)" },
         size: UMUIPickerSize = .small,
         labelWidth: CGFloat = 80,
-        placeholder: String? = nil
+        placeholder: String? = nil,
+        isMixed: Bool = false
     ) {
         let stringOptions = Array(T.allCases).map { titleProvider($0) }
         let binding = Binding<String>(
@@ -156,7 +163,8 @@ extension UMUIPicker {
             selection: binding,
             size: size,
             labelWidth: labelWidth,
-            placeholder: placeholder
+            placeholder: placeholder,
+            isMixed: isMixed
         )
     }
 }
