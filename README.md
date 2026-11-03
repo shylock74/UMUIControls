@@ -51,6 +51,7 @@ To maintain a clean modular architecture, components are structured into dedicat
    - [UMUISettingsGlobalView & UMUISettingPaneView](#25b-umuisettingsglobalview--umuisettingpaneview)
    - [UMWidth, UMHeight & View Frame Extensions](#25c-umwidth-umheight--view-frame-extensions)
    - [UMUITextEditor](#25d-umuitexteditor)
+   - [UMUICodeEditor](#25d2-umuicodeeditor)
    - [UMUIChatBubble](#25e-umuichatbubble)
    - [UMUIStatusPill](#25f-umuistatuspill)
    - [UMUIListRow](#25g-umuilistrow)
@@ -1074,6 +1075,34 @@ public init(
 
 ```swift
 UMUITextEditor(placeholder: "Type your answer…", value: $answer, minHeight: 44) { send() }
+```
+
+---
+
+### 25d2. `UMUICodeEditor`
+A monospaced editor for structured text (YAML, JSON, Markdown, plain text) backed by a TextKit 1 `NSTextView`: line-number ruler, regex syntax highlighting, the real AppKit undo manager (⌘Z), find bar, debounced binding and an optional file-drop handler. Requires macOS 13.
+
+```swift
+public init(
+    text: Binding<String>,
+    language: UMUICodeLanguage = .plainText,   // .plainText / .yaml / .json / .markdown
+    controller: UMUICodeEditorController? = nil,
+    fontSize: CGFloat = 12,
+    isEditable: Bool = true,
+    showsLineNumbers: Bool = true,
+    debounceInterval: TimeInterval = 0.3,
+    onDropFiles: (([URL]) -> Void)? = nil      // dropped files go here instead of inserting paths
+)
+```
+
+- **Sync:** `text` is written 0.3 s after the last keystroke and when the editor loses focus or disappears. Changing `text` from outside replaces the content without an undo step.
+- **Undoable rewrites:** `UMUICodeEditorController.replaceAll(with:actionName:)` replaces everything as one ⌘Z-able step (e.g. an AI conversion).
+- **Highlighting:** `UMUICodeHighlighter.tokens(in:language:)` is pure and testable; colours are system colours (light/dark aware).
+
+```swift
+@StateObject private var editor = UMUICodeEditorController()
+UMUICodeEditor(text: $content, language: .yaml, controller: editor) { urls in importFiles(urls) }
+Button("Convert") { editor.replaceAll(with: yaml, actionName: "Convert to YAML") }
 ```
 
 ---
