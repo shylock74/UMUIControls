@@ -58,6 +58,12 @@ public struct UMUISegmentedBar: View {
     /// Mode controlling whether the bar transforms into a picker automatically.
     public let mode: UMUISegmentedBarMode
     
+    /// Optional closure providing an SF Symbol icon for each option.
+    public let iconProvider: ((String) -> String?)?
+    
+    /// Optional custom horizontal padding for each segment.
+    public let customHorizontalPadding: CGFloat?
+    
     @Namespace private var animationNamespace
     @State private var hoveredOption: String? = nil
     
@@ -69,13 +75,17 @@ public struct UMUISegmentedBar: View {
     ///   - size: Sizing mode (default is `.normal`).
     ///   - labelWidth: Minimum width of the label column; a longer label widens it rather than being truncated (default is `80`).
     ///   - mode: Display mode (default is `.auto`).
+    ///   - iconProvider: Optional closure returning an SF symbol name for an option.
+    ///   - horizontalPadding: Optional custom horizontal padding per segment.
     public init(
         label: String? = nil,
         options: [String],
         selection: Binding<String>,
         size: UMUISegmentedBarSize = .small,
         labelWidth: CGFloat = 80,
-        mode: UMUISegmentedBarMode = .auto
+        mode: UMUISegmentedBarMode = .auto,
+        iconProvider: ((String) -> String?)? = nil,
+        horizontalPadding: CGFloat? = nil
     ) {
         self.label = label
         self.options = options
@@ -83,6 +93,8 @@ public struct UMUISegmentedBar: View {
         self.size = size
         self.labelWidth = labelWidth
         self.mode = mode
+        self.iconProvider = iconProvider
+        self.customHorizontalPadding = horizontalPadding
     }
     
     private var optionFont: Font {
@@ -90,6 +102,9 @@ public struct UMUISegmentedBar: View {
     }
     
     private var horizontalPadding: CGFloat {
+        if let custom = customHorizontalPadding {
+            return custom
+        }
         return size == .normal ? 24 : 18
     }
     
@@ -154,13 +169,19 @@ public struct UMUISegmentedBar: View {
                         selection = option
                     }
                 } label: {
-                    Text(option)
-                        .font(optionFont)
-                        .lineLimit(1)
-                        .foregroundColor(selection == option ? Color.accentColor : Color.secondary)
-                        .padding(.horizontal, horizontalPadding)
-                        .padding(.vertical, verticalPadding)
-                        .frame(minWidth: size == .normal ? 55 : 45)
+                    HStack(spacing: 5) {
+                        if let iconName = iconProvider?(option) {
+                            Image(systemName: iconName)
+                                .font(.system(size: size == .normal ? 12 : 11))
+                        }
+                        Text(option)
+                            .font(optionFont)
+                            .lineLimit(1)
+                    }
+                    .foregroundColor(selection == option ? Color.accentColor : Color.secondary)
+                    .padding(.horizontal, horizontalPadding)
+                    .padding(.vertical, verticalPadding)
+                    .frame(minWidth: size == .normal ? 55 : 45)
                 }
                 .buttonStyle(.plain)
                 .contentShape(Rectangle())

@@ -8,6 +8,15 @@
 
 import SwiftUI
 
+/// Selection style for `UMUIListRow`.
+@available(macOS 11.0, *)
+public enum UMUIListRowSelectionStyle: Sendable, Equatable {
+    /// Solid accent background fill with contrasting white or black text.
+    case solid
+    /// Subtle accent tinted background fill with standard primary text.
+    case subtle
+}
+
 /// A selectable list row with hover feedback and an accent selection background.
 ///
 /// Usage:
@@ -23,15 +32,15 @@ import SwiftUI
 /// }
 /// ```
 @available(macOS 11.0, *)
-public struct UMUIListRow<Trailing: View>: View {
+public struct UMUIListRow<Leading: View, Trailing: View>: View {
     /// Row title.
     public let title: String
 
     /// Optional second line.
     public let subtitle: String?
 
-    /// Optional leading SF Symbol.
-    public let systemImage: String?
+    /// Selection styling (solid or subtle tint).
+    public let selectionStyle: UMUIListRowSelectionStyle
 
     /// Whether the row is the current selection.
     public let isSelected: Bool
@@ -39,25 +48,30 @@ public struct UMUIListRow<Trailing: View>: View {
     /// Called when the row is clicked.
     public let action: () -> Void
 
+    /// Leading accessory (app icon, SF Symbol, thumbnail…).
+    public let leading: Leading
+
     /// Trailing accessory (badge, detail text, status pill…).
     public let trailing: Trailing
 
     @State private var isHovered = false
 
-    /// Creates a row with a custom trailing accessory.
+    /// Creates a row with custom leading and trailing accessories.
     public init(
         title: String,
         subtitle: String? = nil,
-        systemImage: String? = nil,
+        selectionStyle: UMUIListRowSelectionStyle = .subtle,
         isSelected: Bool,
         action: @escaping () -> Void,
+        @ViewBuilder leading: () -> Leading,
         @ViewBuilder trailing: () -> Trailing
     ) {
         self.title = title
         self.subtitle = subtitle
-        self.systemImage = systemImage
+        self.selectionStyle = selectionStyle
         self.isSelected = isSelected
         self.action = action
+        self.leading = leading()
         self.trailing = trailing()
     }
 
@@ -69,18 +83,17 @@ public struct UMUIListRow<Trailing: View>: View {
     }
     
     private var selectedForeground: Color {
-        resolvedAccentColor.umContrastingTextColor(in: environment)
+        if selectionStyle == .subtle {
+            return .primary
+        }
+        return resolvedAccentColor.umContrastingTextColor(in: environment)
     }
 
     public var body: some View {
         Button(action: action) {
             HStack(spacing: 8) {
-                if let systemImage = systemImage {
-                    Image(systemName: systemImage)
-                        .font(.system(size: 12))
-                        .frame(width: 16)
-                        .foregroundColor(isSelected ? selectedForeground : resolvedAccentColor)
-                }
+                leading
+                    .foregroundColor(isSelected && selectionStyle == .solid ? selectedForeground : resolvedAccentColor)
 
                 VStack(alignment: .leading, spacing: 1) {
                     Text(title)
@@ -92,14 +105,14 @@ public struct UMUIListRow<Trailing: View>: View {
                         Text(subtitle)
                             .font(.system(size: 10))
                             .lineLimit(1)
-                            .foregroundColor(isSelected ? selectedForeground.opacity(0.8) : .secondary)
+                            .foregroundColor(isSelected && selectionStyle == .solid ? selectedForeground.opacity(0.8) : .secondary)
                     }
                 }
 
                 Spacer(minLength: 4)
 
                 trailing
-                    .foregroundColor(isSelected ? selectedForeground.opacity(0.9) : .secondary)
+                    .foregroundColor(isSelected && selectionStyle == .solid ? selectedForeground.opacity(0.9) : .secondary)
             }
             .padding(.horizontal, 8)
             .padding(.vertical, 5)
@@ -119,20 +132,55 @@ public struct UMUIListRow<Trailing: View>: View {
 
     private var backgroundColor: Color {
         if isSelected {
-            return resolvedAccentColor
+            return selectionStyle == .subtle ? resolvedAccentColor.opacity(0.15) : resolvedAccentColor
         }
         return isHovered ? Color.secondary.opacity(0.12) : Color.clear
     }
 }
 
 @available(macOS 11.0, *)
-public extension UMUIListRow where Trailing == UMUIListRowDetail {
+public extension UMUIListRow where Leading == AnyView {
+    /// Creates a row with a standard SF symbol leading icon and custom trailing accessory.
+    init(
+        title: String,
+        subtitle: String? = nil,
+        systemImage: String? = nil,
+        selectionStyle: UMUIListRowSelectionStyle = .solid,
+        isSelected: Bool,
+        action: @escaping () -> Void,
+        @ViewBuilder trailing: () -> Trailing
+    ) {
+        self.init(
+            title: title,
+            subtitle: subtitle,
+            selectionStyle: selectionStyle,
+            isSelected: isSelected,
+            action: action,
+            leading: {
+                if let systemImage = systemImage {
+                    return AnyView(
+                        Image(systemName: systemImage)
+                            .font(.system(size: 12))
+                            .frame(width: 16)
+                    )
+                } else {
+                    return AnyView(EmptyView())
+                }
+            },
+            trailing: trailing
+        )
+    }
+}
+
+@available(macOS 11.0, *)
+public extension UMUIListRow where Leading == AnyView, Trailing == UMUIListRowDetail {
     /// Creates a row with an optional trailing detail text.
     init(
         title: String,
         subtitle: String? = nil,
         systemImage: String? = nil,
         detail: String? = nil,
+        selectionStyle: UMUIListRowSelectionStyle = .solid,
         isSelected: Bool,
         action: @escaping () -> Void
     ) {
@@ -140,6 +188,7 @@ public extension UMUIListRow where Trailing == UMUIListRowDetail {
             title: title,
             subtitle: subtitle,
             systemImage: systemImage,
+            selectionStyle: selectionStyle,
             isSelected: isSelected,
             action: action
         ) {
