@@ -53,6 +53,9 @@ public struct UMUIFileDropArea: View {
     /// Whether a clear button appears while a URL is set.
     public let isClearable: Bool
 
+    /// Whether to render in compact height mode.
+    public let isCompact: Bool
+
     @State private var isTargeted = false
 
     /// Creates a file / folder drop area.
@@ -62,7 +65,8 @@ public struct UMUIFileDropArea: View {
         prompt: String = "Drop here or click to choose",
         title: String = "",
         icon: String? = nil,
-        isClearable: Bool = true
+        isClearable: Bool = true,
+        isCompact: Bool = false
     ) {
         self._url = url
         self.kind = kind
@@ -70,6 +74,7 @@ public struct UMUIFileDropArea: View {
         self.title = title
         self.icon = icon
         self.isClearable = isClearable
+        self.isCompact = isCompact
     }
 
     public var body: some View {
@@ -78,6 +83,7 @@ public struct UMUIFileDropArea: View {
                      icon: icon ?? defaultIcon,
                      isTargeted: isTargeted,
                      placeholder: prompt,
+                     isCompact: isCompact,
                      onSelect: choose)
             .overlay(alignment: .topTrailing) {
                 if isClearable && url != nil {

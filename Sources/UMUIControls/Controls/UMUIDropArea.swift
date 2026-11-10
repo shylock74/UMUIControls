@@ -37,6 +37,7 @@ public struct UMUIDropArea: View {
     public let icon: String
     public let isTargeted: Bool
     public var placeholder: String = "Drop items here"
+    public let isCompact: Bool
     public let onSelect: () -> Void
     
     @State private var isHovered = false
@@ -48,6 +49,7 @@ public struct UMUIDropArea: View {
         icon: String,
         isTargeted: Bool,
         placeholder: String = "Drop items here",
+        isCompact: Bool = false,
         onSelect: @escaping () -> Void
     ) {
         self.title = title
@@ -56,59 +58,80 @@ public struct UMUIDropArea: View {
         self.icon = icon
         self.isTargeted = isTargeted
         self.placeholder = placeholder
+        self.isCompact = isCompact
         self.onSelect = onSelect
     }
     
     public var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: 5) {
             // Label and Badge
             if !title.isEmpty || count != nil {
                 HStack(spacing: 4) {
                     Text(title)
-                        .font(.system(size: 9, weight: .black))
-                        .foregroundColor(.secondary)
+                        .font(.system(size: 10, weight: .semibold))
+                        .foregroundColor(.primary.opacity(0.85))
                     
                     if let count = count {
                         Text("\(count)")
                             .font(.system(size: 8, weight: .bold, design: .monospaced))
                             .padding(.horizontal, 4)
                             .padding(.vertical, 1)
-                            .background(Color.accentColor.opacity(0.1))
+                            .background(Color.accentColor.opacity(0.15))
                             .clipShape(RoundedRectangle(cornerRadius: 3))
                     }
                 }
             }
             
             // Main Interaction Area
-            VStack(spacing: 6) {
-                if !icon.isEmpty {
-                    Image(systemName: icon)
-                        .font(.title2)
-                        .foregroundColor(isTargeted ? Color.accentColor : .secondary)
+            Group {
+                if isCompact {
+                    HStack(spacing: 8) {
+                        if !icon.isEmpty {
+                            Image(systemName: icon)
+                                .font(.system(size: 14))
+                                .foregroundColor(isTargeted ? Color.accentColor : .primary.opacity(0.8))
+                        }
+                        
+                        Text(subtitle ?? placeholder)
+                            .font(.system(size: 10, weight: .medium))
+                            .lineLimit(1)
+                            .truncationMode(.middle)
+                            .foregroundColor(subtitle != nil ? Color.primary : Color.secondary)
+                    }
+                    .padding(.horizontal, 10)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 42)
+                } else {
+                    VStack(spacing: 6) {
+                        if !icon.isEmpty {
+                            Image(systemName: icon)
+                                .font(.title2)
+                                .foregroundColor(isTargeted ? Color.accentColor : .primary.opacity(0.8))
+                        }
+                        
+                        Text(subtitle ?? placeholder)
+                            .font(.system(size: 10, weight: .medium))
+                            .lineLimit(1)
+                            .truncationMode(.middle)
+                            .padding(.horizontal, 8)
+                            .foregroundColor(subtitle != nil ? Color.primary : Color.secondary)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 64)
                 }
-                
-                Text(subtitle ?? placeholder)
-                    .font(.system(size: 9, weight: .bold))
-                    .lineLimit(1)
-                    // The subtitle is usually a file name or path, whose start and extension both matter.
-                    .truncationMode(.middle)
-                    .padding(.horizontal, 8)
-                    .foregroundColor(subtitle != nil ? Color.primary : Color.secondary.opacity(0.5))
             }
-            .frame(maxWidth: .infinity)
-            .frame(height: 70)
             .background(
                 isTargeted ?
-                    Color.accentColor.opacity(0.12) :
-                    (isHovered ? Color.primary.opacity(0.06) : Color.primary.opacity(0.03))
+                    Color.accentColor.opacity(0.18) :
+                    (isHovered ? Color.primary.opacity(0.08) : Color.primary.opacity(0.04))
             )
-            .clipShape(RoundedRectangle(cornerRadius: 10))
+            .clipShape(RoundedRectangle(cornerRadius: 8))
             .overlay(
-                RoundedRectangle(cornerRadius: 10)
+                RoundedRectangle(cornerRadius: 8)
                     .strokeBorder(
-                        isTargeted ? Color.accentColor : Color.primary.opacity(0.1),
+                        isTargeted ? Color.accentColor : (isHovered ? Color.primary.opacity(0.42) : Color.primary.opacity(0.24)),
                         style: StrokeStyle(
-                            lineWidth: 1.5,
+                            lineWidth: 1.25,
                             dash: isTargeted ? [] : [4]
                         )
                     )
